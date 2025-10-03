@@ -5,4 +5,7 @@
 </head>
 <body>
     <h1>Hola mundo!</h1>
+    <div>
+        <textarea>Este párrafo es para añadir contenido</textarea>
+    </div>
 </body>
