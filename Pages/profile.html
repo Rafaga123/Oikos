@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="../Scripts/jquery-3.7.1.min.js"></script>
+    <script src="../Scripts/semantic.min.js"></script>
+    <link rel="stylesheet" type="text/CSS" href="../CSS/semantic.css">       
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"> 
+    <script src="../Scripts/scripts_profile.js"></script>
+    <link rel="stylesheet" href="../CSS/profile_css.css">
+
+    
+
+    </head>
+    
+    <body>
+    
+      <div class="ui top fixed stackable menu" style="background-color: #9A9CEA;">
+        <!-- Menú izquierdo -->
+        <div class="item">
+          <img src="../Images/casa.jpeg" alt="Logo">
+          <a class="item" style="color: white;">Volver al Inicio</a>
+        </div>
+    
+        <!-- Menú derecho -->
+        <div class="right menu">
+          <div class="ui dropdown item" style="color: white;">
+            Perfil <i class="dropdown icon"></i>
+            <div class="menu">
+              <a class="item">Pagar</a>
+              <a class="item">Cerrar sesión</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p></p>
+      <p></p>
+      <div style="background-color: #d3d3d3; min-height: 100vh; padding: 2em;">
+        <div class="ui stackable container">
+          <h1 class="ui header" style="margin-top: 2em;">Perfil usuario</h1>
+    
+          <div class="ui stackable grid">
+            <!-- Columna izquierda: tarjeta con imagen -->
+            <div class="eight wide column"><!--tamaño que abarcará la columna con la foto del usuario-->
+              <div class="ui special card">
+                <div class="blurring dimmable image">
+                  <div class="ui dimmer"><!--dimmer es lo del efecto de profundidad-->
+                    <div class="content">
+                      <div class="center">
+                        <div class="ui inverted button">Cambiar foto</div><!--Botón para cambiar la img del usuario-->
+                      </div>
+                    </div>
+                  </div>
+                  <img src="../Images/sof.jpg" alt="Foto de Sofia"><!--Ruta para la img del usuario-->
+                </div>
+                <div class="content" style="background-color: #A2B9EE;"><!--Sección de abajo de la foto del perfil del usuario-->
+                  <div class="header" style="color:white">Sofia Herrera</div>
+                  <div class="meta">
+                    <span class="date" style="color:white">Se unió en 2025.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+    
+            <!-- Columna derecha: información adicional -->
+            <div class="eight wide column"> <!--tamaño que abarcará la columna con la información adicional-->
+              <div class="ui raised segment" style="border-radius: 1em; background-color: #A2B9EE;">
+                <h3 class="ui header" style="color:white">Información del usuario</h3>
+                <div class="ui list">
+                  <div class="item"><!--Item para identificar el nombre -->
+                    <i class="edit icon"></i><!--icono de semantic-->
+                    <div class="content">
+                      <div class="header" style="color: white;">Nombre</div>
+                      <div class="description" style="color: white;">Sofia Herrera</div>
+                    </div>
+                  </div>
+                  <div class="item"><!--Item para identificar el email -->
+                    <i class="mail icon"></i><!--icono de semantic-->
+                    <div class="content">
+                      <div class="header" style="color: white;">Correo electrónico</div>
+                      <div class="description" style="color: white;">Sof@gmail.com</div>
+                    </div>
+                  </div>
+                  <div class="item"><!--Item para identificar la Cedula-->
+                    <i class="address card outline icon"></i><!--icono de semantic-->
+                    <div class="content">
+                      <div class="header" style="color:white;">Cédula</div>
+                      <div class="description" style="color: white;">31.754.635</div>
+                    </div>
+                    <div style="margin-top: 1em;"><!--div para el botón que dice modificar datos-->
+                      <button class="ui left floated inverted button" id="modificarBtn">Modificar datos</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+    
+            <!--Modal para que salga el menú de modificación de datos-->
+    
+            <div class="ui small modal" id="modalModificar">
+              <div class="header">Modificar datos del usuario</div>
+              <div class="content">
+                <form class="ui form">
+                  <div class="field">
+                    <label>Nombre</label>
+                    <input type="text" name="nombre" placeholder="Ej: Sofia Herrera">
+                  </div>
+                  <div class="field">
+                    <label>Correo electrónico</label>
+                    <input type="email" name="correo" placeholder="Ej: Sof@gmail.com">
+                  </div>
+                  <div class="field">
+                    <label>Cédula</label>
+                    <input type="text" name="fecha" placeholder="Ej: 13.234.598">
+                  </div>
+                </form>
+              </div>
+              <div class="actions">
+                <div class="ui approve button" id="guardarCambios" >Guardar</div>
+                <div class="ui cancel button" >Cancelar</div>
+              </div>
+            </div>
+            <!--Alerta de exito-->
+                <div class="alert success" id="alertSuccess" style="display: none;">
+                  <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                  <strong>Éxito:</strong> La información personal ha sido modificada correctamente.
+                </div>
+
+    </body>
+    
+    </html>
