@@ -1,0 +1,60 @@
+
+:root {
+    --color-primario: #9A9CEA;
+    --color-secundario: #A2B9EE;
+    --color-terciario: #A2DCEE;
+    --color-cuaternario: #ADEEE2;
+    --color-texto: #213547;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: #d3d3d3;
+    color: var(--color-texto);
+    margin: 0;
+    padding: 0;
+}
+
+.ui.menu {
+    background-color: var(--color-secundario);
+    border: none;
+}
+
+.ui.menu .item {
+    color: white;
+    font-weight: bold;
+}
+
+.ui.menu .item.activo {
+    border-bottom: 2px solid var(--color-terciario);
+}
+
+.ui.button {
+    background-color: var(--color-terciario);
+    color: white;
+    border-radius: 5px;
+}
+
+.ui.button:hover {
+    background-color: var(--color-cuaternario);
+}
+
+.ui.vertical.masthead {
+    background-color: var(--color-primario);
+    color: white;
+    padding: 50px 0;
+}
+
+.ui.vertical.footer {
+    background-color: var(--color-secundario);
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    bottom: 0;
+    width: 100%;
+    position: absolute;
+}
+
+.ui.two.column.grid{
+    background-color: lightgoldenrodyellow;
+}
