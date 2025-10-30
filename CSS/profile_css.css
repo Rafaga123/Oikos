@@ -1,8 +1,7 @@
- html, 
- body { /*Atributos del Fondo de la pagina*/
-     height: 100%;
-     margin: 0;
-      }
+html, 
+body { /*Atributos del Fondo de la pagina*/
+  margin: 0;
+}
 /*Atributos CSS de la alerta exitosa*/
 .alert {
   padding: 15px 20px;

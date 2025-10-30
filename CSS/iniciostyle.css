@@ -52,9 +52,12 @@ body {
     text-align: center;
     bottom: 0;
     width: 100%;
-    position: absolute;
 }
 
 .ui.two.column.grid{
     background-color: lightgoldenrodyellow;
+}
+
+.justificar{
+    text-align: justify;
 }
