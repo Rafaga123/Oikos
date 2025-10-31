@@ -1,0 +1,21 @@
+
+
+h2{
+    margin-top: 100px;
+    text-align: center;
+    color:#213547
+}
+
+h3{
+    text-align: center;
+    color: #9A9CEA
+}
+
+.ui.card{
+    background-color:#A2DCEE;
+}
+
+
+.ui.placeholder {
+    color: #ADEEE2;
+}
