@@ -19,3 +19,15 @@ h3{
 .ui.placeholder {
     color: #ADEEE2;
 }
+
+/* Necesario para que la tarjeta ocupe el 100% de la columna */
+.full-height-card {
+    height: 100%; 
+    display: flex; /* Convierte la tarjeta en un contenedor flexible */
+    flex-direction: column;
+}
+
+/* Permite que el contenido del cuerpo de la tarjeta se estire */
+.full-height-card .content {
+    flex-grow: 1; 
+}
