@@ -21,6 +21,10 @@ body {
     flex-direction: column;
 }
 
+.ui.menu {
+    padding: 5px;
+}
+
 .centered-form-container {
     flex: 1 0 auto;
     min-height: 80vh;

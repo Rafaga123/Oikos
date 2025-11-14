@@ -1,3 +1,4 @@
+/* Estilos personalizados para Acerca_nuestro, Misión y Visión */
 /* Header blanco igual que login/register */
 .ui.menu {
     background: white !important;
@@ -58,17 +59,26 @@ body {
     text-align: center;
     bottom: 0;
     width: 100%;
-    position: relative;
 }
 
-.column{
-    background-color: white;
+.contenedor-centro {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center !important;
+    margin-top: 40px;
+    margin-bottom: 40px;
 }
 
-.ui.two.column.grid{
-    background-color: white;
+.center{
+    text-align: center;
 }
 
-.justificar{
-    text-align: justify;
+.cards-creadores {
+    margin-top: 40px;
 }
+.image{
+    max-width: fit-content;
+}
+
+
