@@ -23,6 +23,13 @@ h3{
 .header {
     text-align: center;
 }
+.bars.icon {
+    color: white;
+    font-size: 24px;
+    margin-top: 25px;
+    margin-left: 15px;
+    cursor: pointer;
+}
 
 /* Necesario para que la tarjeta ocupe el 100% de la columna */
 .full-height-card {
