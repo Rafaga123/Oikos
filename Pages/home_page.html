@@ -3,24 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página de Inicio</title>
+    <title>Pagina Inicio</title>
     <script src="../Scripts/jquery-3.7.1.min.js"></script>
     <script src="../Scripts/semantic.min.js"></script>
+    <script src="../Scripts/script.js"></script>
     <link rel="stylesheet" type="text/CSS" href="../CSS/semantic.css">       
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
-    <link rel="stylesheet" type="text/CSS" href="../CSS/home_page.css">
+    <link rel="stylesheet" type="text/CSS" href="../CSS/style.css">
 </head>
 <body>
     <div class="ui top fixed stackable menu" style="background-color: #9A9CEA;">
         <!-- Menú izquierdo -->
-        <i class="bars icon">
-            <!--sidebar menu-->
-        </i>
-
+        <a class="item sidebar-toggle-btn">
+            <i class="large sidebar icon"></i>
+        </a>
         <!--Logo-->
         <div class="item">
-            <img src="img_sof/logo_neg.png" alt="Logo" style="height:32px; margin-right:8px;">
-            <a class="item" style="color: white;">Volver al Inicio</a>
+            <img src="img_sof/logo_neg.png" alt="Logo" style="height:32px; margin-left: 8px; margin-right:8px;">
         </div>
 
         <!-- Menú derecho -->
@@ -31,144 +30,166 @@
             </div>
         </div>
     </div>
-    <h2>Muro de Anuncios</h2>
-    <br><br><br><br>
-    <div class="ui container">
-        <!--MURO DE ANUNCIOS-->
-        <div class="ui placeholder">
-            <div class="image header">
-                <div class="line"></div>
-                <div class="line"></div>
-            </div>
-            <div class="paragraph">
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-            </div>
-        </div>
+
+    <div class="ui left vertical inverted sidebar labeled icon menu">
+        <a class="item sidebar-toggle-btn">
+            <br>
+            <i class="large arrow left icon"></i>
+            Cerrar menú
+            <br>
+        </a>
+        <a class="item">
+            <i class="user icon"></i>
+            Perfil
+        </a>
+        <a class="item">
+            <i class="book icon"></i>
+            Reglamento del Condominio
+        </a>
+        <a class="item">
+            <i class="clock icon"></i>
+            Horarios
+        </a>
+        <a class="item">
+            <i class="credit card icon"></i>
+            Cuentas para Pagos
+        </a>
     </div>
 
-    <br><br><br><br><br>
-    <!--Cajas de elección-->
-    <h3>Consulte información acerca de:</h3>
-
-    <div class="ui container">
-        <div class="ui stackable three column grid">
-            <!--PAGOS-->
-            <div class="column">
-                <a class="ui card full-height-card" href="http://www.dog.com">
-                        <div class="content">
-                            <div class="header">Pagos</div>
-                            <div class="meta">
-                                <br>
-                            <span class="category">Haga seguimiento de los pagos que ha realizado</span>
-                            </div>
-                            <div class="description">
-                            <p></p>
-                            </div>
-                        </div>
-                        <div class="extra content">
-                            <div class="right floated author">
-                            <img class="ui avatar image" src="./img_sof/Pagos.png">
-                            </div>
-                        </div>
-                </a>
-            </div>
-            <!--ENCUESTAS-->
-            <div class="column">
-                <a class="ui card full-height-card" href="http://www.dog.com">
-                        <div class="content">
-                            <div class="header">Encuestas</div>
-                            <div class="meta">
-                                <br>
-                            <span class="category">Forme parte de las decisiones de su localidad</span>
-                            </div>
-                            <div class="description">
-                            <p></p>
-                            </div>
-                        </div>
-                        <div class="extra content">
-                            <div class="right floated author">
-                            <img class="ui avatar image" src="./img_sof/Encuestas.png">
-                            </div>
-                        </div>
-                </a>
-            </div>
-
-            <!--FORO-->
-            <div class="column">
-                <a class="ui card full-height-card" href="http://www.dog.com">
-                        <div class="content">
-                            <div class="header">Foro</div>
-                            <div class="meta">
-                                <br>
-                            <span class="category">Enterese de las opiniones y sugerencias de sus vecinos</span>
-                            </div>
-                            <div class="description">
-                            <p></p>
-                            </div>
-                        </div>
-                        <div class="extra content">
-                            <div class="right floated author">
-                            <img class="ui avatar image" src="./img_sof/foro.png">
-                            </div>
-                        </div>
-                </a>
-            </div>
-
-            <!--ACTIVIDADES PAUTADAS-->
-            <div class="ui grid centered row">
-                <div class="column">
-                    <a class="ui card full-height-card" href="http://www.dog.com">
-                        <div class="content">
-                            <div class="header">Actividades Pautadas</div>
-                            <br>
-                            <div class="meta">
-                            <span class="category">Consulte las actividades pautadas</span>
-                            </div>
-                            <div class="description">
-                            <p></p>
-                            </div>
-                        </div>
-                        <div class="extra content">
-                            <div class="right floated author">
-                            <img class="ui avatar image" src="./img_sof/actividades.png">
-                            </div>
-                        </div>
-                    </a>
+    <div class="pusher">
+        <br><br><br>
+        <h2>Muro de Anuncios</h2>
+        <br><br><br><br>
+        <div class="ui container">
+            <!--MURO DE ANUNCIOS-->
+            <div class="ui placeholder">
+                <div class="image header">
+                    <div class="line"></div>
+                    <div class="line"></div>
                 </div>
-
-                <!--REPORTES-->
-                <div class="column">
-                    <a class="ui card full-height-card" href="http://www.dog.com">
-                        <div class="content">
-                            <div class="header">Reportes</div>
-                            <br>
-                            <div class="meta">
-                            <span class="category">Reporte algún problema que esté presentado usted o dentro de la comunidad</span>
-                            </div>
-                            <div class="description">
-                            <p></p>
-                            </div>
-                        </div>
-                        <div class="extra content">
-                            <div class="right floated author">
-                            <img class="ui avatar image" src="./img_sof/reportes.png">
-                            </div>
-                        </div>
-                    </a>
+                <div class="paragraph">
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
+                    <div class="line"></div>
                 </div>
             </div>
         </div>
+
+        <br><br><br><br><br>
+        <!--Cajas de elección-->
+        <h3>Consulte información acerca de:</h3>
+
+        <div class="ui container">
+            <div class="ui stackable three column grid">
+                <!--PAGOS-->
+                <div class="column">
+                    <a class="ui card full-height-card" href="https://youtu.be/j-RpvIuazmc?si=577HPueWEx2QYDl_">
+                            <div class="content">
+                                <div class="header">Pagos</div>
+                                <div class="meta">
+                                    <br>
+                                <span class="category">Haga seguimiento de los pagos que ha realizado</span>
+                                </div>
+                                <div class="description">
+                                <p></p>
+                                </div>
+                            </div>
+                            <div class="extra content">
+                                <div class="right floated author">
+                                <img class="ui avatar image" src="./img_sof/Pagos.png">
+                                </div>
+                            </div>
+                    </a>
+                </div>
+                <!--ENCUESTAS-->
+                <div class="column">
+                    <a class="ui card full-height-card" href="https://youtu.be/UNo0TG9LwwI?si=ZLFwAaSF7wmkirNF">
+                            <div class="content">
+                                <div class="header">Encuestas</div>
+                                <div class="meta">
+                                    <br>
+                                <span class="category">Forme parte de las decisiones de su localidad</span>
+                                </div>
+                                <div class="description">
+                                <p></p>
+                                </div>
+                            </div>
+                            <div class="extra content">
+                                <div class="right floated author">
+                                <img class="ui avatar image" src="./img_sof/Encuestas.png">
+                                </div>
+                            </div>
+                    </a>
+                </div>
+
+                <!--FORO-->
+                <div class="column">
+                    <a class="ui card full-height-card" href="https://youtu.be/Fc7-Oe0tj5k?si=_Vdu7DB3Pzi1bg0j">
+                            <div class="content">
+                                <div class="header">Foro</div>
+                                <div class="meta">
+                                    <br>
+                                <span class="category">Enterese de las opiniones y sugerencias de sus vecinos</span>
+                                </div>
+                                <div class="description">
+                                <p></p>
+                                </div>
+                            </div>
+                            <div class="extra content">
+                                <div class="right floated author">
+                                <img class="ui avatar image" src="./img_sof/foro.png">
+                                </div>
+                            </div>
+                    </a>
+                </div>
+
+                <!--ACTIVIDADES PAUTADAS-->
+                <div class="ui grid centered row">
+                    <div class="column">
+                        <a class="ui card full-height-card" href="https://youtu.be/tA48jeiyRaw?si=tHuunznHfKnR9eYr">
+                            <div class="content">
+                                <div class="header">Actividades Pautadas</div>
+                                <br>
+                                <div class="meta">
+                                <span class="category">Consulte las actividades pautadas</span>
+                                </div>
+                                <div class="description">
+                                <p></p>
+                                </div>
+                            </div>
+                            <div class="extra content">
+                                <div class="right floated author">
+                                <img class="ui avatar image" src="./img_sof/actividades.png">
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!--REPORTES-->
+                    <div class="column">
+                        <a class="ui card full-height-card" href="https://youtu.be/Dab4EENTW5I?si=r0_JsdL-_ABRHtxu">
+                            <div class="content">
+                                <div class="header">Reportes</div>
+                                <br>
+                                <div class="meta">
+                                <span class="category">Reporte algún problema que esté presentado usted o dentro de la comunidad</span>
+                                </div>
+                                <div class="description">
+                                <p></p>
+                                </div>
+                            </div>
+                            <div class="extra content">
+                                <div class="right floated author">
+                                <img class="ui avatar image" src="./img_sof/reportes.png">
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    
-
-
-
-
-
-
 </body>
 </html>
