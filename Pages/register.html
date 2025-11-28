@@ -27,60 +27,99 @@
     </header>
 
     <main class="centered-form-container">
-        <form id="register-form" class="ui form segment horizontal-register-form">
-            <h2 class="ui center aligned header" style="margin-bottom:1.5rem;">Crear cuenta</h2>
-            <div class="ui two column stackable grid">
-                <div class="column">
+
+        <div class="ui top attached progress" id="progress-bar">
+            <div class="bar"></div>
+        </div>
+
+        <form class="ui form attached fluid segment" id="register-form">
+            <h2 class="ui center aligned header" style="margin-bottom:1.5rem;">Registrarme</h2>
+            <!-- Paso 1: Nombre y Apellido -->
+            <div class="step" id="step-1">
+                <div class="two fields">
                     <div class="field">
-                        <label for="cedula">Cédula</label>
-                        <input type="text" id="cedula" name="cedula" placeholder="Cédula" required>
-                    </div>
-                    <div class="field">
-                        <label for="nombre1">Primer Nombre</label>
+                        <label>Primer Nombre</label>
                         <input type="text" id="nombre1" name="nombre1" placeholder="Primer Nombre" required>
                     </div>
                     <div class="field">
-                        <label for="nombre2">Segundo Nombre</label>
+                        <label>Segundo Nombre (Opcional)</label>
                         <input type="text" id="nombre2" name="nombre2" placeholder="Segundo Nombre">
                     </div>
+                </div>
+                <div class="two fields">
                     <div class="field">
-                        <label for="apellido1">Primer Apellido</label>
+                        <label>Primer Apellido</label>
                         <input type="text" id="apellido1" name="apellido1" placeholder="Primer Apellido" required>
                     </div>
                     <div class="field">
-                        <label for="apellido2" class="extended">Segundo Apellido (opcional)</label>
+                        <label>Segundo Apellido (Opcional)</label>
                         <input type="text" id="apellido2" name="apellido2" placeholder="Segundo Apellido">
                     </div>
-                    <div class="field">
-                        <label for="fecha_nacimiento">Fecha de nacimiento</label>
-                        <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
-                    </div>
                 </div>
-                <div class="column">
-                    <div class="field">
-                        <label for="email">Correo electrónico</label>
-                        <input type="email" id="email" name="email" placeholder="Correo electrónico" required>
-                    </div>
-                    <div class="field">
-                        <label for="password">Contraseña</label>
-                        <input type="password" id="password" name="password" placeholder="Contraseña" required>
-                    </div>
-                    <div class="field">
-                        <label for="confirmar">Confirmar contraseña</label>
-                        <input type="password" id="confirmar" name="confirmar" placeholder="Confirmar contraseña" required>
-                    </div>
-                    <div class="field">
-                        <label for="foto_perfil">Foto de perfil (opcional)</label>
-                        <input type="file" id="foto_perfil" name="foto_perfil" accept="image/*">
-                    </div>
-                    <button class="ui button primary fluid" type="submit" style="margin-top:2.5em;">Registrarme</button>
-                    <div id="error-message" class="ui red message" style="display: none;"></div> 
-                    <div class="form-links">
-                        ¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a>
-                    </div>
+                <div class="ui fluid button primary next-btn">Siguiente</div>
+            </div>
+
+            <!-- Paso 2: Cédula, Email, Fecha de Nacimiento -->
+            <div class="step" id="step-2" style="display: none;">
+                <div class="field">
+                    <label>Cédula</label>
+                    <input type="text" id="cedula" name="cedula" placeholder="Cédula" required>
+                </div>
+                <div class="field">
+                    <label>Correo Electrónico</label>
+                    <input type="email" id="email" name="email" placeholder="Correo Electrónico" required>
+                </div>
+                <div class="field">
+                    <label>Fecha de Nacimiento</label>
+                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                </div>
+                <div class="ui two buttons">
+                    <button class="ui button back-btn" type="button">Volver</button>
+                    <div class="or" data-text="o"></div>
+                    <button class="ui button primary next-btn" type="button">Siguiente</button>
                 </div>
             </div>
+
+            <!-- Paso 3: Contraseña -->
+            <div class="step" id="step-3" style="display: none;">
+                <div class="field">
+                    <label>Contraseña</label>
+                    <input type="password" id="password" name="password" placeholder="Contraseña" required>
+                </div>
+                <div class="field">
+                    <label>Confirmar Contraseña</label>
+                    <input type="password" id="confirmar" name="confirmar" placeholder="Confirmar Contraseña" required>
+                </div>
+                <div class="ui two buttons">
+                    <button class="ui button back-btn" type="button">Volver</button>
+                    <div class="or" data-text="o"></div>
+                    <button class="ui large teal submit button" type="submit">Registrarse</button>
+                </div>
+            </div>
+
+            <!-- Mensaje de Error -->
+            <div class="ui error message" id="error-message"></div>
+
         </form>
+
+        <!-- Paso 4: Opciones de Comunidad (Oculto inicialmente) -->
+        <div class="ui attached fluid segment" id="community-step" style="display: none;">
+            <div class="header">
+                ¡Registro Exitoso!
+            </div>
+            <p>Ahora puede crear una nueva comunidad o unirse a una existente.</p>
+            <div class="ui two buttons">
+                <button class="ui green button" id="create-community-btn">Crear una Comunidad</button>
+                <div class="or" data-text="o"></div>
+                <button class="ui blue button" id="join-community-btn">Unirse a una Comunidad</button>
+            </div>
+        </div>
+        <br><br>
+    </main>
+    <main class="container">
+        <div class="ui message" style="text-align: center;">
+            ¿Ya tienes una cuenta? <a href="login.html">Inicia Sesión</a>
+        </div>
     </main>
 
     <footer class="ui inverted vertical footer segment">
