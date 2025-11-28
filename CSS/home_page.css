@@ -1,0 +1,109 @@
+h2{
+    text-align: center;
+    color:#213547
+}
+
+h3{
+    text-align: center;
+    color: #9A9CEA
+}
+
+.ui.card{
+    background-color:#ADEEE2;
+}
+
+
+.ui.placeholder {
+    color: #ADEEE2;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.header {
+    text-align: center;
+}
+
+.pusher {
+    margin-left: 0px;
+    transition: margin-left 0.3s ease;
+}
+
+.sidebar-menu {
+    width: 260px;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.main-content {
+    padding: 70px;
+}
+
+
+.ui.left.vertical.inverted.sidebar.labeled.icon.menu{
+    background-color: #9A9CEA;
+}
+
+.ui.card.link-card {
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+        
+.ui.card.link-card:hover { /*sombra de las linkcards*/
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+        
+.card-icon {
+    font-size: 2.5em;
+    margin-bottom: 15px;
+    color: #2185d0;
+}
+
+
+.large.sidebar.icon {
+    color: white;
+    margin-top: 25px;
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+.large.arrow.left.icon {
+    color: white;
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+/*Para que la tarjeta ocupe el 100% de la columna */
+.full-height-card {
+    height: 100%; 
+    display: flex; /*Convierte la tarjeta en un contenedor flexible */
+    flex-direction: column;
+}
+
+/*Permite que el contenido del cuerpo de la tarjeta se estire */
+.full-height-card .content {
+    flex-grow: 1; 
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .pusher {
+        margin-left: 0;
+    }
+            
+    .sidebar-menu {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+            
+    .sidebar-menu.visible {
+        transform: translateX(0);
+    }
+            
+    .cards-container {
+        grid-template-columns: 1fr;
+    }
+}
