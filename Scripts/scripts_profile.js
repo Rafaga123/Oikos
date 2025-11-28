@@ -26,6 +26,17 @@ $('#guardarCambios').on('click', function() {
   }, 500);
 });
 
+function previewImage(event) { /* funcion para el cambio de img del perfil */
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const imgElement = document.querySelector('.blurring.dimmable.image img');
+        imgElement.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
 
 
 });

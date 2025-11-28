@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagar</title>
+     <script src="../Scripts/jquery-3.7.1.min.js"></script>
+    <script src="../Scripts/semantic.min.js"></script>
+    <link rel="stylesheet" type="text/CSS" href="../CSS/semantic.css">       
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"> 
+    <script src="../Scripts/scripts_pagar.js"></script>
+    <link rel="stylesheet" href="../CSS/pagar.css">
+
+
+
+</head>
+<body>
+
+    <!-- Menú superior fijo -->
+<div class="ui top fixed stackable menu" style="background-color: #9A9CEA;">
+  <!-- Menú izquierdo -->
+  <div class="item">
+    <img src="../Images/logopng.png" alt="Logo" style="height:32px; margin-right:8px;">
+    <a class="item" style="color: white;">Volver al Inicio</a>
+  </div>
+
+  <!-- Menú derecho -->
+  <div class="right menu">
+    <a class="item" href="../Pages/profile.html" style="color: white;">Perfil</a>
+  </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+    <div class="container">
+    <h2>Reportar pago</h2>
+
+    <!-- Métodos de pago -->
+    <div class="payment-methods" role="tablist" aria-label="Métodos de pago">
+      <button class="pm-btn" data-method="local" type="button">Transferencia bancaria</button>
+      <button class="pm-btn active" data-method="mobile" type="button">Pago móvil</button>
+    </div>
+
+    <!-- Formulario -->
+    <div class="payment-grid">
+      <div class="left-col">
+        <label for="bancoDestino">Selecciona el banco al cual transferirás</label>
+        <select id="bancoDestino" aria-labelledby="bancoDestino">
+          <option value="">Selecciona...</option>
+          <option value="bco1">Banesco</option>
+          <option value="bco2">Banco de Venezuela</option>
+          <option value="bco3">Banco Provincial</option>
+        </select>
+
+        <label for="bancoEmisor">Banco emisor</label>
+        <select id="bancoEmisor" aria-labelledby="bancoEmisor">
+          <option value="">Selecciona...</option>
+          <option value="emis1">Banesco</option>
+          <option value="emis2">Banco de venezuela</option>
+          <option value="emis3">Banco provincial</option>
+        </select>
+
+        <label for="codigoRef">Numero de referencia</label>
+        <input type="text" id="codigoRef" placeholder="Ej: 0004783758">
+
+        <div class="two-cols">
+          <div>
+            <label for="monto">Monto transferido en bolívares</label>
+            <input type="number" id="monto" step="1" value="0" min="0">
+          </div>
+          <div>
+            <label for="fechaPago">Fecha del pago</label>
+            <input type="date" id="fechaPago">
+          </div>
+        </div>
+      </div>
+
+      <div class="right-col">
+        <div class="bank-card" id="bankPreview">
+          <div class="bank-icon">🏦</div>
+          <div class="bank-text">Aún no has seleccionado un banco</div>
+        </div>
+
+        <div class="voucher-card">
+          <h4 style="margin:0 0 8px;">Comprobante de pago</h4>
+          <p style="margin:0 0 8px; color:#24324a; font-size:13px;">Adjunta captura o PDF (JPG, PNG, PDF)</p>
+          <input type="file" id="voucherFile" accept=".jpg,.jpeg,.png,.pdf">
+          <div id="voucherName" class="voucher-name"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions-row">
+     <a id="btnBack" href="../Pages/profile.html" class="btn ghost" type="button">Regresar</a>
+      <button id="btnSubmit" class="btn primary" type="button">Enviar</button>
+    </div>
+  </div>
+
+  <!-- Alerta global (oculta por defecto) -->
+  <div class="alert success" id="alertSuccess" role="status" aria-live="polite">
+    <span class="closebtn" onclick="this.parentElement.style.display='none'">&times;</span>
+    <strong>Éxito:</strong> La información de pago se envió correctamente.
+  </div>
+
+
+
+
+</form>
+
+</body>
+</html>
