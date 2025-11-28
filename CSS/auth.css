@@ -21,6 +21,10 @@ body {
     flex-direction: column;
 }
 
+.ui.menu {
+    padding: 5px;
+}
+
 .centered-form-container {
     flex: 1 0 auto;
     min-height: 80vh;
@@ -137,4 +141,33 @@ body {
     text-align: center;
     width: 100%;
     flex-shrink: 0;
+}
+
+/* Estilos para el nuevo contenedor del formulario con borde de progreso */
+.progress-border-container {
+    position: relative;
+    padding: 2px; /* Espacio para el borde */
+    width: 100%;
+    max-width: 800px; /* Ajusta según tu diseño */
+    margin: 1em auto;
+}
+
+.progress-border-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 2px; /* Grosor del borde */
+    background-color: #21ba45; /* Color verde de Semantic UI */
+    transition: width 0.5s ease;
+}
+
+.progress-border-container[data-step="1"]::before { width: 33%; }
+.progress-border-container[data-step="2"]::before { width: 66%; }
+.progress-border-container[data-step="3"]::before { width: 100%; }
+.progress-border-container[data-step="4"]::before { width: 100%; } /* Completado */
+
+.progress-border-container .ui.form {
+    margin: 0;
 }

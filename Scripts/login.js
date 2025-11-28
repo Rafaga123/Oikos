@@ -51,11 +51,11 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('¡Bienvenido!');
         localStorage.setItem('token', data.token);
         localStorage.setItem('usuario', JSON.stringify(data.usuario));
-        window.location.href = 'profile.html'; // Redirige al perfil
+        window.location.href = 'home_page.html'; // Redirige al perfil
       } else {
         // Muestra error del backend
         loginErrorMessage.textContent = data.error;
-        loginErrorMessage.style.display = 'block';
+        loginErrorMessage.style.display = 'block';  
       }
     } catch (error) {
       console.error('Error de conexión:', error);

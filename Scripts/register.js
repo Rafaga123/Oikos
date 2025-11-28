@@ -1,50 +1,112 @@
-// Espera a que todo el HTML esté cargado
 document.addEventListener('DOMContentLoaded', () => {
+  // Inicializar la barra de progreso de Semantic UI
+  $('#progress-bar').progress({
+    total: 3,
+    text: {
+      active: 'Paso {value} de {total}',
+    }
+  });
 
-  // 1. Encuentra el formulario y el div de error
   const registerForm = document.getElementById('register-form');
   const errorMessage = document.getElementById('error-message');
+  const communityStep = document.getElementById('community-step');
+  
+  const steps = Array.from(document.querySelectorAll('.step'));
+  const nextButtons = Array.from(document.querySelectorAll('.next-btn'));
+  const backButtons = Array.from(document.querySelectorAll('.back-btn'));
+  
+  let currentStep = 1;
 
-  // 2. Escucha el evento "submit" del formulario
+  // Manejar botones "Siguiente"
+  nextButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      // Ocultar errores
+      errorMessage.style.display = 'none';
+      errorMessage.textContent = '';
+
+      // Validar campos del paso actual (simple validación de no estar vacíos)
+      const currentStepElement = document.getElementById(`step-${currentStep}`);
+      const inputs = Array.from(currentStepElement.querySelectorAll('input[required]'));
+      
+      let isValid = true;
+      inputs.forEach(input => {
+        if (!input.value.trim()) {
+          isValid = false;
+          input.parentElement.classList.add('error'); // Semantic UI resalta el campo
+        } else {
+          input.parentElement.classList.remove('error');
+        }
+      });
+
+      if (!isValid) {
+        errorMessage.textContent = 'Por favor, complete todos los campos requeridos.';
+        errorMessage.style.display = 'block';
+        return;
+      }
+
+      // Ocultar paso actual y mostrar el siguiente
+      if (currentStep < steps.length) {
+        currentStepElement.style.display = 'none';
+        currentStep++;
+        document.getElementById(`step-${currentStep}`).style.display = 'block';
+        
+        // Actualizar barra de progreso
+        $('#progress-bar').progress('increment');
+      }
+    });
+  });
+
+  // Manejar botones "Volver"
+  backButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        if (currentStep > 1) {
+            // Ocultar errores
+            errorMessage.style.display = 'none';
+            errorMessage.textContent = '';
+
+            // Ocultar paso actual y mostrar el anterior
+            document.getElementById(`step-${currentStep}`).style.display = 'none';
+            currentStep--;
+            document.getElementById(`step-${currentStep}`).style.display = 'block';
+
+            // Decrementar barra de progreso
+            $('#progress-bar').progress('decrement');
+        }
+    });
+  });
+
+  // Manejar el envío final del formulario
   registerForm.addEventListener('submit', async (e) => {
-    // 3. Previene que el formulario se envíe de la forma tradicional
     e.preventDefault();
     
-    // Oculta/Limpia errores anteriores
     errorMessage.style.display = 'none';
     errorMessage.textContent = '';
 
-    // 4. Obtiene los valores de todos los inputs (Usando TUS IDs)
-    const cedula = document.getElementById('cedula').value;
-    const email = document.getElementById('email').value;
-    const primer_nombre_val = document.getElementById('nombre1').value; // <--- Corregido
-    const segundo_nombre_val = document.getElementById('nombre2').value; // <--- Corregido
-    const primer_apellido_val = document.getElementById('apellido1').value; // <--- Corregido
-    const segundo_apellido_val = document.getElementById('apellido2').value; // <--- Corregido
-    const fecha_nacimiento = document.getElementById('fecha_nacimiento').value;
     const password = document.getElementById('password').value;
-    const confirmar_password = document.getElementById('confirmar').value; // <--- Corregido
+    const confirmar_password = document.getElementById('confirmar').value;
 
-    // 5. Validación en el Frontend
     if (password !== confirmar_password) {
       errorMessage.textContent = 'Las contraseñas no coinciden';
-      errorMessage.style.display = 'block'; // Muestra el error
-      return; // Detiene la ejecución
+      errorMessage.style.display = 'block';
+      return;
     }
 
-    // 6. Crea el objeto (body) que enviaremos a la API (Usando las llaves del BACKEND)
-    const body = {
-      cedula: cedula,
-      email: email,
-      password: password,
-      primer_nombre: primer_nombre_val,     // <-- Traducido
-      segundo_nombre: segundo_nombre_val,   // <-- Traducido
-      primer_apellido: primer_apellido_val, // <-- Traducido
-      segundo_apellido: segundo_apellido_val, // <-- Traducido
-      fecha_nacimiento: fecha_nacimiento
-    };
+    // Recolectar todos los datos del formulario
+    const formData = new FormData(registerForm);
+    const body = Object.fromEntries(formData.entries());
 
-    // 7. Usa fetch para enviar la petición a tu API
+    // Renombrar claves para que coincidan con el backend
+    body.primer_nombre = body.nombre1;
+    body.segundo_nombre = body.nombre2;
+    body.primer_apellido = body.apellido1;
+    body.segundo_apellido = body.apellido2;
+    delete body.nombre1;
+    delete body.nombre2;
+    delete body.apellido1;
+    delete body.apellido2;
+    delete body.confirmar;
+
+
     try {
       const response = await fetch('http://localhost:3000/api/registro', {
         method: 'POST',
@@ -57,20 +119,37 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await response.json();
 
       if (response.ok) {
-        // ¡Éxito!
-        alert('¡Registro exitoso! Serás redirigido a la página de inicio de sesión.');
-        window.location.href = 'login.html'; 
+        // Ocultar el formulario y la barra de progreso
+        registerForm.style.display = 'none';
+        document.getElementById('progress-bar').style.display = 'none';
+        document.querySelector('.ui.attached.message').style.display = 'none';
+        
+        // Mostrar el paso de la comunidad
+        communityStep.style.display = 'block';
+        
+        // Actualizar barra de progreso a completado
+        $('#progress-bar').progress('set success');
+
       } else {
-        // Muestra el error que vino del backend
-        errorMessage.textContent = data.error; // Ej: "Este correo electrónico ya está registrado"
-        errorMessage.style.display = 'block'; // Muestra el error
+        errorMessage.textContent = data.error || 'Ocurrió un error en el registro.';
+        errorMessage.style.display = 'block';
       }
 
     } catch (error) {
-      // Error de red (ej: el servidor está caído)
       console.error('Error de conexión:', error);
       errorMessage.textContent = 'No se pudo conectar con el servidor. Intenta más tarde.';
-      errorMessage.style.display = 'block'; // Muestra el error
+      errorMessage.style.display = 'block';
     }
+  });
+
+  // Lógica para los botones de comunidad (puedes expandir esto)
+  document.getElementById('create-community-btn').addEventListener('click', () => {
+    alert('Funcionalidad "Crear Comunidad" no implementada aún.');
+    // window.location.href = 'crear_comunidad.html'; // Ejemplo
+  });
+
+  document.getElementById('join-community-btn').addEventListener('click', () => {
+    alert('Funcionalidad "Unirse a Comunidad" no implementada aún.');
+    // window.location.href = 'unirse_comunidad.html'; // Ejemplo
   });
 });
