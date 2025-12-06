@@ -67,6 +67,19 @@ h3{
     background-color: #9A9CEA;
 }
 
+.large.sidebar.icon {
+    color: white;
+    margin-top: 25px;
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+.large.arrow.left.icon {
+    color: white;
+    margin-left: 15px;
+    cursor: pointer;
+}
+
 .ui.card.link-card {
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -81,20 +94,6 @@ h3{
     font-size: 2.5em;
     margin-bottom: 15px;
     color: #2185d0;
-}
-
-
-.large.sidebar.icon {
-    color: white;
-    margin-top: 25px;
-    margin-left: 15px;
-    cursor: pointer;
-}
-
-.large.arrow.left.icon {
-    color: white;
-    margin-left: 15px;
-    cursor: pointer;
 }
 
 /*Para que la tarjeta ocupe el 100% de la columna */

@@ -1,0 +1,92 @@
+body{
+    background-image: url('../Images/Fondopagina.png');
+    background-size: cover; /* cubre toda la pantalla */
+    background-position: center center; /* centra la imagen */
+    background-repeat: no-repeat; /* no se repite */
+    background-attachment: fixed; /* queda fija al hacer scroll */
+    background-color: #f0f0f0; /* color de respaldo por si la imagen no carga */
+}
+
+h1{
+    padding-top: 100px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 3rem;
+    color:#213547
+}
+
+.pusher {
+    margin-left: 0px;
+    transition: margin-left 0.3s ease;
+}
+
+.sidebar-menu {
+    width: 260px;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.main-content {
+    padding: 70px;
+}
+
+
+.pusher {
+    margin-left: 0px;
+    transition: margin-left 0.3s ease;
+}
+
+.sidebar-menu {
+    width: 260px;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.main-content {
+    padding: 70px;
+}
+
+
+.ui.left.vertical.inverted.sidebar.labeled.icon.menu{
+    background-color: #9A9CEA;
+}
+
+.large.sidebar.icon {
+    color: white;
+    margin-top: 25px;
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+.large.arrow.left.icon {
+    color: white;
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+/* Estilos para las tarjetas de encuesta */
+.ui.cards > .card,
+.ui.card {
+    display: flex; /* Convierte la tarjeta en un contenedor flex */
+    flex-direction: column; /* Coloca los elementos hijos verticalmente */
+}
+
+.ui.cards > .card > .content {
+    flex-grow: 1; /* Permite que el contenido se estire para ocupar el espacio disponible */
+}
+
+/* Efecto pop-up*/
+.ui.cards > .card:hover {
+    /* Aumenta la sombra para simular elevación (efecto pop-up) */
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+    /* Ligeramente más grande y elevado (Opcional, pero genial para pop-up) */
+    transform: translateY(-5px); 
+    /* El puntero cambia a mano para indicar que es interactivo */
+    cursor: pointer;
+}

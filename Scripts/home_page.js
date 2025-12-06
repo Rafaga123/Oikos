@@ -26,6 +26,7 @@ function initSidebar() {
     });
 }
 
+//CARUSEL DE ANUNCIOS
 function initAnnouncementCarousel() {
     const slides = document.querySelectorAll('.carousel-slide');
     const prevBtn = document.querySelector('.prev-btn');
