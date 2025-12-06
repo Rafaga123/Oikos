@@ -6,15 +6,10 @@
     <title>Pagina Inicio</title>
     <script src="../Scripts/jquery-3.7.1.min.js"></script>
     <script src="../Scripts/semantic.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script> <!-- Slick Carousel JS para el muro de anuncios -->
     <script src="../Scripts/home_page.js"></script>
     <link rel="stylesheet" type="text/CSS" href="../CSS/semantic.css">       
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
     <link rel="stylesheet" type="text/CSS" href="../CSS/home_page.css">
-
-    <!-- Slick Carousel CSS para el muro de anuncios -->
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css"/>
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css"/>
 </head>
 <body>
     <div class="ui top fixed stackable menu" style="background-color: #9A9CEA;">
@@ -63,86 +58,52 @@
 
     <div class="pusher">
         <br><br><br>
-        <h2 class="ui center aligned header">Muro de Anuncios</h2>
+        <h2 class="carousel-header">Muro de Anuncios</h2>
         <br>
-        <div class="announcement-carousel-container">
-            <!--SLIDE-->
-            <div class="announcement-slide">
-                <div class="ui fluid card announcement-card">
-                    <div class="content">
-                        <div class="header">Anuncio Reciente</div>
-                        <div class="meta">
-                            <span class="date">Fecha: 08/12/2025</span>
-                        </div>
-                        <div class="description">
-                            <div class="ui placeholder">
-                                <div class="image header">
-                                    <div class="line"></div>
-                                    <div class="line"></div>
-                                </div>
-                                <div class="paragraph">
-                                    <div class="line"></div>
-                                    <div class="line"></div>
-                                    <div class="line"></div>
-                                </div>
-                            </div>
-                        </div>
+        <!--Muro de anuncios-->
+        <div class="announcement-caroulsel">
+            <div class="carousel-nav">
+                <button class="carousel-btn prev-btn">
+                    <i class="chevron left icon"></i>
+                </button>
+                <button class="carousel-btn next-btn">
+                    <i class="chevron right icon"></i>
+                </button>
+            </div>
+            <div class="carousel-container">
+                <!--Aquí irían los anuncios dinámicos desde la base de datos-->
+                <!--placeholders de ejemplo-->
+
+                <!-- Anuncio 1 -->
+                <div class="carousel-slide active">
+                    <h3 class="announcement-title">Mantenimiento de áreas comunes</h3>
+                    <div class="announcement-date">Publicado: 01 de Diciembre, 2025</div>
+                    <div class="announcement-content">
+                        <p>Estimados residentes, les informamos que el próximo lunes 8 de diciembre se realizará mantenimiento de las áreas verdes y limpieza profunda de la piscina. Agradecemos su comprensión.</p>
                     </div>
-                        <div class="extra content">
-                            <span class="left floated"><i class="thumbs up outline icon"></i></span>
-                            <span class="right floated"><i class="comment outline icon"></i></span>
-                        </div>
+                </div>
+
+                <!-- Anuncio 2 -->
+                <div class="carousel-slide">
+                    <h3 class="announcement-title">Reunión de Condominio</h3>
+                    <div class="announcement-date">Publicado: 30 de noviembre, 2025</div>
+                    <div class="announcement-content">
+                        <p>Convocamos a todos los residentes a la reunión ordinaria que se llevará a cabo el próximo sábado 6 de diciembre a las 10:00 AM en el salón comunal.</p>
+                        <p>Temas a tratar: Presupuesto 2026, mejoras en seguridad, y actividades navideñas.</p>                        
+                    </div>
+                </div>
+
+                <!-- Anuncio 3 -->
+                <div class="carousel-slide">
+                    <h3 class="announcement-title">Nuevo sistema de vigilancia</h3>
+                    <div class="announcement-date">Publicado: 28 de Noviembre, 2025</div>
+                    <div class="announcement-content">
+                        <p>Se han instalado nuevas cámaras de seguridad en los accesos principales y áreas comunes. El sistema estará operativo a partir del 5 de diciembre.</p>
                     </div>
                 </div>
             </div>
-            <!--SLIDE-->
-            <div class="announcement-slide">
-                <div class="ui fluid card announcement-card">
-                    <div class="content">
-                        <div class="header">Anuncio Antiguo 2</div>
-                        <div class="meta"><span class="date">Fecha: 05/12/2025</span></div>
-                        <div class="description">
-                            <div class="ui placeholder">
-                                <div class="image header">
-                                    <div class="line"></div>
-                                </div>
-                                <div class="paragraph">
-                                    <div class="line"></div>
-                                    <div class="line"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="extra content">
-                        <span class="left floated"><i class="thumbs up outline icon"></i> 80</span>
-                        <span class="right floated"><i class="comment outline icon"></i> 10</span>
-                    </div>
-                </div>
-            </div>
-            <div class="announcement-slide">
-                <div class="ui fluid card announcement-card">
-                    <div class="content">
-                        <div class="header">Anuncio Anterior 3</div>
-                        <div class="meta"><span class="date">Fecha: 01/12/2025</span></div>
-                        <div class="description">
-                            <div class="ui placeholder">
-                                <div class="image header">
-                                    <div class="line"></div>
-                                </div>
-                                <div class="paragraph">
-                                    <div class="line"></div>
-                                    <div class="line"></div>
-                                    <div class="line"></div>
-                                    <div class="line"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="extra content">
-                        <span class="left floated"><i class="thumbs up outline icon"></i> 65</span>
-                        <span class="right floated"><i class="comment outline icon"></i> 4</span>
-                    </div>
-                </div>
+            <div class="carousel-indicators">
+                <!--Los indicadores se generarán dinámicamente con JS-->
             </div>
         </div>
 
