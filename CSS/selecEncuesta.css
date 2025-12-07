@@ -135,20 +135,19 @@ h3{
 
 /* Aplicamos todos los efectos a la clase principal del botón */
 .ui.huge.primary.button {
-    /* Base: Sombra sutil y Transición suave */
     background-color: #9A9CEA;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
     transition: all 0.2s ease-in-out;
 }
 
-/* Efecto Hover (Elevación) */
+/*Levatamiento al colocar el cursor*/
 .ui.huge.primary.button:hover {
     background-color: #7b7fd6;
     box-shadow: 0 8px 12px rgba(0, 0, 0, 0.25); 
     transform: translateY(-2px); 
 }
 
-/* Efecto Active (Hundimiento/Presionado) */
+/*Presionado*/
 .ui.huge.primary.button:active {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); 
     transform: translateY(1px); 
