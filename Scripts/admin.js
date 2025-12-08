@@ -25,14 +25,7 @@ $(document).ready(function() {
     }
 });
             
-            // Para pantallas grandes, mostrar sidebar como fijo
-            if ($(window).width() > 768) {
-                $('.ui.sidebar').addClass('visible');
-                $('.ui.sidebar').sidebar({
-                    context: $('.pusher'),
-                    transition: 'overlay'
-                });
-            }
+           
 
 // Animaciones para los gráficos
     $(document).ready(function() {

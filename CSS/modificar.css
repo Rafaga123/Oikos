@@ -1,11 +1,6 @@
 body {
     background-image: url(/Images/Fondopagina.png);
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    min-height: 100vh;
-    overflow-x: hidden;
+   
 }
 
 .sidebar-menu .item {
@@ -49,16 +44,23 @@ body {
     transform: translateX(0);
 }
 
-/* ===== MAIN CONTENT ===== */
+/* Contenido Principal */
 .main-content {
-    padding: 100px 200px 50px 30px;
+    background-image: url(/Images/Fondopagina.png);
+    background-size:auto;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    padding: 100px 10px 50px 30px;
     min-height: 100vh;
     transition: padding-left 0.3s ease;
+    
 }
 
-/* ===== ESTILOS RESPONSIVE ===== */
+/* Estilos Responsive */
 
-/* MOBILE (≤ 768px) */
+/* para telefonos moviles (≤ 768px) */
 @media (max-width: 768px) {
     .ui.sidebar {
         transform: translateX(-100%) !important;
@@ -91,7 +93,7 @@ body {
     }
 }
 
-/* DESKTOP (> 768px) */
+/* para escritorios (> 768px) */
 @media (min-width: 769px) {
     .ui.sidebar {
         position: fixed !important;
@@ -99,19 +101,19 @@ body {
         box-shadow: 2px 0 10px rgba(0,0,0,0.1);
     }
     
-    /* Sin overlay en desktop */
+    /* Sin overlay en escritorio */
     .pusher.dimmed::before {
         display: none;
     }
     
-    /* Sidebar visible por defecto en desktop */
+    /* Sidebar visible por defecto en escritorio */
     .ui.sidebar {
         display: block !important;
         visibility: visible !important;
     }
     
     .pusher {
-        padding-left: 260px !important;
+        padding-left: 0px !important;
     }
     
     .pusher.with-sidebar {
@@ -119,7 +121,7 @@ body {
     }
 }
 
-/* ===== ESTILOS DEL SIDEBAR MENU ===== */
+/* Estilos del menu sidebar */
 .sidebar-menu .item {
     font-size: 1.15em !important;
     padding-top: 18px !important;
@@ -147,7 +149,7 @@ body {
     height: auto;
 }
 
-/* ===== ESTILOS DE LA PÁGINA DE REGLAS ===== */
+/* ESTILOS DE LA PÁGINA DE REGLAS */
 .page-header {
     display: flex;
     justify-content: space-between;
@@ -158,7 +160,7 @@ body {
 }
 
 .rules-container {
-    background: white;
+    background-color: #e0e0e0;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     padding: 30px;

@@ -71,7 +71,7 @@
 
             //fijar sidebar
             if ($(window).width() > 768) {
-                $('.ui.sidebar').addClass('visible');
+                $('.ui.sidebar').addClass('hide');
                 $('.ui.sidebar').sidebar({
                     context: $('.pusher'),
                     transition: 'overlay'

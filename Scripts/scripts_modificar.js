@@ -26,7 +26,7 @@ $(document).ready(function() {
         if ($(window).width() > 768) {
             // En desktop, mostrar sidebar siempre
             $('.ui.sidebar').sidebar('hide');
-            $('.ui.sidebar').addClass('visible');
+            $('.ui.sidebar').addClass('hide');
             $('.pusher').addClass('desktop-sidebar-visible');
         } else {
             // En mobile, ocultar sidebar
@@ -59,9 +59,6 @@ $(document).ready(function() {
         }
     });
     
-    // ... EL RESTO DE TU CÓDIGO DE REGLAS SE MANTIENE IGUAL ...
-    // [Todo el código de manejo de reglas permanece igual]
-    
     // Datos de ejemplo (simulando base de datos)
     let reglas = [
         {
@@ -82,7 +79,6 @@ $(document).ready(function() {
         }
     ];
     
-    // ... resto del código de manejo de reglas ...
 });
 
 // Datos de ejemplo (simulando base de datos)
