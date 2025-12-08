@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
     alertEl.innerHTML = `<span class="closebtn" onclick="this.parentElement.style.display='none'">&times;</span>
       <strong>${tipo.charAt(0).toUpperCase() + tipo.slice(1)}:</strong> ${mensaje}`;
     alertEl.style.display = 'block';
+
     // fuerza reflow para asegurar transición en algunos navegadores
     void alertEl.offsetWidth;
     alertEl.style.opacity = '1';
@@ -76,4 +77,58 @@ document.addEventListener('DOMContentLoaded', function() {
       setTimeout(() => alertEl.style.display = 'none', 450);
     }, 3000);
   }
+
+
+  // Alerta temporal usando div #alertSuccess
+function mostrarAlertaTemporal(tipo, mensaje) {
+  const alertEl = document.getElementById('alertSuccess');
+  if (!alertEl) return;
+  
+  // Configurar clase según tipo
+  let clase = '';
+  let titulo = '';
+  
+  switch(tipo) {
+    case 'success':
+      clase = 'success';
+      titulo = 'Éxito';
+      break;
+    case 'danger':
+      clase = 'danger';
+      titulo = 'Error';
+      break;
+    case 'warning':
+      clase = 'warning';
+      titulo = 'Advertencia';
+      break;
+    default:
+      clase = 'info';
+      titulo = 'Información';
+  }
+  
+  alertEl.className = 'alert ' + clase;
+  alertEl.innerHTML = `
+    <span class="closebtn" onclick="this.parentElement.style.display='none'">&times;</span>
+    <strong>${titulo}:</strong> ${mensaje}
+  `;
+  
+  // Mostrar alerta con animación
+  alertEl.style.display = 'block';
+  alertEl.style.opacity = '0';
+  
+  // Forzar reflow para asegurar transición
+  void alertEl.offsetWidth;
+  
+  // Animar entrada
+  alertEl.style.opacity = '1';
+  
+  // Ocultar automáticamente después de 4 segundos
+  setTimeout(() => {
+    alertEl.style.opacity = '0';
+    setTimeout(() => {
+      alertEl.style.display = 'none';
+    }, 450);
+  }, 4000);
+}
+
 });

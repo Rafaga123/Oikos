@@ -1,0 +1,146 @@
+ body {
+            background-image: url(/Images/Fondopagina.png);
+        }
+        
+        .pusher {
+            margin-left: 0px;
+            transition: none;
+        }
+        
+        .sidebar-menu {
+            width: 260px;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-menu .item {
+            /*Aumenta la fuente de todo el texto del item*/
+            font-size: 1.15em; 
+
+            /*Añade más espacio vertical entre los items para que se vean mejor*/
+            padding-top: 18px !important;
+            padding-bottom: 18px !important;
+        }
+
+            /* Aumentar el tamaño de los iconos dentro de los elementos del menú */
+        .sidebar-menu .item i.icon {
+            /*Aumenta el tamaño de la fuente del icono*/
+            font-size: 1.5em !important;
+
+            /*Asegura que haya más espacio entre el icono y el texto*/
+            margin-right: 15px !important; 
+        }
+
+        .sidebar-footer-image {
+            flex-grow: 1; /*Ocupa el espacio restante del sidebar */
+            display: flex;
+            justify-content: center;
+            align-items: flex-end; /* Alinea la imagen a la parte inferior del espacio */
+            padding: 20px; /* Espacio de relleno para que no se pegue al borde */
+        }
+
+        /*Estilos de la Imagen*/
+        .sidebar-footer-image img {
+            /* Asegura que la imagen no exceda el ancho del sidebar */
+            max-width: 100%; 
+            /* Define una altura máxima para que no empuje el menú */
+            max-height: 150px; 
+            /* Mantiene la proporción de la imagen */
+            height: auto; 
+
+        }
+        
+        .main-content {
+            padding: 70px;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .search-filter {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+            overflow: hidden;
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .payment-history {
+            max-width: 300px;
+        }
+        
+        .payment-item {
+            padding: 8px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .payment-item:last-child {
+            border-bottom: none;
+        }
+        
+        .payment-details {
+            flex-grow: 1;
+        }
+        
+        .payment-status {
+            margin-left: 10px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .pusher {
+                margin-left: 0;
+            }
+            
+            .sidebar-menu {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar-menu.visible {
+                transform: translateX(0);
+            }
+            
+            .search-filter {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .action-buttons {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
