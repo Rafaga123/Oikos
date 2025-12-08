@@ -1,10 +1,10 @@
  body {
-            background-color: #f9fafb;
+            background-image: url(/Images/Fondopagina.png);
         }
         
         .pusher {
             margin-left: 0px;
-            transition: margin-left 0.3s ease;
+            transition: none;
         }
         
         .sidebar-menu {
@@ -14,6 +14,44 @@
             bottom: 0;
             z-index: 1000;
             overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-menu .item {
+            /*Aumenta la fuente de todo el texto del item*/
+            font-size: 1.15em; 
+
+            /*Añade más espacio vertical entre los items para que se vean mejor*/
+            padding-top: 18px !important;
+            padding-bottom: 18px !important;
+        }
+
+            /* Aumentar el tamaño de los iconos dentro de los elementos del menú */
+        .sidebar-menu .item i.icon {
+            /*Aumenta el tamaño de la fuente del icono*/
+            font-size: 1.5em !important;
+
+            /*Asegura que haya más espacio entre el icono y el texto*/
+            margin-right: 15px !important; 
+        }
+
+        .sidebar-footer-image {
+            flex-grow: 1; /*Ocupa el espacio restante del sidebar */
+            display: flex;
+            justify-content: center;
+            align-items: flex-end; /* Alinea la imagen a la parte inferior del espacio */
+            padding: 20px; /* Espacio de relleno para que no se pegue al borde */
+        }
+
+        /*Estilos de la Imagen*/
+        .sidebar-footer-image img {
+            /* Asegura que la imagen no exceda el ancho del sidebar */
+            max-width: 100%; 
+            /* Define una altura máxima para que no empuje el menú */
+            max-height: 150px; 
+            /* Mantiene la proporción de la imagen */
+            height: auto; 
+
         }
         
         .main-content {

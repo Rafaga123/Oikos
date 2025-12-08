@@ -30,7 +30,7 @@
             <div class="menu">
                 <a class="active item">
                     <i class="home icon"></i>
-                    Dashboard
+                    Panel de Control
                 </a>
                 <a class="item" href="gestion_habitantes.html">
                     <i class="users icon"></i>
@@ -38,7 +38,7 @@
                 </a>
                 <a class="item">
                     <i class="chart bar icon"></i>
-                    Reportes
+                    Solicitudes
                 </a>
                 <a class="item">
                     <i class="cogs icon"></i>
@@ -52,6 +52,9 @@
                 <i class="sign out icon"></i>
                 Cerrar Sesión
             </a>
+        </div>
+        <div class="sidebar-footer-image">
+            <img src="../Images/logopng.png" alt="Decoración de Sidebar">
         </div>
     </div>
 
@@ -88,19 +91,137 @@
         <div class="main-content">
             <div class="ui container">
                 <h1 class="ui header"> <!--titulo superior-->
-                    Dashboard
+                    Panel de Control
                     <div class="sub header">Panel de administración para la gestión de habitantes</div> <!--descripcion de la pagina-->
                 </h1>
                 
                 <div class="ui divider"></div> <!--linea divisoria entre el titulo y las link cards-->
                 
+                <!-- GRÁFICOS MODERNOS -->
+<div class="charts-container">
+    <!-- Habitantes Activos - Gráfico Circular -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <div>
+                <div class="chart-title">Habitantes Activos</div>
+                <div class="chart-value">245</div>
+            </div>
+            <div class="chart-icon users">
+                <i class="users icon"></i>
+            </div>
+        </div>
+        <div class="circle-chart">
+            <svg viewBox="0 0 36 36">
+                <path class="circle-bg"
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+                <path class="circle users"
+                    stroke-dasharray="82, 100"
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+            </svg>
+            <div class="circle-value">82%</div>
+        </div>
+    </div>
+    
+    <!-- Pagos Pendientes - Gráfico de Barra -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <div>
+                <div class="chart-title">Pagos Pendientes</div>
+                <div class="chart-value">12</div>
+            </div>
+            <div class="chart-icon payment">
+                <i class="dollar sign icon"></i>
+            </div>
+        </div>
+        <div class="bar-chart">
+            <div class="bar" style="height: 60%;">
+                <div class="bar-label">Ene</div>
+            </div>
+            <div class="bar" style="height: 80%;">
+                <div class="bar-label">Feb</div>
+            </div>
+            <div class="bar" style="height: 40%;">
+                <div class="bar-label">Mar</div>
+            </div>
+            <div class="bar" style="height: 100%;">
+                <div class="bar-label">Abr</div>
+            </div>
+            <div class="bar" style="height: 70%;">
+                <div class="bar-label">May</div>
+            </div>
+            <div class="bar" style="height: 90%;">
+                <div class="bar-label">Jun</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Alertas - Gráfico de Línea -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <div>
+                <div class="chart-title">Alertas</div>
+                <div class="chart-value">5</div>
+            </div>
+            <div class="chart-icon alert">
+                <i class="exclamation triangle icon"></i>
+            </div>
+        </div>
+        <div class="line-chart">
+            <svg viewBox="0 0 200 100">
+                <path class="area-path alert" 
+                    d="M0,80 L40,60 L80,70 L120,30 L160,40 L200,20 L200,100 L0,100 Z">
+                </path>
+                <path class="line-path alert" 
+                    d="M0,80 L40,60 L80,70 L120,30 L160,40 L200,20"
+                    stroke-dasharray="300"
+                    stroke-dashoffset="300">
+                </path>
+            </svg>
+        </div>
+    </div>
+    
+    <!-- Completado - Gráfico Circular -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <div>
+                <div class="chart-title">Completado</div>
+                <div class="chart-value">98%</div>
+            </div>
+            <div class="chart-icon complete">
+                <i class="check circle icon"></i>
+            </div>
+        </div>
+        <div class="circle-chart">
+            <svg viewBox="0 0 36 36">
+                <path class="circle-bg"
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+                <path class="circle complete"
+                    stroke-dasharray="98, 100"
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+            </svg>
+            <div class="circle-value">98%</div>
+        </div>
+    </div>
+</div>
+                
+                <!-- LINK CARDS -->
                 <div class="cards-container">
                     <!-- Gestión de Habitantes -->
                     <div class="ui card link-card">
                         <div class="content">
-                            <div class="center aligned">
-                                <i class="users card-icon"></i>
-                            </div>
+                            <div class="center aligned"></div>
                             <div class="center aligned header">
                                 Gestión de Habitantes
                             </div>
@@ -110,7 +231,7 @@
                         </div>
                         <div class="extra content">
                             <div class="center aligned">
-                                <button class="ui primary button">
+                                <button class="ui primary button" data-href="../Pages/gestion_habitantes.html">
                                     Acceder
                                     <i class="right arrow icon"></i>
                                 </button>
@@ -122,18 +243,18 @@
                     <div class="ui card link-card">
                         <div class="content">
                             <div class="center aligned">
-                                <i class="edit card-icon"></i>
                             </div>
                             <div class="center aligned header">
                                 Modificar
                             </div>
                             <div class="center aligned description">
-                                <p>Actualiza o edita la información existente de las reglas del condominio.</p>
+                                <p>Actualiza o edita la información existente de las reglas del condominio.
+                                </p>
                             </div>
                         </div>
                         <div class="extra content">
                             <div class="center aligned">
-                                <button class="ui primary button">
+                                <button class="ui primary button" data-href="../Pages/modificar.html">
                                     Acceder
                                     <i class="right arrow icon"></i>
                                 </button>
@@ -141,34 +262,11 @@
                         </div>
                     </div>
                     
-                    <!-- Pagos -->
-                    <div class="ui card link-card">
-                        <div class="content">
-                            <div class="center aligned">
-                                <i class="money bill alternate card-icon"></i>
-                            </div>
-                            <div class="center aligned header">
-                                Pagos
-                            </div>
-                            <div class="center aligned description">
-                                <p>Gestiona los pagos y estados de cuenta de los habitantes.</p>
-                            </div>
-                        </div>
-                        <div class="extra content">
-                            <div class="center aligned">
-                                <button class="ui primary button">
-                                    Acceder
-                                    <i class="right arrow icon"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
                     
                     <!-- Crear -->
                     <div class="ui card link-card">
                         <div class="content">
                             <div class="center aligned">
-                                <i class="plus circle card-icon"></i>
                             </div>
                             <div class="center aligned header">
                                 Crear
@@ -179,7 +277,7 @@
                         </div>
                         <div class="extra content">
                             <div class="center aligned">
-                                <button class="ui primary button">
+                                <button class="ui primary button" data-href="../Pages/Crear.html">
                                     Acceder
                                     <i class="right arrow icon"></i>
                                 </button>
@@ -187,48 +285,10 @@
                         </div>
                     </div>
                 </div>
-                
-                <!-- Estadísticas rápidas -->
-                <div class="ui segment">
-                    <h3 class="ui header">Resumen General</h3>
-                    <div class="ui four statistics">
-                        <div class="statistic">
-                            <div class="value">
-                                245
-                            </div>
-                            <div class="label">
-                                Habitantes Activos
-                            </div>
-                        </div>
-                        <div class="statistic">
-                            <div class="value">
-                                12
-                            </div>
-                            <div class="label">
-                                Pagos Pendientes
-                            </div>
-                        </div>
-                        <div class="statistic">
-                            <div class="value">
-                                5
-                            </div>
-                            <div class="label">
-                                Alertas
-                            </div>
-                        </div>
-                        <div class="statistic">
-                            <div class="value">
-                                98%
-                            </div>
-                            <div class="label">
-                                Completado
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
+
 
 
 </body>

@@ -62,11 +62,21 @@
                     id: h.id
                 }))
             });
+
             
             // Controlar sidebar en móviles
             $('#sidebar-toggle').click(function() {
                 $('.ui.sidebar').sidebar('toggle');
             });
+
+            //fijar sidebar
+            if ($(window).width() > 768) {
+                $('.ui.sidebar').addClass('visible');
+                $('.ui.sidebar').sidebar({
+                    context: $('.pusher'),
+                    transition: 'overlay'
+                });
+            }
             
             // Inicializar modales
             $('#habitant-modal').modal({
@@ -348,3 +358,16 @@
                 loadHabitantsTable();
             }
         }
+
+        const allToggleSelectors = '#sidebar-toggle, .sidebar-toggle-btn';
+
+        //Inicializamos y controlamos el sidebar usando la API de Semantic UI
+    $('.ui.sidebar').sidebar({
+        context: $('.pusher'),
+        transition: 'overlay'
+    });
+
+    $(allToggleSelectors).click(function() {
+        //La función 'toggle' lo abrirá si está cerrado, y lo cerrará si está abierto.
+        $('.ui.sidebar').sidebar('toggle');
+    });

@@ -1,38 +1,154 @@
- body { font-family: "Segoe UI", Tahoma, sans-serif; background:#f7f8fb; margin:0; padding:90px; }
-    .container { max-width:980px; margin:0 auto; background:#a2b9ee; padding:20px; border-radius:8px; box-shadow:0 6px 24px rgba(16,24,40,0.06); }
-    h2 { margin:0 0 14px; }
-    .payment-methods { display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
-    .pm-btn { padding:10px 14px; border:1px solid #9a9cea; background:#9a9cea; cursor:pointer; border-radius:6px; }
-    .pm-btn.active { background:#9a9cea; box-shadow:0 0 0 3px rgba(22,119,255,0.06); border-color:#cfe3ff; }
+ body {
+  font-family: "Segoe UI", Tahoma, sans-serif; 
+  background-image: url('../Images/Fondopagina.png');
+  background-size: cover; /* cubre toda la pantalla*/ 
+  background-position: center center; /* centra la imagen */
+  background-repeat: no-repeat; /* no se repite */
+  background-attachment: fixed; /* queda fija al hacer scroll */
+  background-color: #f0f0f0; /* color de respaldo por si la imagen no carga */
+  margin:0;
+  padding:140px; 
+}
 
-    .payment-grid { display:grid; grid-template-columns:1fr 320px; gap:20px; align-items:start; margin-top:10px; }
-    label { display:block; margin:12px 0 6px; font-weight:600; color:#24324a; font-size:13px; }
+    .container { 
+    max-width:980px; 
+    margin:0 auto; 
+    padding:20px; 
+    box-shadow:0 6px 24px rgba(16,24,40,0.06); 
+    background: #a2b9ee;
+    border-radius: 14px;
+  }
+    
+    h2 { 
+      margin:0 0 14px;
+     }
+    .payment-methods {
+       display:flex; 
+       gap:10px; 
+       margin-bottom:18px; 
+       flex-wrap:wrap;
+       }
+    .pm-btn { 
+      padding:10px 14px; 
+      border:1px solid #9a9cea; 
+      background: linear-gradient(to bottom, #adeee2, #a2dcee);
+      cursor:pointer; 
+      border-radius:15px; 
+    }
+    .pm-btn.active { 
+      background:#a2dcee; 
+      box-shadow:0 0 0 3px rgba(22,119,255,0.06);
+       border-color:#cfe3ff; 
+      }
+
+    .payment-grid { display:grid; 
+      grid-template-columns:1fr 320px; 
+      gap:20px; 
+      align-items:start;
+      margin-top:10px;
+     }
+    label { 
+      display:block; 
+      margin:12px 0 6px; 
+      font-weight:600; 
+      color:#24324a; 
+      font-size:13px; 
+    }
     select, input[type="text"], input[type="number"], input[type="date"] {
-      width:100%; padding:10px; border-radius:6px; border:1px solid #9a9cea; background:#fff; box-sizing:border-box;
+      width:100%; 
+      padding:10px; 
+      border-radius:6px; 
+      border:1px solid #9a9cea; 
+      background:#fff; 
+      box-sizing:border-box;
     }
 
-    .two-cols { display:flex; gap:12px; margin-top:8px; }
+    .two-cols {
+      display:flex;
+      gap:12px; 
+      margin-top:8px; 
+    }
+
     .two-cols > div { flex:1; }
 
-    .bank-card { background:#9a9cea; padding:18px; border-radius:8px; text-align:center; margin-bottom:14px; color:#24324a; border:1px dashed #e6eefc; }
-    .bank-icon { font-size:40px; margin-bottom:8px; }
-    .voucher-card { background:#9a9cea; padding:14px; border-radius:8px; border:1px solid #f0f2f7; }
+    .bank-card { 
+    background:#a2dcee; 
+    padding:18px; 
+    border-radius:8px; 
+    text-align:center; 
+    margin-bottom:14px; 
+    color:#24324a; 
+    border:1px dashed #e6eefc; 
+  }
+    .bank-icon {
+      font-size:40px; 
+      margin-bottom:8px; 
+    }
+    .voucher-card { 
+    background:#a2dcee; 
+    padding:14px; 
+    border-radius:8px; 
+    border:1px solid #f0f2f7; 
+  }
 
-    .voucher-name { margin-top:8px; color:#24324a; font-size:13px; }
-     .actions-row { display:flex; justify-content:space-between; gap:12px; margin-top:18px; }
-    .btn { padding:10px 16px; border-radius:6px; cursor:pointer; border:1px solid transparent; font-weight:600; }
-    .btn.ghost { background:#fff; color:#333; border-color:#e2e6ef; }
-    .btn.primary { background:#1677ff; color:#fff; }
+    .voucher-name { 
+      margin-top:8px; 
+      color:#24324a; 
+      font-size:13px; 
+    }
+     .actions-row { 
+      display:flex; 
+      justify-content:space-between; 
+      gap:12px;
+      margin-top:18px; 
+    }
+    .btn {
+      padding:10px 16px; 
+      border-radius:6px; 
+      cursor:pointer; 
+      border:1px solid transparent;
+      font-weight:600; 
+    }
+    .btn.ghost {
+      background:#fff; 
+      color:#333; 
+      border-color:#e2e6ef; 
+    }
+    .btn.primary { 
+      background:#a2dcee; 
+      color:#fff; 
+    }
 
     /* Alerta global */
-    .alert { position:fixed; top:20px; right:20px; z-index:9999; min-width:260px; padding:14px 18px; border-radius:6px; color:#fff; background:#4caf50; box-shadow:0 6px 18px rgba(0,0,0,0.12); display:none; opacity:0; transition:opacity .45s ease; }
+    .alert { 
+      position:fixed; 
+      top:20px; 
+      right:20px; 
+      z-index:9999; 
+      min-width:260px;
+      padding:14px 18px; 
+      border-radius:6px;
+      color:#fff; 
+      background:#4caf50;
+      box-shadow:0 6px 18px rgba(0,0,0,0.12); 
+      display:none; 
+      opacity:0; 
+      transition:opacity .45s ease;
+     }
+
     .alert.success { background:#4caf50; }
     .alert.danger  { background:#f44336; }
     .alert.info    { background:#2196F3; }
-    .alert .closebtn { position:absolute; top:6px; right:10px; cursor:pointer; font-size:18px; color:#fff; }
+    .alert .closebtn { position:absolute; 
+      top:6px; right:10px; 
+      cursor:pointer; 
+      font-size:18px; 
+      color:#fff; }
 
     /* Responsivo */
     @media (max-width:840px) {
       .payment-grid { grid-template-columns:1fr; }
-      .actions-row { flex-direction:column-reverse; align-items:stretch; }
+      .actions-row { 
+        flex-direction:column-reverse;
+         align-items:stretch; }
     }
