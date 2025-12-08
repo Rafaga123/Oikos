@@ -7,17 +7,39 @@ body{
     background-color: #f0f0f0; /* color de respaldo por si la imagen no carga */
 }
 
+/* Responsive */
+@media (max-width: 768px) {
+    .pusher {
+        margin-left: 0;
+    }
+            
+    .sidebar-menu {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+            
+    .sidebar-menu.visible {
+        transform: translateX(0);
+    }
+            
+    .cards-container {
+        grid-template-columns: 1fr;
+    }
+}
+
 h2{
     text-align: center;
     font-weight: 700;
     font-size: 2.5rem;
-    color:#213547
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color:#213547;
 }
 
 h3{
     text-align: center;
     font-weight: 600;
     font-size: 1.8rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #7b7fd6;
 }
 
@@ -52,18 +74,50 @@ h3{
 }
 
 
+.pusher{
+    margin-left: 0px;
+    transition: none;
+}
+
 .sidebar-menu {
     width: 260px;
     position: fixed;
     top: 0;
     bottom: 0;
-    z-index: 1000;
+    z-index: 1001;
     overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+.sidebar-menu.visible {
+    transform: translateX(0);
+}
+
+/*Aumentar el tamaño de la letra de todos los elementos del menú */
+.sidebar-menu .item {
+    /*Aumenta la fuente de todo el texto del item*/
+    font-size: 1.15em; 
+    
+    /*Añade más espacio vertical entre los items para que se vean mejor*/
+    padding-top: 18px !important;
+    padding-bottom: 18px !important;
+}
+
+/*Aumentar el tamaño de los iconos dentro de los elementos del menú*/
+.sidebar-menu .item i.icon {
+    /*Aumenta el tamaño de la fuente del icono*/
+    font-size: 1.5em !important;
+    
+    /*Asegura que haya más espacio entre el icono y el texto */
+    margin-right: 15px !important; 
 }
 
 .main-content {
     padding: 70px;
+    width:100%;
 }
+
 
 
 .ui.left.vertical.inverted.sidebar.labeled.icon.menu{
@@ -104,11 +158,6 @@ h3{
 
 }
 
-.large.arrow.left.icon {
-    color: white;
-    margin-left: 15px;
-    cursor: pointer;
-}
 
 .ui.card.link-card {
     cursor: pointer;
@@ -136,26 +185,6 @@ h3{
 /*Permite que el contenido del cuerpo de la tarjeta se estire */
 .full-height-card .content {
     flex-grow: 1; 
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .pusher {
-        margin-left: 0;
-    }
-            
-    .sidebar-menu {
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-    }
-            
-    .sidebar-menu.visible {
-        transform: translateX(0);
-    }
-            
-    .cards-container {
-        grid-template-columns: 1fr;
-    }
 }
 
 /* Estilos para el carrusel de Slick */
@@ -228,7 +257,9 @@ h3{
 
 
 .carousel-btn:hover {
-    background-color: rgba(154, 156, 234, 1);
+    background-color: #7b7fd6;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.25); 
+    transform: translateY(-2px); 
 }
 
 .carousel-indicators {

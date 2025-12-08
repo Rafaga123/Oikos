@@ -1,25 +1,98 @@
 document.addEventListener('DOMContentLoaded', function() {
     initSidebar();
+    formForo();
+
+    //Inicializar dropdowns
+    $('.ui.dropdown').dropdown();
 });
 
 //SIDEBAR
 function initSidebar() {
-    //Seleccion los elementos por su clase
-    const sidebar = document.querySelector('.ui.left.vertical.inverted.sidebar.labeled.icon.menu');
-    const pusher = document.querySelector('.pusher');
-    //Seleccionamos todos los botones de alternancia (el del menú superior y el del sidebar)
-    const toggleButtons = document.querySelectorAll('.sidebar-toggle-btn');
-    
-    //Funcion para manejar los eventos (click)
-    function toggleSidebar() {
-        //se añade la clase si no existe, o se elimina si existe
-        sidebar.classList.toggle('visible');  //El sidebar se muestra u oculta
-        pusher.classList.toggle('pushed'); //Empuja el contenido principal o vuelve a su posición original
-        document.body.classList.toggle('dimmed'); //El body se atenúa cuando el sidebar está visible
-    }
-    
-    //Asigna la función a todos los botones que tienen la clase
-    toggleButtons.forEach(button => {
-        button.addEventListener('click', toggleSidebar); //Ejecuta la función al hacer click
+    //Botones de control
+    const allToggleSelectors = '#sidebar-toggle, .sidebar-toggle-btn';
+
+    //Inicializamos y controlamos el sidebar usando la API de Semantic UI
+    $('.ui.sidebar').sidebar({
+        context: $('.pusher'),
+        transition: 'overlay'
     });
+
+    $(allToggleSelectors).click(function() {
+        //La función 'toggle' lo abrirá si está cerrado, y lo cerrará si está abierto.
+        $('.ui.sidebar').sidebar('toggle');
+    });
+}
+
+//FORO
+function formForo(){
+    // Activar dropdown
+    $('.ui.dropdown').dropdown();
+
+    // Activar dimmer
+    $('.special.card .image').dimmer({ on: 'hover' });
+
+    // Inicialización y configuración del Modal
+    $('#modalAgregar').modal({
+        // Validación de campos OBLIGATORIOS al intentar 'Aprobar' (Publicar)
+        onApprove: function() {
+            // El 'form' dentro del modal
+            const $form = $('#modalAgregar .ui.form');
+
+            // Semantic UI Form Validation: se utiliza aquí para verificar los campos 'required'
+            $form.form({
+                fields: {
+                    Tema: 'empty', // El campo con name="Tema" no puede estar vacío
+                    Descripción: 'empty', // El campo con name="Descripción" no puede estar vacío
+                }
+            });
+
+            // Si la validación falla, Semantic UI automáticamente muestra los mensajes
+            if ($form.form('is valid')) {
+                // Si el formulario es válido, podemos proceder a mostrar la alerta de éxito.
+                
+                // Muestra la alerta de éxito
+                setTimeout(() => {
+                    $('#alertSuccess').fadeIn();
+
+                    // Oculta la alerta después de 3 segundos
+                    setTimeout(() => {
+                        $('#alertSuccess').fadeOut();
+                    }, 3000);
+                }, 500);
+                
+                // IMPORTANTE: Retorna TRUE para permitir que el modal se CIERRE.
+                return true; 
+            }
+            
+            // Muestra la alerta de éxito
+            setTimeout(() => {
+                $('#alertFail').fadeIn();
+
+                // Oculta la alerta después de 3 segundos
+                setTimeout(() => {
+                    $('#alertFail').fadeOut();
+                }, 3000);
+            }, 500);
+            // Si el formulario NO es válido, retorna FALSE para mantener el modal ABIERTO.
+            return false;
+        },
+
+        // Preguntar si está seguro al intentar 'Cancelar'
+        onDeny: function() {
+            // Utilizamos la función de confirmación nativa del navegador
+            const confirmar = confirm('¿Estás seguro de que deseas cancelar? Se perderán los cambios.');
+            
+            // Retorna TRUE si el usuario CONFIRMA (permite que el modal se cierre).
+            // Retorna FALSE si el usuario CANCELA (mantiene el modal abierto).
+            return confirmar; 
+        }
+    });
+
+    // Abrir el modal (usa la configuración definida arriba)
+    $('#agregarBtn').on('click', function() {
+        // Reinicia el estado del formulario (mensajes de error) antes de mostrarlo
+        $('#modalAgregar .ui.form').form('clear');
+        $('#modalAgregar').modal('show');
+    });
+    
 }

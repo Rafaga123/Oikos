@@ -35,8 +35,29 @@ h3{
     position: fixed;
     top: 0;
     bottom: 0;
-    z-index: 1000;
+    z-index: 1001;
     overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;;
+}
+
+/*Aumentar el tamaño de la letra de todos los elementos del menú */
+.sidebar-menu .item {
+    /*Aumenta la fuente de todo el texto del item*/
+    font-size: 1.15em; 
+    
+    /*Añade más espacio vertical entre los items para que se vean mejor*/
+    padding-top: 18px !important;
+    padding-bottom: 18px !important;
+}
+
+/*Aumentar el tamaño de los iconos dentro de los elementos del menú*/
+.sidebar-menu .item i.icon {
+    /*Aumenta el tamaño de la fuente del icono*/
+    font-size: 1.5em !important;
+    
+    /*Asegura que haya más espacio entre el icono y el texto */
+    margin-right: 15px !important; 
 }
 
 .main-content {
@@ -116,7 +137,6 @@ h3{
     padding: 20px; /* Espacio de relleno para que no se pegue al borde */
 }
 
-/* 3. Estilos de la Imagen (Asegura que se ajuste) */
 .sidebar-footer-image img {
     /* Asegura que la imagen no exceda el ancho del sidebar */
     max-width: 100%; 

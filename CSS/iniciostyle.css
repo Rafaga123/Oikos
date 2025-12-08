@@ -3,7 +3,7 @@
     background: white !important;
     color: var(--color-texto) !important;
     box-shadow: 0 4px 24px rgba(154,156,234,0.12);
-    border: 2px solid #213547 ;
+    border: 12px solid #ffffff ;
     border-radius: 0px;
     padding: 5px;
 }
@@ -22,54 +22,27 @@
 body::-webkit-scrollbar{
     width: 12px;
 }
-body::-webkit-scrollbar-thumb{
-    background-color: #5b60f0;
-}
 
 body {
-    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background-color: #d3d3d3;
-    color: var(--color-texto);
-    margin: 0;
-    padding: 0;
+    background-image: url('../Images/Fondopagina.png');
+    background-size: cover; /* cubre toda la pantalla */
+    background-position: center center; /* centra la imagen */
+    background-repeat: no-repeat; /* no se repite */
+    background-attachment: fixed; /* queda fija al hacer scroll */
+    background-color: #f0f0f0; /* color de respaldo por si la imagen no carga */;
 }
-
 
 .ui.button {
     background-color: var(--color-terciario);
-    color: white;
+    color: #6066d8;
     border-radius: 5px;
 }
 
 .ui.button:hover {
-    background-color: var(--color-cuaternario);
-}
-
-
-.fondo-menu {
-    position: relative;
-    background: url('../Images/FotoMenu.jpg') center center/cover no-repeat;
-    min-height: 70vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.fondo-menu .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(33, 53, 71, 0.6); /* Opacidad y color oscuro */
-    z-index: 1;
-}
-
-.fondo-menu .contenido-menu {
-    position: relative;
-    z-index: 2;
-    color: #fff;
-    text-align: center;
+    background: linear-gradient(135deg, #9A9CEA, #a2dcee) !important;   
+    color: black;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.25); 
+    transform: translateY(-2px); 
 }
 
 .ui.vertical.footer {
@@ -79,7 +52,7 @@ body {
     text-align: center;
     bottom: 0;
     width: 100%;
-    position: relative;
+    position: fixed;
 }
 
 .column{
@@ -93,3 +66,222 @@ body {
 .justificar{
     text-align: justify;
 }
+
+.title{
+    /*Definir el tamaño */
+    width: 250px; /* Ajusta este valor al ancho que desees para tu título */
+    height: auto; /* Mantiene la proporción original de la imagen */
+    max-width: 90%; /* Asegura que no se desborde en pantallas muy pequeñas */
+    
+    /*Colocar en el centro */
+    display: block;
+    margin-left: auto;
+    margin-right: auto; 
+}
+
+.header-content-wrapper {
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+}
+
+/*Estilos para el Título*/
+.name-pag {
+    /* Controla el espacio que ocupa en la fila */
+    flex-shrink: 0; 
+    
+    /* Añade margen derecho para separarlo del eslogan */
+    margin-right: 30px; 
+}
+
+/*Estilos para el Eslogan*/
+.slog-area {
+    /* Controla el espacio que ocupa en la fila */
+    flex-shrink: 0; 
+}
+
+/* Estilos para el carrusel de Introducción*/
+.announcement-carousel {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.carousel-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 30px;
+    margin-left: 200px;
+    margin-right: 200px; 
+    background: linear-gradient(135deg, #a2b9ee, #ADEEE2) !important;   
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    min-height: 250px;
+}
+
+.carousel-slide {
+    display: none;
+    padding: 30px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.carousel-slide.active {
+    display: block;
+}
+
+.carousel-nav {
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    top: 50%;
+    left: 50px;
+    right: 50px;
+    transform: translateY(-50%);
+    z-index: 10;
+    padding: 0 15px;
+}
+
+.carousel-btn {
+    background-color: rgba(154, 156, 234, 0.8);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: background-color 0.3s;
+}
+
+.carousel-btn.prev-btn {
+    position: absolute;
+    left: 20px; /* Fuera del contenedor a la izquierda */
+    top: 50px; /*Altura del boton*/
+}
+
+.carousel-btn.next-btn {
+    position: absolute;
+    right: 20px; /*Fuera del contenedor a la derecha*/
+    top: 50px; /*Altura del boron*/
+}
+
+
+.carousel-btn:hover {
+    background-color: #7b7fd6;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.25); 
+    transform: translateY(-2px); 
+}
+
+.carousel-indicators {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #ccc;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.indicator.active {
+    background-color: #9A9CEA;
+}
+
+.announcement-title {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.5em;
+}
+
+.announcement-date {
+    color: #777;
+    font-size: 0.9em;
+    margin-bottom: 15px;
+}
+
+.announcement-content {
+    color: #555;
+    font-size: 1.5em;
+    line-height: 1.5;
+}
+
+.no-announcements {
+    text-align: center;
+    padding: 40px;
+    color: #777;
+    font-style: italic;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.carousel-header {
+    text-align: center;
+    margin-bottom: 10px;
+    color: #444;
+}
+
+/*Estilos para los Botones*/
+.button-margin-top {
+    margin-top: 50px;    /* Espacio arriba para separarlo de las tarjetas */
+    margin-bottom: 50px; /* Espacio abajo para separarlo del borde inferior */
+}
+
+/* Aplicamos todos los efectos a la clase principal del botón */
+.ui.huge.primary.button {
+    background-color: #9A9CEA;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    transition: all 0.2s ease-in-out;
+}
+
+/*Levatamiento al colocar el cursor*/
+.ui.huge.primary.button:hover {
+    background-color: #7b7fd6;
+    color:black;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.25); 
+    transform: translateY(-2px); 
+}
+
+/*Presionado*/
+.ui.huge.primary.button:active {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); 
+    transform: translateY(1px); 
+}
+
+.carousel-slide.active {
+    display: flex;
+    align-items: center; 
+    /*Distribuye el espacio entre los dos elementos */
+    justify-content: space-between; 
+    /*Permite que el contenido fluya hacia abajo si es necesario*/
+    flex-wrap: wrap; 
+}
+
+/* Estilo para el Contenido*/
+.content-area {
+    /*Más espacio*/
+    flex: 3;
+    max-width: 60%; 
+    padding-right: 20px; /*Separación de la imagen*/
+    text-align: left;
+}
+
+/* Estilo para el Área de la Imagen*/
+.announcement-image-area {
+    flex: 2; 
+    max-width: 40%;
+    text-align: center; 
+}
+
+
+
