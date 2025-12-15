@@ -1,84 +1,76 @@
+// Scripts/register.js
+
 document.addEventListener('DOMContentLoaded', () => {
-  // --- Referencias a los Formularios y Botones ---
-  const loginForm = document.getElementById('loginForm');
-  const forgotForm = document.getElementById('forgotForm');
+    const registerForm = document.getElementById('register-form');
+    const errorMessage = document.getElementById('error-message');
   
-  const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-  const backToLogin = document.getElementById('backToLogin');
-
-  // --- Referencias a los Divs de Error ---
-  const loginErrorMessage = document.getElementById('login-error-message');
-  const forgotErrorMessage = document.getElementById('forgot-error-message');
-
-  // --- Lógica para MOSTRAR/OCULTAR formularios ---
+    if (!registerForm) return; // Protección por si el script carga en otra página
   
-  forgotPasswordLink.addEventListener('click', (e) => {
-    e.preventDefault(); // Previene que el link '#' recargue la página
-    loginForm.style.display = 'none';
-    forgotForm.style.display = 'block';
-  });
-
-  backToLogin.addEventListener('click', (e) => {
-    e.preventDefault();
-    forgotForm.style.display = 'none';
-    loginForm.style.display = 'block';
-  });
-
-  // --- Lógica del Formulario de LOGIN ---
-  loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    loginErrorMessage.style.display = 'none';
-
-    // 1. Obtener valores (¡usando 'usuario'!)
-    const usuario = document.getElementById('usuario').value;
-    const password = document.getElementById('password').value;
-
-    // 2. Crear el body
-    const body = { usuario, password };
-
-    // 3. Enviar al backend (¡que ahora es más inteligente!)
-    try {
-      const response = await fetch('http://localhost:3000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // ¡ÉXITO!
-        alert('¡Bienvenido!');
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('usuario', JSON.stringify(data.usuario));
-        window.location.href = 'home_page.html'; // Redirige al perfil
-      } else {
-        // Muestra error del backend
-        loginErrorMessage.textContent = data.error;
-        loginErrorMessage.style.display = 'block';  
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Limpiar errores visuales
+      errorMessage.style.display = 'none';
+      errorMessage.textContent = '';
+      errorMessage.className = 'ui red message'; // Resetear clase
+  
+      // 1. Obtener valores del HTML (Tus IDs actuales)
+      const cedula = document.getElementById('cedula').value.trim();
+      const email = document.getElementById('email').value.trim();
+      
+      const primer_nombre = document.getElementById('nombre1').value.trim();
+      const segundo_nombre = document.getElementById('nombre2').value.trim();
+      
+      const primer_apellido = document.getElementById('apellido1').value.trim();
+      const segundo_apellido = document.getElementById('apellido2').value.trim();
+      
+      const fecha_nacimiento = document.getElementById('fecha_nacimiento').value;
+      const password = document.getElementById('password').value;
+      const confirmar = document.getElementById('confirmar').value;
+  
+      // 2. Validaciones Frontend
+      if (password !== confirmar) {
+        mostrarError('Las contraseñas no coinciden');
+        return;
       }
-    } catch (error) {
-      console.error('Error de conexión:', error);
-      loginErrorMessage.textContent = 'No se pudo conectar con el servidor.';
-      loginErrorMessage.style.display = 'block';
+  
+      // 3. Preparar el paquete para Oikos (Nombres de la Base de Datos)
+      const datosParaEnviar = {
+        cedula,
+        email,
+        password,
+        primer_nombre,   // Mapeo directo
+        segundo_nombre,
+        primer_apellido,
+        segundo_apellido,
+        fecha_nacimiento
+      };
+  
+      // 4. Enviar al Backend
+      try {
+        const respuesta = await fetch('http://localhost:3000/api/registro', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datosParaEnviar)
+        });
+  
+        const data = await respuesta.json();
+  
+        if (respuesta.ok) {
+          alert('¡Registro exitoso en Oikos! Ahora inicia sesión.');
+          window.location.href = 'login.html';
+        } else {
+          mostrarError(data.error || 'Error desconocido al registrarse');
+        }
+  
+      } catch (error) {
+        console.error('Error de red:', error);
+        mostrarError('No hay conexión con el servidor Oikos');
+      }
+    });
+  
+    function mostrarError(msg) {
+      errorMessage.textContent = msg;
+      errorMessage.style.display = 'block';
     }
-  });
-
-  // --- Lógica del Formulario de OLVIDAR CONTRASEÑA ---
-  forgotForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    forgotErrorMessage.style.display = 'none';
-    
-    // NOTA: Aún no hemos creado este endpoint en el backend.
-    // Esto requeriría un servicio de envío de emails (como SendGrid).
-    // Por ahora, solo mostramos un mensaje.
-    
-    const email = document.getElementById('forgotEmail').value;
-    alert('Función de recuperar contraseña aún no implementada.');
-    
-    // (Cuando esté listo, aquí iría el fetch a '/api/forgot-password')
-    
-    // forgotErrorMessage.textContent = 'Si el correo existe, se enviará un enlace.';
-    // forgotErrorMessage.style.display = 'block';
-  });
 });

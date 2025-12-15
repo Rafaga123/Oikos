@@ -1,3 +1,5 @@
+// backend/prisma/schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,30 +9,167 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// --- NUESTROS MODELOS ---
+// --- ENUMS (Listas de opciones fijas) ---
+// Esto evita errores de dedo. En la base de datos se guardan como texto, 
+// pero Prisma te obliga a usar solo estas opciones.
+
+enum RolNombre {
+  ADMINISTRADOR       // Equipo de desarrollo (Ustedes)
+  ENCARGADO_COMUNIDAD // Presidente / Junta de condominio
+  HABITANTE           // Vecino / Inquilino
+}
+
+enum EstadoSolicitud {
+  PENDIENTE
+  ACEPTADO
+  RECHAZADO
+  SIN_COMUNIDAD
+}
+
+enum TipoHabitante {
+  PROPIETARIO
+  INQUILINO
+  FAMILIAR
+  OTRO
+}
+
+enum EstadoPago {
+  PENDIENTE
+  EN_REVISION
+  APROBADO
+  RECHAZADO
+}
+
+enum EstadoIncidencia {
+  ABIERTO
+  EN_PROGRESO
+  RESUELTO
+  CERRADO
+}
+
+// --- MODELOS (Tablas) ---
 
 model Rol {
-  id        Int       @id @default(autoincrement())
-  nombre    String    @unique // "ADMINISTRADOR", "ENCARGADO_COMUNIDAD", "USUARIO_GENERAL"
-  usuarios  Usuario[] // Un Rol puede tener muchos Usuarios
+  id        Int         @id @default(autoincrement())
+  nombre    RolNombre   @unique // Usamos el Enum aquí
+  usuarios  Usuario[]
+}
+
+model Comunidad {
+  id              Int       @id @default(autoincrement())
+  nombre          String
+  direccion       String?
+  codigo_unico    String    @unique // El código (ej: "RES-402") para unirse
+  fecha_creacion  DateTime  @default(now())
+  
+  // Relaciones
+  usuarios        Usuario[]
+  anuncios        Anuncio[]
+  areas_comunes   AreaComun[]
 }
 
 model Usuario {
-  id            Int     @id @default(autoincrement())
+  id              Int       @id @default(autoincrement())
+  cedula          String    @unique
+  email           String    @unique
+  password_hash   String
+  
+  // Datos Personales
+  primer_nombre    String
+  segundo_nombre   String?
+  primer_apellido  String
+  segundo_apellido String?
+  fecha_nacimiento DateTime?
+  telefono         String?   // Útil para contactar al vecino
+  foto_perfil_url  String?
 
-  cedula        String  @unique // Nuevo - Cédula
-  email         String  @unique // Correo
-  password_hash String  // Contraseña encriptada
+  // Datos de la Propiedad (Onboarding)
+  tipo_habitante   TipoHabitante? // Propietario, Inquilino...
+  numero_casa      String?        // "Apto 4B" o "Casa 12"
+  
+  // Estado en la Comunidad
+  estado_solicitud EstadoSolicitud @default(SIN_COMUNIDAD)
+  fecha_registro   DateTime        @default(now())
 
-  primer_nombre     String
-  segundo_nombre    String? // Opcional (con el ?)
-  primer_apellido   String
-  segundo_apellido  String? // Opcional
+  // Relaciones (Foreign Keys)
+  rol           Rol        @relation(fields: [id_rol], references: [id])
+  id_rol        Int
+  
+  comunidad     Comunidad? @relation(fields: [id_comunidad], references: [id])
+  id_comunidad  Int?
 
-  fecha_nacimiento  DateTime? // Opcional (o quita el ? si es obligatorio)
-  foto_perfil_url   String?   // Opcional (aquí guardaremos la URL de la foto)
+  // Lo que el usuario crea
+  pagos         Pago[]
+  anuncios      Anuncio[]
+  incidencias   Incidencia[]
+  reservas      Reserva[]
+}
 
-  // La Relación con Rol
-  rol     Rol     @relation(fields: [id_rol], references: [id])
-  id_rol  Int     // Esta es la Llave Foránea
+model Anuncio {
+  id            Int       @id @default(autoincrement())
+  titulo        String
+  contenido     String    @db.Text // @db.Text permite textos largos
+  fecha_public  DateTime  @default(now())
+  es_importante Boolean   @default(false)
+
+  // Relaciones
+  autor         Usuario   @relation(fields: [id_autor], references: [id])
+  id_autor      Int
+  
+  comunidad     Comunidad @relation(fields: [id_comunidad], references: [id])
+  id_comunidad  Int
+}
+
+model Pago {
+  id            Int        @id @default(autoincrement())
+  monto         Decimal    @db.Decimal(10, 2) // Ej: 1500.50
+  fecha_pago    DateTime   @default(now())
+  concepto      String     // "Alicuota Enero", "Multa", etc.
+  referencia    String?    // Nro de referencia bancaria
+  comprobante_url String?  // Foto del recibo
+  estado        EstadoPago @default(PENDIENTE)
+  nota_admin    String?    // Si el admin rechaza, explica por qué aquí
+
+  // Relaciones
+  usuario       Usuario    @relation(fields: [id_usuario], references: [id])
+  id_usuario    Int
+}
+
+model Incidencia {
+  id            Int             @id @default(autoincrement())
+  titulo        String
+  descripcion   String          @db.Text
+  fecha_reporte DateTime        @default(now())
+  foto_url      String?
+  estado        EstadoIncidencia @default(ABIERTO)
+  
+  // Relaciones
+  usuario       Usuario   @relation(fields: [id_usuario], references: [id])
+  id_usuario    Int
+}
+
+// Opcional: Si en el futuro quieren reservar el salón de fiestas o piscina
+model AreaComun {
+  id            Int       @id @default(autoincrement())
+  nombre        String    // "Salón de Fiestas", "Parrillera"
+  descripcion   String?
+  
+  comunidad     Comunidad @relation(fields: [id_comunidad], references: [id])
+  id_comunidad  Int
+  
+  reservas      Reserva[]
+}
+
+model Reserva {
+  id            Int       @id @default(autoincrement())
+  fecha_reserva DateTime
+  hora_inicio   DateTime
+  hora_fin      DateTime
+  estado        String    @default("PENDIENTE") // O usa un Enum
+  
+  usuario       Usuario   @relation(fields: [id_usuario], references: [id])
+  id_usuario    Int
+  
+  area          AreaComun @relation(fields: [id_area], references: [id])
+  id_area       Int
 }
