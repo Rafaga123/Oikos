@@ -10,13 +10,10 @@ datasource db {
 }
 
 // --- ENUMS (Listas de opciones fijas) ---
-// Esto evita errores de dedo. En la base de datos se guardan como texto, 
-// pero Prisma te obliga a usar solo estas opciones.
-
 enum RolNombre {
-  ADMINISTRADOR       // Equipo de desarrollo (Ustedes)
-  ENCARGADO_COMUNIDAD // Presidente / Junta de condominio
-  HABITANTE           // Vecino / Inquilino
+  ADMINISTRADOR
+  ENCARGADO_COMUNIDAD
+  HABITANTE
 }
 
 enum EstadoSolicitud {
@@ -47,32 +44,34 @@ enum EstadoIncidencia {
   CERRADO
 }
 
-// --- MODELOS (Tablas) ---
+// --- TABLAS PRINCIPALES ---
 
 model Rol {
   id        Int         @id @default(autoincrement())
-  nombre    RolNombre   @unique // Usamos el Enum aquí
+  nombre    RolNombre   @unique
   usuarios  Usuario[]
 }
 
 model Comunidad {
-  id              Int       @id @default(autoincrement())
+  id              Int        @id @default(autoincrement())
   nombre          String
-  direccion       String?
-  codigo_unico    String    @unique // El código (ej: "RES-402") para unirse
-  fecha_creacion  DateTime  @default(now())
+  direccion       String?    @db.Text
+  codigo_unico    String     @unique
+  fecha_creacion  DateTime   @default(now())
   
-  // Relaciones
+  // Relaciones: Una comunidad tiene muchas...
   usuarios        Usuario[]
   anuncios        Anuncio[]
+  encuestas       Encuesta[]
   areas_comunes   AreaComun[]
+  logs            LogAuditoria[]
 }
 
 model Usuario {
-  id              Int       @id @default(autoincrement())
-  cedula          String    @unique
-  email           String    @unique
-  password_hash   String
+  id               Int       @id @default(autoincrement())
+  cedula           String    @unique
+  email            String    @unique
+  password_hash    String
   
   // Datos Personales
   primer_nombre    String
@@ -80,37 +79,42 @@ model Usuario {
   primer_apellido  String
   segundo_apellido String?
   fecha_nacimiento DateTime?
-  telefono         String?   // Útil para contactar al vecino
+  telefono         String?
   foto_perfil_url  String?
 
-  // Datos de la Propiedad (Onboarding)
-  tipo_habitante   TipoHabitante? // Propietario, Inquilino...
-  numero_casa      String?        // "Apto 4B" o "Casa 12"
+  // Datos de la Propiedad
+  tipo_habitante   TipoHabitante?
+  numero_casa      String?        
   
-  // Estado en la Comunidad
+  // Estado
   estado_solicitud EstadoSolicitud @default(SIN_COMUNIDAD)
   fecha_registro   DateTime        @default(now())
 
-  // Relaciones (Foreign Keys)
+  // Relaciones
   rol           Rol        @relation(fields: [id_rol], references: [id])
   id_rol        Int
   
   comunidad     Comunidad? @relation(fields: [id_comunidad], references: [id])
   id_comunidad  Int?
 
-  // Lo que el usuario crea
+  // Lo que el usuario genera
   pagos         Pago[]
   anuncios      Anuncio[]
   incidencias   Incidencia[]
+  votos         VotoEncuesta[]
+  logs          LogAuditoria[]
   reservas      Reserva[]
 }
 
-model Anuncio {
+// --- TABLAS FUNCIONALES (Normalizadas) ---
+
+model Anuncio { // Equivalente a TABLA FEED
   id            Int       @id @default(autoincrement())
   titulo        String
-  contenido     String    @db.Text // @db.Text permite textos largos
+  contenido     String    @db.Text
   fecha_public  DateTime  @default(now())
   es_importante Boolean   @default(false)
+  imagen_url    String?
 
   // Relaciones
   autor         Usuario   @relation(fields: [id_autor], references: [id])
@@ -121,37 +125,75 @@ model Anuncio {
 }
 
 model Pago {
-  id            Int        @id @default(autoincrement())
-  monto         Decimal    @db.Decimal(10, 2) // Ej: 1500.50
-  fecha_pago    DateTime   @default(now())
-  concepto      String     // "Alicuota Enero", "Multa", etc.
-  referencia    String?    // Nro de referencia bancaria
-  comprobante_url String?  // Foto del recibo
-  estado        EstadoPago @default(PENDIENTE)
-  nota_admin    String?    // Si el admin rechaza, explica por qué aquí
+  id              Int        @id @default(autoincrement())
+  monto           Decimal    @db.Decimal(10, 2)
+  fecha_pago      DateTime   @default(now())
+  concepto        String     // Ej: "Alicuota Enero"
+  referencia      String?    
+  comprobante_url String?
+  estado          EstadoPago @default(PENDIENTE)
+  nota_admin      String?    // Feedback si se rechaza
 
-  // Relaciones
-  usuario       Usuario    @relation(fields: [id_usuario], references: [id])
-  id_usuario    Int
+  usuario         Usuario    @relation(fields: [id_usuario], references: [id])
+  id_usuario      Int
+}
+
+model Encuesta {
+  id            Int       @id @default(autoincrement())
+  pregunta      String    @db.VarChar(200)
+  fecha_inicio  DateTime  @default(now())
+  fecha_fin     DateTime
+  activa        Boolean   @default(true)
+  
+  comunidad     Comunidad @relation(fields: [id_comunidad], references: [id])
+  id_comunidad  Int
+  
+  votos         VotoEncuesta[]
+}
+
+model VotoEncuesta {
+  id              Int      @id @default(autoincrement())
+  opcion_elegida  String   // "SI", "NO", "A", "B"
+  fecha_voto      DateTime @default(now())
+  
+  encuesta        Encuesta @relation(fields: [id_encuesta], references: [id])
+  id_encuesta     Int
+  
+  usuario         Usuario  @relation(fields: [cedula_usuario], references: [cedula]) // Relación por cédula según tu CSV
+  cedula_usuario  String
+
+  // Restricción: Un usuario solo vota una vez por encuesta
+  @@unique([id_encuesta, cedula_usuario]) 
+}
+
+model LogAuditoria {
+  id              BigInt   @id @default(autoincrement())
+  accion          String   // "LOGIN", "INSERT_PAGO", etc.
+  detalle_tecnico String?  @db.Text
+  fecha_hora      DateTime @default(now())
+  
+  usuario         Usuario?  @relation(fields: [id_usuario], references: [id])
+  id_usuario      Int?
+
+  comunidad       Comunidad? @relation(fields: [id_comunidad], references: [id])
+  id_comunidad    Int?
 }
 
 model Incidencia {
-  id            Int             @id @default(autoincrement())
+  id            Int              @id @default(autoincrement())
   titulo        String
-  descripcion   String          @db.Text
-  fecha_reporte DateTime        @default(now())
+  descripcion   String           @db.Text
+  fecha_reporte DateTime         @default(now())
   foto_url      String?
   estado        EstadoIncidencia @default(ABIERTO)
   
-  // Relaciones
   usuario       Usuario   @relation(fields: [id_usuario], references: [id])
   id_usuario    Int
 }
 
-// Opcional: Si en el futuro quieren reservar el salón de fiestas o piscina
 model AreaComun {
   id            Int       @id @default(autoincrement())
-  nombre        String    // "Salón de Fiestas", "Parrillera"
+  nombre        String
   descripcion   String?
   
   comunidad     Comunidad @relation(fields: [id_comunidad], references: [id])
@@ -165,7 +207,7 @@ model Reserva {
   fecha_reserva DateTime
   hora_inicio   DateTime
   hora_fin      DateTime
-  estado        String    @default("PENDIENTE") // O usa un Enum
+  estado        String    @default("PENDIENTE")
   
   usuario       Usuario   @relation(fields: [id_usuario], references: [id])
   id_usuario    Int

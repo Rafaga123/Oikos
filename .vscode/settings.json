@@ -4,5 +4,6 @@
     ],
     "cSpell.ignoreWords": [
         "boton"
-    ]
+    ],
+    "livePreview.defaultPreviewPath": "/Pages/administrador.html"
 }

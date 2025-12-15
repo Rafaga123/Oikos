@@ -14,15 +14,18 @@ app.use(cors());
 
 // --- FUNCIÓN DE INICIALIZACIÓN (Se ejecuta al iniciar el servidor) ---
 async function inicializarRoles() {
+  // Estos nombres deben coincidir EXACTAMENTE con tu enum RolNombre en schema.prisma
   const rolesNecesarios = ['ADMINISTRADOR', 'ENCARGADO_COMUNIDAD', 'HABITANTE'];
   
   console.log("🔄 Verificando roles en la base de datos...");
   
   for (const nombreRol of rolesNecesarios) {
+    // Buscamos si el rol ya existe
     const existe = await prisma.rol.findUnique({
-      where: { nombre: nombreRol } // Prisma sabe que esto es un Enum
+      where: { nombre: nombreRol } 
     });
     
+    // Si no existe, lo creamos
     if (!existe) {
       await prisma.rol.create({ data: { nombre: nombreRol } });
       console.log(`✅ Rol creado: ${nombreRol}`);
@@ -35,7 +38,6 @@ async function inicializarRoles() {
 
 /**
  * REGISTRO DE USUARIO
- * Adaptado a la nueva tabla Usuario de Oikos
  */
 app.post('/api/registro', async (req, res) => {
   try {
@@ -43,7 +45,11 @@ app.post('/api/registro', async (req, res) => {
       cedula, email, password, 
       primer_nombre, segundo_nombre, 
       primer_apellido, segundo_apellido, 
-      fecha_nacimiento 
+      fecha_nacimiento,
+      telefono,
+      numero_casa,
+      tipo_habitante,
+      foto_perfil_url
     } = req.body;
 
     // 1. Validaciones básicas
@@ -51,8 +57,18 @@ app.post('/api/registro', async (req, res) => {
       return res.status(400).json({ error: 'Faltan campos obligatorios' });
     }
 
+    // 1.1 Validaciones adicionales opcionales
+    if (telefono && !/^\+?\d{7,15}$/.test(telefono)) {
+      return res.status(400).json({ error: 'Teléfono no válido' });
+    }
+    if (numero_casa && !/^[A-Za-z0-9-]{1,10}$/.test(numero_casa)) {
+      return res.status(400).json({ error: 'Número de casa no válido' });
+    }
+    if (tipo_habitante && !['PROPIETARIO','INQUILINO','FAMILIAR','OTRO'].includes(tipo_habitante)) {
+      return res.status(400).json({ error: 'Tipo de habitante no válido' });
+    }
+
     // 2. Buscar el ID del rol "HABITANTE"
-    // Ya no usamos el ID 3 fijo, lo buscamos por nombre para ser seguros
     const rolHabitante = await prisma.rol.findUnique({
       where: { nombre: 'HABITANTE' }
     });
@@ -65,7 +81,6 @@ app.post('/api/registro', async (req, res) => {
     const password_hash = await bcrypt.hash(password, 10);
 
     // 4. Crear usuario
-    // Nota: 'estado_solicitud' se pone en 'SIN_COMUNIDAD' por defecto en la BD
     const nuevoUsuario = await prisma.usuario.create({
       data: {
         cedula,
@@ -76,8 +91,12 @@ app.post('/api/registro', async (req, res) => {
         primer_apellido,
         segundo_apellido: segundo_apellido || null,
         fecha_nacimiento: fecha_nacimiento ? new Date(fecha_nacimiento) : null,
+        telefono: telefono || null,
+        numero_casa: numero_casa || null,
+        tipo_habitante: tipo_habitante || null,
+        foto_perfil_url: foto_perfil_url || null,
         id_rol: rolHabitante.id,
-        // id_comunidad se queda en null
+        estado_solicitud: 'SIN_COMUNIDAD' // Valor por defecto del Enum
       }
     });
 
@@ -89,7 +108,6 @@ app.post('/api/registro', async (req, res) => {
   } catch (error) {
     console.error("Error en registro:", error);
     
-    // Manejo de errores de Prisma (P2002 es violación de campo único)
     if (error.code === 'P2002') {
       const target = error.meta?.target || "";
       if (target.includes('email')) return res.status(400).json({ error: 'El correo ya está registrado' });
@@ -102,7 +120,6 @@ app.post('/api/registro', async (req, res) => {
 
 /**
  * INICIO DE SESIÓN (LOGIN)
- * Ahora devuelve el estado de la solicitud para redirigir correctamente
  */
 app.post('/api/login', async (req, res) => {
   try {
@@ -136,7 +153,6 @@ app.post('/api/login', async (req, res) => {
     }
 
     // 3. Generar Token
-    // Incluimos el estado_solicitud en el token por si acaso
     const token = jwt.sign(
       { 
         id: userFound.id, 
@@ -147,7 +163,7 @@ app.post('/api/login', async (req, res) => {
       { expiresIn: '1d' }
     );
 
-    // 4. Responder con datos clave para el frontend
+    // 4. Responder
     res.json({
       mensaje: 'Bienvenido',
       token,
@@ -156,7 +172,7 @@ app.post('/api/login', async (req, res) => {
         nombre: userFound.primer_nombre,
         apellido: userFound.primer_apellido,
         rol: userFound.rol.nombre,
-        estado_solicitud: userFound.estado_solicitud, // ¡CRUCIAL PARA LA REDIRECCIÓN!
+        estado_solicitud: userFound.estado_solicitud,
         id_comunidad: userFound.id_comunidad
       }
     });
@@ -167,8 +183,77 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Iniciar servidor y crear roles si no existen
+/**
+ * CREAR COMUNIDAD
+ */
+app.post('/api/comunidades', async (req, res) => {
+  try {
+    const { nombre, codigo_unico, direccion } = req.body;
+
+    if (!nombre || !codigo_unico) {
+      return res.status(400).json({ error: 'Nombre y código único son obligatorios' });
+    }
+
+    const nuevaComunidad = await prisma.comunidad.create({
+      data: {
+        nombre,
+        codigo_unico,
+        direccion: direccion || null
+      }
+    });
+
+    res.status(201).json({ mensaje: 'Comunidad creada', comunidad: nuevaComunidad });
+  } catch (error) {
+    console.error('Error al crear comunidad:', error);
+    if (error.code === 'P2002') {
+      return res.status(400).json({ error: 'El código único ya está en uso' });
+    }
+    res.status(500).json({ error: 'Error interno al crear comunidad' });
+  }
+});
+
+/**
+ * UNIRSE A UNA COMUNIDAD
+ */
+app.post('/api/comunidades/unirse', async (req, res) => {
+  try {
+    const { cedula, codigo_unico } = req.body;
+
+    if (!cedula || !codigo_unico) {
+      return res.status(400).json({ error: 'Cédula y código de comunidad son obligatorios' });
+    }
+
+    const usuario = await prisma.usuario.findUnique({ where: { cedula } });
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    if (usuario.id_comunidad) {
+      return res.status(400).json({ error: 'El usuario ya pertenece a una comunidad' });
+    }
+
+    const comunidad = await prisma.comunidad.findUnique({ where: { codigo_unico } });
+    if (!comunidad) {
+      return res.status(404).json({ error: 'Código de comunidad no válido' });
+    }
+
+    await prisma.usuario.update({
+      where: { id: usuario.id },
+      data: {
+        id_comunidad: comunidad.id,
+        estado_solicitud: 'PENDIENTE'
+      }
+    });
+
+    res.json({ mensaje: 'Solicitud enviada a la comunidad', comunidad: { id: comunidad.id, nombre: comunidad.nombre } });
+  } catch (error) {
+    console.error('Error al unirse a comunidad:', error);
+    res.status(500).json({ error: 'Error interno al unirse a comunidad' });
+  }
+});
+
+// Iniciar servidor
 app.listen(port, async () => {
-  console.log(`🚀 Servidor Oikos corriendo en http://localhost:${port}`);
-  await inicializarRoles(); // <--- La magia ocurre aquí
+  console.log(`🚀 Servidor corriendo en http://localhost:${port}`);
+  await inicializarRoles(); // <--- IMPORTANTE: Esto crea los roles
 });

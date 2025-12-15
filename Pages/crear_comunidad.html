@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="../Images/logo.ico" />
+    <link rel="stylesheet" href="CSS/semantic.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" />
+    <link rel="stylesheet" href="../CSS/auth.css" />
+    <title>Crear Comunidad</title>
+</head>
+<body>
+    <header class="ui menu">
+        <div class="ui container">
+            <a href="../index.html">
+                <img src="../Images/logoproyecto.png" alt="Por definir" width="40" height="35" />
+            </a>
+            <a class="item" href="../index.html">Inicio</a>
+            <a class="item" href="Acerca_nuestro.html">¿Quiénes somos?</a>
+            <a class="item" href="mision.html">Misión</a>
+            <a class="item" href="vision.html">Visión</a>
+            <div class="right menu">
+                <a class="ui button" href="login.html">Iniciar sesión</a>
+                <a class="ui button" href="register.html">Registrarme</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="centered-form-container">
+        <form class="ui form attached fluid segment" id="crear-comunidad-form">
+            <h2 class="ui center aligned header" style="margin-bottom:1.5rem;">Crear comunidad</h2>
+
+            <div class="field">
+                <label>Nombre de la comunidad</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Ej: Conjunto Jardines" required>
+            </div>
+
+            <div class="field">
+                <label>Código único</label>
+                <input type="text" id="codigo_unico" name="codigo_unico" placeholder="Ej: JARDINES-2025" required>
+            </div>
+
+            <div class="field">
+                <label>Dirección (opcional)</label>
+                <textarea id="direccion" name="direccion" rows="3" placeholder="Calle y referencia"></textarea>
+            </div>
+
+            <button class="ui primary fluid button" type="submit">Crear</button>
+
+            <div class="ui hidden message" id="success-message">
+                <i class="check icon"></i>
+                <span></span>
+            </div>
+            <div class="ui error message" id="error-message" style="display:none;"></div>
+        </form>
+    </main>
+
+    <footer class="ui inverted vertical footer segment">
+        <div class="ui container">
+            <p>Hecho con <i class="heart icon"></i></p>
+        </div>
+    </footer>
+
+    <script src="../Scripts/jquery-3.7.1.min.js"></script>
+    <script src="../Scripts/semantic.min.js"></script>
+    <script src="../Scripts/crear_comunidad.js"></script>
+</body>
+</html>

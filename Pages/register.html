@@ -28,10 +28,6 @@
 
     <main class="centered-form-container">
 
-        <div class="ui top attached progress" id="progress-bar">
-            <div class="bar"></div>
-        </div>
-
         <form class="ui form attached fluid segment" id="register-form">
             <h2 class="ui center aligned header" style="margin-bottom:1.5rem;">Registrarme</h2>
             <!-- Paso 1: Nombre y Apellido -->
@@ -59,19 +55,43 @@
                 <div class="ui fluid button primary next-btn">Siguiente</div>
             </div>
 
-            <!-- Paso 2: Cédula, Email, Fecha de Nacimiento -->
+            <!-- Paso 2: Cédula, Email, Numero, Fecha de Nacimiento -->
             <div class="step" id="step-2" style="display: none;">
-                <div class="field">
-                    <label>Cédula</label>
-                    <input type="text" id="cedula" name="cedula" placeholder="Cédula" required>
+                <div class="two fields">
+                    <div class="field">
+                        <label>Cédula</label>
+                        <input type="text" id="cedula" name="cedula" placeholder="Cédula" required>
+                    </div>
+                    <div class="field">
+                        <label>Correo Electrónico</label>
+                        <input type="email" id="email" name="email" placeholder="Correo Electrónico" required>
+                    </div>
                 </div>
-                <div class="field">
-                    <label>Correo Electrónico</label>
-                    <input type="email" id="email" name="email" placeholder="Correo Electrónico" required>
+                <div class="two fields">
+                    <div class="field">
+                        <label>Teléfono (Opcional)</label>
+                        <input type="tel" id="telefono" name="telefono" placeholder="Ej: +593987654321">
+                    </div>
+                    <div class="field">
+                        <label>Número de casa (Opcional)</label>
+                        <input type="text" id="numero_casa" name="numero_casa" placeholder="Ej: A-12">
+                    </div>
                 </div>
-                <div class="field">
-                    <label>Fecha de Nacimiento</label>
-                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                <div class="two fields">
+                    <div class="field">
+                        <label>Fecha de Nacimiento</label>
+                        <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                    </div>
+                    <div class="field">
+                        <label>Tipo de habitante (Opcional)</label>
+                        <select id="tipo_habitante" name="tipo_habitante" class="ui dropdown">
+                            <option value="">Selecciona una opción</option>
+                            <option value="PROPIETARIO">Propietario</option>
+                            <option value="INQUILINO">Inquilino</option>
+                            <option value="FAMILIAR">Familiar</option>
+                            <option value="OTRO">Otro</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="ui two buttons">
                     <button class="ui button back-btn" type="button">Volver</button>
@@ -119,7 +139,7 @@
     </main>
     <main class="container">
         <div class="ui message" style="text-align: center;">
-            ¿Ya tienes una cuenta? <a href="login.html">Inicia Sesión</a>
+            ¿Ya tienes una cuenta? <a href="login.html">Inicia sesión</a>
         </div>
     </main>
 
