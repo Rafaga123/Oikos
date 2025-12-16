@@ -32,7 +32,7 @@ $(document).ready(function() {
         // Animar gráficos circulares
         $('.circle').each(function() {
             const circle = $(this);
-            const radius = 15.9155; // Radio del círculo SVG
+            const radius = 10.9155; // Radio del círculo SVG
             const circumference = 2 * Math.PI * radius;
             const strokeDashArray = circle.attr('stroke-dasharray');
             const [value] = strokeDashArray.split(',').map(Number);
