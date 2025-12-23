@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido a Oikos</title>
+    <link rel="stylesheet" href="../CSS/semantic.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"/>
+    <link rel="stylesheet" href="../CSS/bienvenida.css">
+</head>
+<body>
+
+<div class="welcome-container">
+    <div class="ui segment raised center aligned" id="main-selection">
+        <h1 class="ui header text-primary">¡Bienvenido a Oikos!</h1>
+        <p>Para comenzar, necesitamos saber qué rol tendrás en la plataforma.</p>
+        
+        <div class="ui two column grid stackable">
+            <div class="column">
+                <div class="ui segment action-card" id="btn-crear">
+                    <i class="building icon huge blue"></i>
+                    <h3 class="ui header">Crear Comunidad</h3>
+                    <p>Soy el encargado/presidente y quiero registrar mi edificio o urbanización.</p>
+                </div>
+            </div>
+            <div class="column">
+                <div class="ui segment action-card" id="btn-unirse">
+                    <i class="users icon huge green"></i>
+                    <h3 class="ui header">Unirme a Comunidad</h3>
+                    <p>Ya vivo en una comunidad registrada y tengo el código de acceso.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui segment hidden-form" id="form-crear">
+        <h3 class="ui header"><i class="plus circle icon"></i> Nueva Comunidad</h3>
+        <form class="ui form">
+            <div class="field">
+                <label>Nombre del Edificio / Urbanización</label>
+                <input type="text" id="crear-nombre" placeholder="Ej: Residencias El Parque">
+            </div>
+            <div class="field">
+                <label>Dirección (Opcional)</label>
+                <input type="text" id="crear-direccion" placeholder="Calle, Ciudad...">
+            </div>
+            <button class="ui button primary fluid" type="submit">Registrar Comunidad</button>
+            <div class="ui button fluid basic" style="margin-top:10px" id="cancelar-crear">Cancelar</div>
+        </form>
+    </div>
+
+    <div class="ui segment hidden-form" id="form-unirse">
+        <h3 class="ui header"><i class="sign in icon"></i> Unirse a Comunidad</h3>
+        <form class="ui form">
+            <div class="field">
+                <label>Código de la Comunidad</label>
+                <input type="text" id="unir-codigo" placeholder="Ej: RES-8421">
+            </div>
+            <div class="two fields">
+                <div class="field">
+                    <label>Nro Casa / Apto</label>
+                    <input type="text" id="unir-casa" placeholder="Ej: 4-B">
+                </div>
+                <div class="field">
+                    <label>Soy...</label>
+                    <select class="ui dropdown" id="unir-tipo">
+                        <option value="PROPIETARIO">Propietario</option>
+                        <option value="INQUILINO">Inquilino</option>
+                        <option value="FAMILIAR">Familiar</option>
+                    </select>
+                </div>
+            </div>
+            <button class="ui button green fluid" type="submit">Enviar Solicitud</button>
+            <div class="ui button fluid basic" style="margin-top:10px" id="cancelar-unir">Cancelar</div>
+        </form>
+    </div>
+</div>
+
+<script src="../Scripts/jquery-3.7.1.min.js"></script>
+<script src="../Scripts/semantic.min.js"></script>
+<script src="../Scripts/bienvenida.js"></script> </body>
+</html>

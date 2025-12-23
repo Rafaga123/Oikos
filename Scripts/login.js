@@ -49,12 +49,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Redirección por rol
       const rol = data.usuario.rol;
-      if (rol === 'HABITANTE') {
-        window.location.href = 'home_page.html';
+      if (data.usuario.estado_solicitud === 'SIN_COMUNIDAD') {
+        window.location.href = 'bienvenida.html'; // <--- El usuario nuevo va aquí
       } else if (rol === 'ENCARGADO_COMUNIDAD') {
-        window.location.href = 'admin.html'; // página de gestor (antes llamada admin)
+        window.location.href = 'admin.html'; // página de gestor (debo estar pendiente de cambiar el nombre luego)
       } else if (rol === 'ADMINISTRADOR') {
-        window.location.href = 'administrador.html'; // nueva página de administrador
+        window.location.href = '/administrador/administrador.html'; // página de administrador
       } else {
         window.location.href = 'home_page.html';
       }

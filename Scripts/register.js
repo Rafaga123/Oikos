@@ -183,21 +183,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Éxito: mostrar panel de comunidad
-      form.style.display = 'none';
-      if (communityStep) communityStep.style.display = '';
-      updateProgress(2);
+      alert('¡Registro exitoso! Por favor inicia sesión.');
+      window.location.href = 'login.html';
 
     } catch (error) {
       console.error(error);
       setError('Error de conexión con el servidor');
     }
   });
-
-  // Botones post-registro
-  const createBtn = document.getElementById('create-community-btn');
-  const joinBtn = document.getElementById('join-community-btn');
-  if (createBtn) createBtn.addEventListener('click', () => { window.location.href = 'crear_comunidad.html'; });
-  if (joinBtn) joinBtn.addEventListener('click', () => { window.location.href = 'unirse_comunidad.html'; });
 
   // Inicialización
   showStep(0);

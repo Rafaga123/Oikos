@@ -1,0 +1,5 @@
+body { background-color: #f4f4f4; display: flex; align-items: center; justify-content: center; height: 100vh; }
+.welcome-container { max-width: 600px; width: 100%; padding: 20px; }
+.action-card { cursor: pointer; transition: transform 0.2s; }
+.action-card:hover { transform: translateY(-5px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.hidden-form { display: none; margin-top: 20px; }
