@@ -7,7 +7,16 @@ body{
     background-color: #f0f0f0; /* color de respaldo por si la imagen no carga */
 }
 
-
+/*Estilos para el footer*/
+.ui.vertical.footer {
+    background-color: #A2B9EE;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    bottom: 0;
+    width: 100%;
+    align-items: flex-end;
+}
 
 .pusher{
     margin-left: 0px;

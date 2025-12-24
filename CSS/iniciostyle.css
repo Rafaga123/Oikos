@@ -52,7 +52,7 @@ body {
     text-align: center;
     bottom: 0;
     width: 100%;
-    position: fixed;
+    align-items: flex-end;
 }
 
 .column{
@@ -87,10 +87,9 @@ body {
 
 /*Estilos para el Título*/
 .name-pag {
-    /* Controla el espacio que ocupa en la fila */
+    /*Controla el espacio que ocupa en la fila*/
     flex-shrink: 0; 
-    
-    /* Añade margen derecho para separarlo del eslogan */
+    /*Añade margen derecho para separarlo del eslogan*/
     margin-right: 30px; 
 }
 
@@ -101,12 +100,7 @@ body {
 }
 
 /* Estilos para el carrusel de Introducción*/
-.announcement-carousel {
-    position: relative;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-}
+/*kjhj*/
 
 .carousel-container {
     position: relative;
