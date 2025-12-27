@@ -1,0 +1,122 @@
+body{
+    background-image: url('../Images/Fondopagina.png');
+    background-size: cover; /* cubre toda la pantalla */
+    background-position: center center; /* centra la imagen */
+    background-repeat: no-repeat; /* no se repite */
+    background-attachment: fixed; /* queda fija al hacer scroll */
+    background-color: #f0f0f0; /* color de respaldo por si la imagen no carga */
+}
+
+/*Estilos para el footer*/
+.ui.vertical.footer {
+    background-color: #A2B9EE;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    bottom: 0;
+    width: 100%;
+    align-items: flex-end;
+}
+
+h2{
+    padding-top: 100px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 2.5rem;
+    color: black
+}
+
+
+.pusher {
+    margin-left: 0px;
+    transition: margin-left 0.3s ease;
+}
+
+.sidebar-menu {
+    width: 260px;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 1001;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;;
+}
+
+/*Aumentar el tamaño de la letra de todos los elementos del menú */
+.sidebar-menu .item {
+    /*Aumenta la fuente de todo el texto del item*/
+    font-size: 1.15em; 
+    
+    /*Añade más espacio vertical entre los items para que se vean mejor*/
+    padding-top: 18px !important;
+    padding-bottom: 18px !important;
+}
+
+/*Aumentar el tamaño de los iconos dentro de los elementos del menú*/
+.sidebar-menu .item i.icon {
+    /*Aumenta el tamaño de la fuente del icono*/
+    font-size: 1.5em !important;
+    
+    /*Asegura que haya más espacio entre el icono y el texto */
+    margin-right: 15px !important; 
+}
+
+.main-content {
+    padding: 70px;
+}
+
+
+.ui.left.vertical.inverted.sidebar.labeled.icon.menu{
+    background-color: #9A9CEA;
+}
+
+.large.sidebar.icon {
+    color: white;
+    margin-top: 25px;
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+.large.arrow.left.icon {
+    color: white;
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+/*Habilita Flexbox en el Sidebar Contenedor */
+.ui.left.vertical.sidebar {
+    /* Es crucial que el sidebar sea un contenedor Flex */
+    display: flex !important; 
+    /* Los elementos se apilan verticalmente */
+    flex-direction: column;
+}
+
+/* Haz que el contenedor de la imagen crezca */
+.sidebar-footer-image {
+    /*Esto le dice a este div que debe tomar todo el espacio vertical 
+       restante dentro del sidebar */
+    flex-grow: 1; 
+    
+    /* Centra la imagen dentro de este espacio (opcional) */
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Alinea la imagen a la parte inferior del espacio */
+    padding: 20px; /* Espacio de relleno para que no se pegue al borde */
+}
+
+.sidebar-footer-image img {
+    /* Asegura que la imagen no exceda el ancho del sidebar */
+    max-width: 100%; 
+    /* Define una altura máxima para que no empuje el menú */
+    max-height: 150px; 
+    /* Mantiene la proporción de la imagen */
+    height: auto; 
+
+}
+
+/* Espaciado para el botón de retorno */
+.button-margin-top {
+    margin-top: 50px;    /* Espacio arriba para separarlo de las tarjetas */
+    margin-bottom: 50px; /* Espacio abajo para separarlo del borde inferior */
+}

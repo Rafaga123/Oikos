@@ -72,12 +72,6 @@ h3{
     transition: margin-left 0.3s ease;
 }
 
-
-.pusher{
-    margin-left: 0px;
-    transition: none;
-}
-
 .sidebar-menu {
     width: 260px;
     position: fixed;
@@ -117,8 +111,6 @@ h3{
     width:100%;
 }
 
-
-
 .ui.left.vertical.inverted.sidebar.labeled.icon.menu{
     background-color: #9A9CEA;
 }
@@ -157,7 +149,6 @@ h3{
 
 }
 
-
 .ui.card.link-card {
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -186,7 +177,7 @@ h3{
     flex-grow: 1; 
 }
 
-/*EL CONTENEDOR PADRE DEL CARRUSEL*/
+/*CONTENEDOR PADRE DEL CARRUSEL*/
 .announcement-carousel {
     position: relative;
     width: 100%;
@@ -200,7 +191,6 @@ h3{
     position: relative;
     overflow: hidden;
     border-radius: 30px;
-    /* En vez de margin 200px, usamos un ancho relativo */
     width: 85%; 
     margin: 0 auto; 
     background: linear-gradient(135deg, #a2b9ee, #ADEEE2) !important;   
@@ -228,11 +218,9 @@ h3{
     justify-content: space-between;
     width: 100%;
     z-index: 10;
-    pointer-events: none; /* Permite hacer clic a lo que está detrás si es necesario */
 }
 
 .carousel-btn {
-    pointer-events: auto; /* Reactiva el click en los botones */
     background-color: rgba(154, 156, 234, 0.9);
     border: none;
     color: white;
