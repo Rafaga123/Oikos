@@ -19,7 +19,7 @@ body{
 }
 
 h2{
-    padding-top: 100px;
+    padding-top: 70px;
     text-align: center;
     font-weight: 700;
     font-size: 2.5rem;
@@ -119,4 +119,103 @@ h2{
 .button-margin-top {
     margin-top: 50px;    /* Espacio arriba para separarlo de las tarjetas */
     margin-bottom: 50px; /* Espacio abajo para separarlo del borde inferior */
+}
+
+/*Reportes*/
+.filters-container {
+    background:linear-gradient(135deg, #A2DCEE, #a2b9ee) !important;
+    border-radius: 12px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.ui.segment:not(.footer){
+    background: linear-gradient(135deg, #a2b9ee, #ADEEE2) !important;
+}
+
+.report-item {
+    background:linear-gradient(135deg, #ffffff, #ADEEE2) !important;
+    border: 1px solid #d4d4d5;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
+}
+
+.report-body {
+    padding-left: 15px;
+    margin: 10px 0;
+    font-style: italic;
+    word-wrap: break-word;       
+    overflow-wrap: break-word;  
+    white-space: normal;         
+    line-height: 1.5;            
+    color: #444;
+}
+
+.meta-info { font-size: 0.85em; color: gray; }
+
+/*Boton para enviar reporte*/
+.ui.primary.button,
+.ui.primary.button:focus,
+.ui.primary.button:active{
+    background-color: #9A9CEA;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    transition: all 0.2s ease-in-out;
+}
+
+.ui.primary.button:hover {
+    background-color: #7b7fd6;
+    color:black;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.25); 
+    transform: translateY(-2px); 
+}
+
+/* Colores de la barra lateral según categoría */
+.bar-mantenimiento { border-left: 4px solid #2185d0 !important; } /* Azul */
+.bar-seguridad { border-left: 4px solid #db2828 !important; }     /* Rojo */
+.bar-limpieza { border-left: 4px solid #21ba45 !important; }      /* Verde */
+.bar-otros { border-left: 4px solid #767676 !important; }         /* Gris */
+
+/* Colores para las etiquetas de Importancia*/
+.label-alta { background-color: #db2828 !important; color: white !important; }
+.label-media { background-color: #fbbd08 !important; color: white !important; }
+.label-baja { background-color: #21ba45 !important; color: white !important; }
+
+/* Colores para los Estados */
+.status-pendiente { background-color: #f2711c !important; color: white !important; } /* Naranja */
+.status-revision { background-color: #2185d0 !important; color: white !important; }  /* Azul */
+.status-procesado { background-color: #21ba45 !important; color: white !important; } /* Verde */
+.status-rechazado { background-color: #db2828 !important; color: white !important; } /* Rojo */
+
+
+/*ALERTAS*/
+.alert.fail {
+    margin-top: 20px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    transition: opacity 0.4s ease-in-out; /* Controla el desvanecimiento */
+    display: flex;
+    align-items: center;
+}
+
+.alert.fail i {
+    margin-right: 10px;
+}
+
+.alert.success {
+    margin-top: 20px;
+    background-color: #d4edda; /* Verde claro */
+    color: #155724;            /* Verde oscuro */
+    border: 1px solid #c3e6cb;
+    transition: opacity 0.4s ease-in-out;
+    display: flex;
+    align-items: center;
+}
+
+.alert.success i {
+    margin-right: 10px;
 }

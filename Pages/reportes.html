@@ -66,7 +66,7 @@
 
     <div class="pusher">
         <!--Menú Superior-->
-        <div class="ui top fixed stackable menu" style="background-color: #9A9CEA;">
+        <div class="ui top fixed menu" style="background-color: #9A9CEA;">
             <div class="ui container">
                 <div class="item">
                     <img src="../Images/logopng.png" alt="Logo"> <!--logo de la pagina-->
@@ -93,38 +93,60 @@
         </div>
 
         <h2>Reporte en Vivienda</h2>
-        <div class="ui container">
-            <div class="ui two column grid">
-                <div class="row">
-                    <div class="column">
+
+        <div class="ui container" style="margin-top: 2em; margin-bottom: 5em;">
+            <div class="ui stackable two column grid">
+                
+                <div class="column">
+                <div class="ui segment">
+                    <h3 class="ui header">Nuevo Reporte</h3>
+                    <div class="ui form">
+                    <div class="filters-container">
                         <div class="field">
                             <label>Categoría</label>
-                            <select class="ui dropdown" id="category-filter">
-                                <option value="all">Todas las categorías</option>
-                                <option value="mantenimiento">Mantenimiento</option>
-                                <option value="ruido">Ruido</option>
-                                <option value="limpieza">Limpieza</option>
-                                <option value="seguridad">Seguridad</option>
-                                <option value="otros">Otros</option>
+                            <select class="ui dropdown" id="input-categoria">
+                            <option value="" selected disabled>Seleccione una categoría</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                            <option value="Seguridad">Seguridad</option>
+                            <option value="Limpieza">Limpieza</option>
+                            <option value="Otros">Otros</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Nivel de Importancia</label>
+                            <select class="ui dropdown" id="input-importancia">
+                            <option value="" selected disabled>Seleccione un nivel</option>
+                            <option value="Bajo">Baja</option>
+                            <option value="Medio">Media</option>
+                            <option value="Alto">Alta</option>
                             </select>
                         </div>
                     </div>
+                    <div class="field">
+                        <label>Descripción</label>
+                        <textarea id="input-texto" placeholder="¿Qué sucede?"></textarea>
+                    </div>
+                    <button class="ui primary button" onclick="enviarReporte()">Enviar</button>
+                    </div>
+                </div>
+                </div>
 
-                    <div class="column">
-                        <!--Aqui iran las informacion de reportes anteriores-->
+                <div class="column">
+                <h3 class="ui header">Mis Reportes</h3>
+                <div id="contenedor-reportes">
                     </div>
                 </div>
-                <div class="row">
-                    <div class="column">
-                        <div class="ui form">
-                            <div class="field">
-                                <label>Reporte</label>
-                                <textarea placeholder="Escriba su reporte aqui..."></textarea>
-                            </div>
-                            <button class="ui button">Enviar</button>
-                        </div>
-                    </div>
-                </div>
+            </div>
+
+            <!-- Alertas -->
+            <div class="alert fail" id="alertFail" style="display: none; padding: 15px; margin-bottom: 20px; border-radius: 5px; opacity: 0;">
+                <i class="exclamation circle icon"></i>
+                <span id="alertMessage">Debe completar todos los campos. Por favor, intente nuevamente.</span>
+            </div>
+
+            <div class="alert success" id="alertSuccess" style="display: none; padding: 15px; margin-bottom: 20px; border-radius: 5px; opacity: 0;">
+                <i class="check circle icon"></i>
+                <span id="successMessage">¡Reporte enviado correctamente!</span>
             </div>
         </div>
     

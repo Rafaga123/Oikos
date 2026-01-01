@@ -108,4 +108,13 @@ body {
     max-width: fit-content;
 }
 
+/* Color específico para MISIÓN (Púrpura suave) */
+.column:first-child .segment-redondeado {
+    background: linear-gradient(135deg, #ffffff, #9A9CEA) !important;
+}
+
+/* Color específico para VISIÓN (Verde agua) */
+.column:nth-child(2) .segment-redondeado {
+    background: linear-gradient(135deg, #ffffff, #a2dcee) !important;
+}
 
