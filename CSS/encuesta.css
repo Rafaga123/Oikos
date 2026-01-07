@@ -7,6 +7,22 @@ body{
     background-color: #f0f0f0; /* color de respaldo por si la imagen no carga */
 }
 
+h1{
+    padding-top:100px;
+    color: #333;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h2{
+    color: #333;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+
 /*Estilos para el footer*/
 .ui.vertical.footer {
     background-color: #A2B9EE;
@@ -16,22 +32,6 @@ body{
     bottom: 0;
     width: 100%;
     align-items: flex-end;
-}
-
-h1{
-    padding-top: 100px;
-    text-align: center;
-    font-weight: 700;
-    font-size: 3rem;
-    color: black
-}
-
-h3{
-    text-align: center;
-    margin-top: 20px;
-    font-weight: 700;
-    font-size: 1.8rem;
-    color: #7b7fd6;
 }
 
 .pusher {
@@ -91,40 +91,6 @@ h3{
     cursor: pointer;
 }
 
-/* Estilos para las tarjetas de encuesta */
-.ui.cards > .card,
-.ui.card {
-    background-color: #bdeefd; 
-    display: flex; /* Convierte la tarjeta en un contenedor flex */
-    flex-direction: column; /* Coloca los elementos hijos verticalmente */
-}
-
-.ui.cards > .card > .content {
-    flex-grow: 1; /* Permite que el contenido se estire para ocupar el espacio disponible */
-}
-
-/* Efecto pop-up*/
-.ui.cards > .card:hover {
-    background-color: #a2dcee;
-    /* Aumenta la sombra para simular elevación (efecto pop-up) */
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
-    /* Ligeramente más grande y elevado*/
-    transform: translateY(-5px); 
-    /* El puntero cambia a mano para indicar que es interactivo */
-    cursor: pointer;
-}
-
-.ui.inverted.button{
-    background-color: #9a9cea;
-    color: white;
-    
-}
-
-.ui.inverted.button:hover{
-    background-color: #7b7fd6;
-    color: white;
-}
-
 /*Habilita Flexbox en el Sidebar Contenedor */
 .ui.left.vertical.sidebar {
     /* Es crucial que el sidebar sea un contenedor Flex */
@@ -155,6 +121,102 @@ h3{
     height: auto; 
 }
 
+/*ENCUESTA*/
+
+.main-wrapper {
+    max-width: 800px !important;
+}
+
+.survey-card {
+    border-radius: 12px !important;
+    padding: 2.5em !important;
+    border-top: 6px solid #9A9CEA !important;
+}
+
+.survey-header-box {
+    margin-bottom: 2em;
+}
+
+#titulo-encuesta {
+    color: #9A9CEA !important;
+    font-size: 2em;
+}
+
+/* Estilo para los bloques de preguntas */
+.question-item {
+    margin-bottom: 2em !important;
+    padding: 1.5em;
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.question-item:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    border-color: #9A9CEA;
+}
+
+.question-label {
+    font-size: 1.2em !important;
+    color: #444;
+    margin-bottom: 1em !important;
+    display: block;
+}
+
+/*Boton para cancelar el envio de las respuestas*/
+.ui.button.btn-cancel{
+    background-color: #f5f5f5;
+    color: #e00000;
+    border: 1px solid #e00000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+    transition: all 0.2s ease-in-out;
+}
+
+.ui.button.btn-cancel:hover {
+    background-color: #e00000;
+    color: #ffffff;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.25); 
+    transform: translateY(-2px); 
+}
+
+/*Boton para emviar la respuesta*/
+.ui.button.btn-send {
+    background-color: #9A9CEA;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    transition: all 0.2s ease-in-out;
+}
+
+/*Levatamiento al colocar el cursor*/
+.ui.button.btn-send:hover {
+    background-color: #7b7fd6;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.25); 
+    transform: translateY(-2px); 
+}
+
+/*Presionado*/
+.ui.button.btn-send:active {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); 
+    transform: translateY(1px); 
+}
+
+/*Alerta de exito*/
+.alert.success {
+    margin-top: 20px;
+    background-color: #d4edda; /* Verde claro */
+    color: #155724;            /* Verde oscuro */
+    border: 1px solid #c3e6cb;
+    transition: opacity 0.4s ease-in-out;
+    display: flex;
+    align-items: center;
+}
+
+.alert.success i {
+    margin-right: 10px;
+}
+
+
+/*Boton para regresar a la pagina de seleccionar encuesta*/
 /* Espaciado para el botón de retorno */
 .button-margin-top {
     margin-top: 50px;    /* Espacio arriba para separarlo de las tarjetas */

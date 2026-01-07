@@ -1,10 +1,19 @@
 /* Estilos personalizados para Acerca_nuestro, Misión y Visión */
 /* Header blanco igual que login/register */
+body{
+    background-image: url('../Images/Fondopagina.png');
+    background-size: cover; /* cubre toda la pantalla */
+    background-position: center center; /* centra la imagen */
+    background-repeat: no-repeat; /* no se repite */
+    background-attachment: fixed; /* queda fija al hacer scroll */
+    background-color: #f0f0f0; /* color de respaldo por si la imagen no carga */
+}
+
 .ui.menu {
     background: white !important;
     color: var(--color-texto) !important;
     box-shadow: 0 4px 24px rgba(154,156,234,0.12);
-    border: 2px solid #213547 ;
+    border: 12px solid #ffffff ;
     border-radius: 0px;
     padding: 5px;
 }
@@ -38,12 +47,15 @@ body {
 
 .ui.button {
     background-color: var(--color-terciario);
-    color: white;
+    color: #6066d8;
     border-radius: 5px;
 }
 
 .ui.button:hover {
-    background-color: var(--color-cuaternario);
+    background: linear-gradient(135deg, #9A9CEA, #a2dcee) !important;   
+    color: black;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.25); 
+    transform: translateY(-2px); 
 }
 
 .ui.vertical.masthead {
@@ -52,26 +64,41 @@ body {
     padding: 50px 0;
 }
 
+/*Estilos para el footer*/
 .ui.vertical.footer {
-    background-color: var(--color-secundario);
+    background-color: #A2B9EE;
     color: white;
     padding: 20px 0;
     text-align: center;
     bottom: 0;
     width: 100%;
+    align-items: flex-end;
 }
 
-.contenedor-centro {
-    flex: 1;
+
+.seccion-centrada {
     display: flex;
     justify-content: center;
-    align-items: center !important;
-    margin-top: 40px;
-    margin-bottom: 40px;
+    align-items: center;
+    min-height: 100vh; 
+    padding: 40px 0;
+    width: 100%;
 }
 
-.center{
-    text-align: center;
+
+.ui.grid.stackable {
+    margin: 0 !important;
+    width: 100% !important;
+}
+
+.segment-redondeado {
+    border-radius: 15px !important;
+    height: 100%; 
+}
+
+
+.ui.image.centered {
+    margin-top: 20px; 
 }
 
 .cards-creadores {
@@ -81,4 +108,13 @@ body {
     max-width: fit-content;
 }
 
+/*Color específico para misión*/
+.column:first-child .segment-redondeado {
+    background: linear-gradient(135deg, #ffffff, #9A9CEA) !important;
+}
+
+/*Color específico para visión*/
+.column:nth-child(2) .segment-redondeado {
+    background: linear-gradient(135deg, #ffffff, #a2dcee) !important;
+}
 
