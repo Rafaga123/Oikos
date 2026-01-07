@@ -2,7 +2,7 @@
 
 > **Oikos** (del griego *oîkos*: casa, patrimonio, familia).
 
-![Logo Oikos](./images/logo.png)
+![Logo Oikos](./Images/OIKOS.png)
 ## 📖 Descripción del Proyecto
 
 **Oikos** es una solución de software completa (*Full Stack*) desarrollada para resolver los problemas comunes en la administración de propiedades horizontales: falta de transparencia, comunicación ineficiente y procesos manuales tediosos.
