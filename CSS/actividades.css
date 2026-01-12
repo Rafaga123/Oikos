@@ -86,31 +86,31 @@ h2{
 
 /*Habilita Flexbox en el Sidebar Contenedor */
 .ui.left.vertical.sidebar {
-    /* Es crucial que el sidebar sea un contenedor Flex */
+    /*Contenedor Flex */
     display: flex !important; 
-    /* Los elementos se apilan verticalmente */
+    /*Los elementos se apilan verticalmente */
     flex-direction: column;
 }
 
-/* Haz que el contenedor de la imagen crezca */
+/*Hace que el contenedor de la imagen crezca */
 .sidebar-footer-image {
     /*Esto le dice a este div que debe tomar todo el espacio vertical 
        restante dentro del sidebar */
     flex-grow: 1; 
     
-    /* Centra la imagen dentro de este espacio (opcional) */
+    /*Centra la imagen dentro de este espacio*/
     display: flex;
     justify-content: center;
-    align-items: flex-end; /* Alinea la imagen a la parte inferior del espacio */
-    padding: 20px; /* Espacio de relleno para que no se pegue al borde */
+    align-items: flex-end; /*Alinea la imagen a la parte inferior del espacio*/
+    padding: 20px; /*Espacio de relleno para que no se pegue al borde*/
 }
 
 .sidebar-footer-image img {
-    /* Asegura que la imagen no exceda el ancho del sidebar */
+    /*Asegura que la imagen no exceda el ancho del sidebar */
     max-width: 100%; 
-    /* Define una altura máxima para que no empuje el menú */
+    /*Define una altura máxima para que no empuje el menú */
     max-height: 150px; 
-    /* Mantiene la proporción de la imagen */
+    /*Mantiene la proporción de la imagen */
     height: auto; 
 
 }

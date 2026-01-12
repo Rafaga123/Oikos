@@ -181,9 +181,9 @@ h3{
 .announcement-carousel {
     position: relative;
     width: 100%;
-    max-width: 900px; /* Tamaño máximo en PC */
-    margin: 0 auto;   /* Centra el carrusel horizontalmente */
-    padding: 0 10px;  /* Pequeño respiro en los bordes para móviles */
+    max-width: 900px; /*Tamaño máximo en PC */
+    margin: 0 auto;   /*Centra el carrusel horizontalmente */
+    padding: 0 10px;  /*Pequeño espacio en los bordes para telefonos */
     box-sizing: border-box;
 }
 
