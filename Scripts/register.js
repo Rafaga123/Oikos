@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const steps = Array.from(document.querySelectorAll('.step'));
   const errorBox = document.getElementById('error-message');
   const progress = document.getElementById('progress-bar');
-  const communityStep = document.getElementById('community-step');
 
   let current = 0; // 0..2
 
@@ -31,20 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
     1: () => {
       const cedula = document.getElementById('cedula').value.trim();
       const email = document.getElementById('email').value.trim();
-      const fecha = document.getElementById('fecha_nacimiento').value;
-      const telefono = document.getElementById('telefono')?.value.trim();
-      const numeroCasa = document.getElementById('numero_casa')?.value.trim();
-      const tipoHabitante = document.getElementById('tipo_habitante')?.value.trim();
 
       if (!/^\d{6,12}$/.test(cedula)) return 'La cédula debe tener entre 6 y 12 dígitos';
       if (!emailRegex.test(email)) return 'Correo electrónico no válido';
-      if (!fecha) return 'Seleccione su fecha de nacimiento';
-      const f = new Date(fecha);
-      const hoy = new Date();
-      if (isNaN(f.getTime()) || f > hoy) return 'Fecha de nacimiento inválida';
-      if (telefono && !/^\+?\d{7,15}$/.test(telefono)) return 'Teléfono no válido (use solo dígitos, 7-15)';
-      if (numeroCasa && !/^[A-Za-z0-9-]{1,10}$/.test(numeroCasa)) return 'Número de casa no válido';
-      if (tipoHabitante && !['PROPIETARIO','INQUILINO','FAMILIAR','OTRO'].includes(tipoHabitante)) return 'Tipo de habitante no válido';
       return null;
     },
     2: () => {
@@ -78,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateProgress(index) {
-    const percent = index === 0 ? 33 : index === 1 ? 66 : 100;
+    const percent = Math.round(((index + 1) / steps.length) * 100);
     // Semantic UI progress (si está disponible)
     if (window.$ && window.jQuery && progress && $(progress).progress) {
       $(progress).progress({ percent });
@@ -137,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (el) el.addEventListener('input', () => updateStepState(0));
   });
 
-  ['cedula','email','fecha_nacimiento','telefono','numero_casa','tipo_habitante'].forEach(id => {
+  ['cedula','email'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('input', () => updateStepState(1));
   });
@@ -163,11 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
       segundo_apellido: document.getElementById('apellido2').value.trim() || null,
       cedula: document.getElementById('cedula').value.trim(),
       email: document.getElementById('email').value.trim(),
-      fecha_nacimiento: document.getElementById('fecha_nacimiento').value || null,
-      password: document.getElementById('password').value,
-      telefono: document.getElementById('telefono')?.value.trim() || null,
-      numero_casa: document.getElementById('numero_casa')?.value.trim() || null,
-      tipo_habitante: document.getElementById('tipo_habitante')?.value.trim() || null
+      password: document.getElementById('password').value
     };
 
     try {

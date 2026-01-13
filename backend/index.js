@@ -63,8 +63,8 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: process.env.SMTP_USER || 'correoderecuperacion869@gmail.com',
-    pass: process.env.SMTP_PASS || 'xyfn gyek lies jvxa'
+    user: process.env.EMAIL_USER, // <--- Lee del archivo .env
+    pass: process.env.EMAIL_PASS  // <--- Lee del archivo .env
   },
   logger: true,
   debug: true
@@ -77,15 +77,11 @@ const transporter = nodemailer.createTransport({
  */
 app.post('/api/registro', async (req, res) => {
   try {
-    // 1. Recibir TODOS los datos nuevos
+    // 1. Recibir solo datos mínimos; el resto se completará en el primer login
     const { 
       cedula, email, password, 
       primer_nombre, segundo_nombre, 
-      primer_apellido, segundo_apellido, 
-      fecha_nacimiento,
-      telefono,       // Nuevo
-      numero_casa,    // Nuevo
-      tipo_habitante  // Nuevo
+      primer_apellido, segundo_apellido
     } = req.body;
 
     // 2. Validaciones
@@ -100,7 +96,7 @@ app.post('/api/registro', async (req, res) => {
     // 4. Hash password
     const password_hash = await bcrypt.hash(password, 10);
 
-    // 5. Crear usuario (Ahora guardamos todo)
+    // 5. Crear usuario con datos mínimos; campos complementarios se llenarán después
     const nuevoUsuario = await prisma.usuario.create({
       data: {
         cedula,
@@ -110,10 +106,6 @@ app.post('/api/registro', async (req, res) => {
         segundo_nombre: segundo_nombre || null,
         primer_apellido,
         segundo_apellido: segundo_apellido || null,
-        fecha_nacimiento: fecha_nacimiento ? new Date(fecha_nacimiento) : null,
-        telefono: telefono || null,             // <--- Guardamos teléfono
-        numero_casa: numero_casa || null,       // <--- Guardamos casa
-        tipo_habitante: tipo_habitante || null, // <--- Guardamos tipo (PROPIETARIO, etc)
         id_rol: rolHabitante.id,
         estado_solicitud: 'SIN_COMUNIDAD'
       }
@@ -130,8 +122,8 @@ app.post('/api/registro', async (req, res) => {
     console.error("Error en registro:", error);
     if (error.code === 'P2002') {
       const target = error.meta?.target || "";
-      if (target.includes('email')) return res.status(400).json({ error: 'El correo ya existe' });
-      if (target.includes('cedula')) return res.status(400).json({ error: 'La cédula ya existe' });
+      if (target.includes('email')) return res.status(400).json({ error: 'El correo ya esta registrado en el sistema' });
+      if (target.includes('cedula')) return res.status(400).json({ error: 'La cédula ya esta registrada en el sistema' });
     }
     res.status(500).json({ error: 'Error interno al registrar' });
   }
@@ -147,7 +139,7 @@ app.post('/api/password/forgot', async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Correo requerido' });
 
-    // Buscar usuario; mantenemos respuesta genérica luego
+    // Buscar usuario;
     const user = await prisma.usuario.findUnique({ where: { email } });
 
     // Generar token solo si el usuario existe
@@ -156,12 +148,11 @@ app.post('/api/password/forgot', async (req, res) => {
     if (user) {
       const token = buildResetToken({ id: user.id, tipo: 'RESET' });
 
-      // URL de frontend (ajusta si tu host es distinto)
-      // Asumimos XAMPP sirve htdocs en http://localhost/Proyectoquinto
+      // URL de frontend 
       resetUrl = `http://localhost/proyectoquinto/Pages/restablecer.html?token=${encodeURIComponent(token)}`;
 
       const info = await transporter.sendMail({
-        from: 'Soporte Oikos <correoderecuperacion869@gmail.com>',
+        from: `"Soporte Oikos" <${process.env.EMAIL_USER}>`,
         to: email,
         subject: 'Restablecer contraseña',
         text: `Para restablecer tu contraseña, visita: ${resetUrl}\nEste enlace expira en 1 hora.`,

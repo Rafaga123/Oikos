@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OIKOS - Reportes</title>
+    <link rel="shortcut icon" href="../Images/logo.ico" />
+    <script src="../Scripts/jquery-3.7.1.min.js"></script>
+    <script src="../Scripts/semantic.min.js"></script>
+    <script src="../Scripts/reportes.js"></script>
+    <link rel="stylesheet" type="text/CSS" href="../CSS/semantic.css">       
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <link rel="stylesheet" type="text/CSS" href="../CSS/reportes.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="ui vertical inverted sidebar menu sidebar-menu" style="background-color: #9A9CEA;">
+        <div class="item">
+            <div class="header">
+                <h2 class="ui inverted header">
+                    <i class="home icon"></i>
+                    <div class="content">
+                        Habitante
+                        <div class="sub header">Gestión de vivienda</div>
+                    </div>
+                </h2>
+            </div>
+        </div>
+        <div class="item">
+            <div class="menu">
+                <a class="item sidebar-toggle-btn">
+                    <br>
+                    <i class="large arrow left icon"></i>
+                    Cerrar menú
+                    <br>
+                </a>
+                <a class="active item">
+                    <i class="book icon"></i>
+                    Reglamento del Condominio
+                </a>
+                <a class="item">
+                    <i class="clock icon"></i>
+                    Horarios
+                </a>
+                <a class="item">
+                    <i class="credit card icon"></i>
+                    Cuentas para Pagos
+                </a>
+                <a class="item">
+                    <i class="cogs icon"></i>
+                    Configuración
+                </a>
+            </div>
+        </div>
+        <div class="item">
+            <div class="ui divider"></div>
+            <a class="item" href="../index.html">
+                <i class="sign out icon"></i>
+                Cerrar Sesión
+            </a>
+        </div>
+        <div class="sidebar-footer-image">
+            <img src="../Images/logo_neg.png" alt="Decoración de Sidebar">
+        </div>
+    </div>
+
+    <div class="pusher">
+        <!--Menú Superior-->
+        <div class="ui top fixed menu" style="background-color: #9A9CEA;">
+            <div class="ui container">
+                <div class="item">
+                    <img src="../Images/logopng.png" alt="Logo"> <!--logo de la pagina-->
+                </div>
+                <a class="item" id="sidebar-toggle"><!--activador del sidebar-->
+                    <i class="sidebar icon" style="color: white;"></i><!--Icono del sidebar-->
+                </a>
+                <div class="header item" style="color: white;"><!--color y titulo del menu superior-->
+                    Gestión de Vivienda
+                </div>
+                <div class="right menu">
+                    <div class="ui dropdown item" style="color: white;">
+                        <i class="user icon" style="color: white;"></i> Habitante
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <a class="item" href="/Pages/profile.html"><i class="user icon"></i> Mi Perfil</a>
+                            <a class="item"><i class="cog icon"></i> Configuración</a>
+                            <div class="divider"></div>
+                            <a class="item" href="/index.html"><i class="sign out icon"></i> Cerrar Sesión</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2>Reporte en Vivienda</h2>
+
+        <div class="ui container" style="margin-top: 2em; margin-bottom: 5em;">
+            <div class="ui stackable two column grid">
+                
+                <div class="column">
+                <div class="ui segment">
+                    <h3 class="ui header">Nuevo Reporte</h3>
+                    <div class="ui form">
+                    <div class="filters-container">
+                        <div class="field">
+                            <label>Categoría</label>
+                            <select class="ui dropdown" id="input-categoria">
+                            <option value="" selected disabled>Seleccione una categoría</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                            <option value="Seguridad">Seguridad</option>
+                            <option value="Limpieza">Limpieza</option>
+                            <option value="Otros">Otros</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Nivel de Importancia</label>
+                            <select class="ui dropdown" id="input-importancia">
+                            <option value="" selected disabled>Seleccione un nivel</option>
+                            <option value="Bajo">Baja</option>
+                            <option value="Medio">Media</option>
+                            <option value="Alto">Alta</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Descripción</label>
+                        <textarea id="input-texto" placeholder="¿Qué sucede?"></textarea>
+                    </div>
+                    <button class="ui primary button" onclick="enviarReporte()">Enviar</button>
+                    </div>
+                </div>
+                </div>
+
+                <div class="column">
+                <h3 class="ui header">Mis Reportes</h3>
+                <div id="contenedor-reportes">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alertas -->
+            <div class="alert fail" id="alertFail" style="display: none; padding: 15px; margin-bottom: 20px; border-radius: 5px; opacity: 0;">
+                <i class="exclamation circle icon"></i>
+                <span id="alertMessage">Debe completar todos los campos. Por favor, intente nuevamente.</span>
+            </div>
+
+            <div class="alert success" id="alertSuccess" style="display: none; padding: 15px; margin-bottom: 20px; border-radius: 5px; opacity: 0;">
+                <i class="check circle icon"></i>
+                <span id="successMessage">¡Reporte enviado correctamente!</span>
+            </div>
+        </div>
+    
+        <footer class="ui inverted vertical footer segment">
+            <div class="ui container">
+                <p>Hecho con <i class="heart icon"></i></p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

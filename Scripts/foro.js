@@ -25,32 +25,32 @@ function initSidebar() {
 
 //FORO
 function formForo(){
-    // Activar dropdown
+    //Activar dropdown
     $('.ui.dropdown').dropdown();
 
-    // Activar dimmer
+    //Activar dimmer
     $('.special.card .image').dimmer({ on: 'hover' });
 
-    // Inicialización y configuración del Modal
+    //Inicialización y configuración del Modal
     $('#modalAgregar').modal({
-        // Validación de campos OBLIGATORIOS al intentar 'Aprobar' (Publicar)
+        // Validación de campos obligatorios al intentar publicar
         onApprove: function() {
-            // El 'form' dentro del modal
+            //El form dentro del modal
             const $form = $('#modalAgregar .ui.form');
 
-            // Semantic UI Form Validation: se utiliza aquí para verificar los campos 'required'
+            //Se utiliza el semantic ui form validation para verificar los campos requeridos
             $form.form({
                 fields: {
-                    Tema: 'empty', // El campo con name="Tema" no puede estar vacío
-                    Descripción: 'empty', // El campo con name="Descripción" no puede estar vacío
+                    Tema: 'empty', //El campo con name="Tema" no puede estar vacío
+                    Descripción: 'empty', //El campo con name="Descripción" no puede estar vacío
                 }
             });
 
-            // Si la validación falla, Semantic UI automáticamente muestra los mensajes
+            //Si la validación falla, Semantic UI automáticamente muestra los mensajes
             if ($form.form('is valid')) {
-                // Si el formulario es válido, podemos proceder a mostrar la alerta de éxito.
+                //Si el formulario es válido, podemos proceder a mostrar la alerta de éxito.
                 
-                // Muestra la alerta de éxito
+                //Muestra la alerta de éxito
                 setTimeout(() => {
                     $('#alertSuccess').fadeIn();
 
@@ -60,37 +60,37 @@ function formForo(){
                     }, 3000);
                 }, 500);
                 
-                // IMPORTANTE: Retorna TRUE para permitir que el modal se CIERRE.
+                //retorna true para permitir que el modal cierre
                 return true; 
             }
             
-            // Muestra la alerta de éxito
+            //Muestra la alerta de éxito
             setTimeout(() => {
                 $('#alertFail').fadeIn();
 
-                // Oculta la alerta después de 3 segundos
+                //Oculta la alerta después de 3 segundos
                 setTimeout(() => {
                     $('#alertFail').fadeOut();
                 }, 3000);
             }, 500);
-            // Si el formulario NO es válido, retorna FALSE para mantener el modal ABIERTO.
+            //Si el formulario no es válido, retorna false para mantener el modal abierto
             return false;
         },
 
-        // Preguntar si está seguro al intentar 'Cancelar'
+        //preguntar si está seguro al intentar 'Cancelar'
         onDeny: function() {
-            // Utilizamos la función de confirmación nativa del navegador
+            //Utilizamos la función de confirmación nativa del navegador
             const confirmar = confirm('¿Estás seguro de que deseas cancelar? Se perderán los cambios.');
             
-            // Retorna TRUE si el usuario CONFIRMA (permite que el modal se cierre).
-            // Retorna FALSE si el usuario CANCELA (mantiene el modal abierto).
+            //Retorna true si el usuario confirma (permite que el modal se cierre)
+            // Retorna FALSE si el usuario cancela (mantiene el modal abierto)
             return confirmar; 
         }
     });
 
-    // Abrir el modal (usa la configuración definida arriba)
+    //Abrir el modal
     $('#agregarBtn').on('click', function() {
-        // Reinicia el estado del formulario (mensajes de error) antes de mostrarlo
+        //Reinicia el estado del formulario (mensajes de error) antes de mostrarlo
         $('#modalAgregar .ui.form').form('clear');
         $('#modalAgregar').modal('show');
     });

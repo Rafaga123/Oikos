@@ -6,7 +6,6 @@ body{
     background-attachment: fixed; /* queda fija al hacer scroll */
     background-color: #f0f0f0; /* color de respaldo por si la imagen no carga */
 }
-
 /* Responsive */
 @media (max-width: 768px) {
     .pusher {
@@ -73,12 +72,6 @@ h3{
     transition: margin-left 0.3s ease;
 }
 
-
-.pusher{
-    margin-left: 0px;
-    transition: none;
-}
-
 .sidebar-menu {
     width: 260px;
     position: fixed;
@@ -118,8 +111,6 @@ h3{
     width:100%;
 }
 
-
-
 .ui.left.vertical.inverted.sidebar.labeled.icon.menu{
     background-color: #9A9CEA;
 }
@@ -158,7 +149,6 @@ h3{
 
 }
 
-
 .ui.card.link-card {
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -187,20 +177,22 @@ h3{
     flex-grow: 1; 
 }
 
-/* Estilos para el carrusel de Slick */
+/*CONTENEDOR PADRE DEL CARRUSEL*/
 .announcement-carousel {
     position: relative;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
+    width: 100%;
+    max-width: 900px; /* Tamaño máximo en PC */
+    margin: 0 auto;   /* Centra el carrusel horizontalmente */
+    padding: 0 10px;  /* Pequeño respiro en los bordes para móviles */
+    box-sizing: border-box;
 }
 
 .carousel-container {
     position: relative;
     overflow: hidden;
     border-radius: 30px;
-    margin-left: 200px;
-    margin-right: 200px; 
+    width: 85%; 
+    margin: 0 auto; 
     background: linear-gradient(135deg, #a2b9ee, #ADEEE2) !important;   
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     min-height: 250px;
@@ -217,30 +209,32 @@ h3{
 }
 
 .carousel-nav {
-    display: flex;
-    justify-content: space-between;
     position: absolute;
     top: 50%;
-    left: 50px;
-    right: 50px;
+    left: 0;
+    right: 0;
     transform: translateY(-50%);
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
     z-index: 10;
-    padding: 0 15px;
 }
 
 .carousel-btn {
-    background-color: rgba(154, 156, 234, 0.8);
+    background-color: rgba(154, 156, 234, 0.9);
     border: none;
     color: white;
-    width: 40px;
-    height: 40px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 18px;
-    transition: background-color 0.3s;
+    transition: all 0.3s;
+    position: relative; /* Quitamos el position absolute individual */
+    top: 0 !important; /* Reseteamos el -220px */
 }
 
 .carousel-btn.prev-btn {
@@ -316,4 +310,15 @@ h3{
     text-align: center;
     margin-bottom: 10px;
     color: #444;
+}
+
+/*Estilos para el footer*/
+.ui.vertical.footer {
+    background-color: #A2B9EE;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    bottom: 0;
+    width: 100%;
+    align-items: flex-end;
 }

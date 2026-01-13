@@ -55,7 +55,7 @@
                 <div class="ui fluid button primary next-btn">Siguiente</div>
             </div>
 
-            <!-- Paso 2: Cédula, Email, Numero, Fecha de Nacimiento -->
+            <!-- Paso 2: Cédula y Email (datos mínimos; el resto se pedirá en el primer ingreso) -->
             <div class="step" id="step-2" style="display: none;">
                 <div class="two fields">
                     <div class="field">
@@ -65,32 +65,6 @@
                     <div class="field">
                         <label>Correo Electrónico</label>
                         <input type="email" id="email" name="email" placeholder="Correo Electrónico" required>
-                    </div>
-                </div>
-                <div class="two fields">
-                    <div class="field">
-                        <label>Teléfono (Opcional)</label>
-                        <input type="tel" id="telefono" name="telefono" placeholder="Ej: +593987654321">
-                    </div>
-                    <div class="field">
-                        <label>Número de casa (Opcional)</label>
-                        <input type="text" id="numero_casa" name="numero_casa" placeholder="Ej: A-12">
-                    </div>
-                </div>
-                <div class="two fields">
-                    <div class="field">
-                        <label>Fecha de Nacimiento</label>
-                        <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
-                    </div>
-                    <div class="field">
-                        <label>Tipo de habitante (Opcional)</label>
-                        <select id="tipo_habitante" name="tipo_habitante" class="ui dropdown">
-                            <option value="">Selecciona una opción</option>
-                            <option value="PROPIETARIO">Propietario</option>
-                            <option value="INQUILINO">Inquilino</option>
-                            <option value="FAMILIAR">Familiar</option>
-                            <option value="OTRO">Otro</option>
-                        </select>
                     </div>
                 </div>
                 <div class="ui two buttons">

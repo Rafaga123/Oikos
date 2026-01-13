@@ -18,21 +18,14 @@ body{
     align-items: flex-end;
 }
 
-h1{
-    padding-top: 100px;
+h2{
+    padding-top: 70px;
     text-align: center;
     font-weight: 700;
-    font-size: 3rem;
+    font-size: 2.5rem;
     color: black
 }
 
-h3{
-    text-align: center;
-    margin-top: 20px;
-    font-weight: 700;
-    font-size: 1.8rem;
-    color: #7b7fd6;
-}
 
 .pusher {
     margin-left: 0px;
@@ -91,40 +84,6 @@ h3{
     cursor: pointer;
 }
 
-/* Estilos para las tarjetas de encuesta */
-.ui.cards > .card,
-.ui.card {
-    background-color: #bdeefd; 
-    display: flex; /* Convierte la tarjeta en un contenedor flex */
-    flex-direction: column; /* Coloca los elementos hijos verticalmente */
-}
-
-.ui.cards > .card > .content {
-    flex-grow: 1; /* Permite que el contenido se estire para ocupar el espacio disponible */
-}
-
-/* Efecto pop-up*/
-.ui.cards > .card:hover {
-    background-color: #a2dcee;
-    /* Aumenta la sombra para simular elevación (efecto pop-up) */
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
-    /* Ligeramente más grande y elevado*/
-    transform: translateY(-5px); 
-    /* El puntero cambia a mano para indicar que es interactivo */
-    cursor: pointer;
-}
-
-.ui.inverted.button{
-    background-color: #9a9cea;
-    color: white;
-    
-}
-
-.ui.inverted.button:hover{
-    background-color: #7b7fd6;
-    color: white;
-}
-
 /*Habilita Flexbox en el Sidebar Contenedor */
 .ui.left.vertical.sidebar {
     /* Es crucial que el sidebar sea un contenedor Flex */
@@ -153,30 +112,5 @@ h3{
     max-height: 150px; 
     /* Mantiene la proporción de la imagen */
     height: auto; 
-}
 
-/* Espaciado para el botón de retorno */
-.button-margin-top {
-    margin-top: 50px;    /* Espacio arriba para separarlo de las tarjetas */
-    margin-bottom: 50px; /* Espacio abajo para separarlo del borde inferior */
-}
-
-/* Aplicamos todos los efectos a la clase principal del botón */
-.ui.huge.primary.button {
-    background-color: #9A9CEA;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
-    transition: all 0.2s ease-in-out;
-}
-
-/*Levatamiento al colocar el cursor*/
-.ui.huge.primary.button:hover {
-    background-color: #7b7fd6;
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.25); 
-    transform: translateY(-2px); 
-}
-
-/*Presionado*/
-.ui.huge.primary.button:active {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); 
-    transform: translateY(1px); 
 }
