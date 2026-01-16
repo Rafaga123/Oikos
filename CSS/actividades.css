@@ -7,6 +7,7 @@ body{
     background-color: #f0f0f0; /* color de respaldo por si la imagen no carga */
 }
 
+
 /*Estilos para el footer*/
 .ui.vertical.footer {
     background-color: #A2B9EE;
@@ -113,4 +114,48 @@ h2{
     /*Mantiene la proporción de la imagen */
     height: auto; 
 
+}
+
+.pusher>.ui.container {
+    padding-top: 40px;
+}
+
+.meta {
+    margin-top: 5px;
+}
+
+.icon-brand{
+    color: #9A9CEA;
+}
+
+.ui.card, .ui.fluid.card {
+    background: linear-gradient(135deg, #adeee2, #A2B9EE) !important; ;
+}
+
+/* Espaciado para el botón de retorno */
+.button-margin-top {
+    margin-top: 50px;    /* Espacio arriba para separarlo de las tarjetas */
+    margin-bottom: 50px; /* Espacio abajo para separarlo del borde inferior */
+}
+
+/* Aplicamos todos los efectos a la clase principal del botón */
+.ui.huge.primary.button {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    background-color: #9A9CEA;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    transition: all 0.2s ease-in-out;
+}
+
+/*Levatamiento al colocar el cursor*/
+.ui.huge.primary.button:hover {
+    background-color: #7b7fd6;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.25); 
+    transform: translateY(-2px); 
+}
+
+/*Presionado*/
+.ui.huge.primary.button:active {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); 
+    transform: translateY(1px); 
 }

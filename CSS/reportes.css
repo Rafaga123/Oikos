@@ -18,8 +18,14 @@ body{
     align-items: flex-end;
 }
 
+.ui.container.report{
+    padding-top: 50px;
+    margin-top: 50px;
+}
+
 h2{
-    padding-top: 70px;
+    padding-top: 50px;
+    padding-bottom: 30px;
     text-align: center;
     font-weight: 700;
     font-size: 2.5rem;
@@ -119,6 +125,26 @@ h2{
 .button-margin-top {
     margin-top: 50px;    /* Espacio arriba para separarlo de las tarjetas */
     margin-bottom: 50px; /* Espacio abajo para separarlo del borde inferior */
+}
+
+/* Aplicamos todos los efectos a la clase principal del botón */
+.ui.huge.primary.button {
+    background-color: #9A9CEA;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    transition: all 0.2s ease-in-out;
+}
+
+/*Levatamiento al colocar el cursor*/
+.ui.huge.primary.button:hover {
+    background-color: #7b7fd6;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.25); 
+    transform: translateY(-2px); 
+}
+
+/*Presionado*/
+.ui.huge.primary.button:active {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); 
+    transform: translateY(1px); 
 }
 
 /*Reportes*/
