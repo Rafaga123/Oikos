@@ -44,6 +44,9 @@ body {
     padding: 0;
 }
 
+.justificar{
+    text-align: justify;
+}
 
 .ui.button {
     background-color: var(--color-terciario);
