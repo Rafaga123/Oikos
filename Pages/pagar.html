@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pagar</title>
     <link rel="shortcut icon" href="../Images/logo.ico" />
-     <script src="../Scripts/jquery-3.7.1.min.js"></script>
+    <script src="../Scripts/jquery-3.7.1.min.js"></script>
     <script src="../Scripts/semantic.min.js"></script>
     <link rel="stylesheet" type="text/CSS" href="../CSS/semantic.css">       
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"> 
@@ -36,7 +36,7 @@
 <form>
 
 
-    <div class="container">
+    <div class="main-form-container">
     <h2>Reportar pago</h2>
 
     <!-- Métodos de pago -->
@@ -71,13 +71,13 @@
         <div>
           <label for="monto">Monto transferido en bolívares</label>
           <input type="text" 
-           id="monto" 
-           placeholder="Ej: 1.234,56"
+          id="monto" 
+          placeholder="Ej: 1.234,56"
             placeholder="Ej:200.00" 
             pattern="[0-9.,]+"
             inputmode="decimal">
           </div>
-           <div>
+          <div>
             <label for="fechaPago">Fecha del pago</label>
             <input type="date" 
             id="fechaPago"
@@ -105,12 +105,9 @@
     </div>
 
     <div class="actions-row">
-     <a id="btnBack" href="home_page.html" class="btn ghost" type="button">Regresar al Inicio</a>
+    <a id="btnBack" href="home_page.html" class="btn ghost" type="button">Regresar al Inicio</a>
       <button id="btnSubmit" class="btn primary" type="button">Enviar</button>
     </div>
-
-
-    
 
   </div>
 
@@ -119,17 +116,14 @@
     <span class="closebtn" onclick="this.parentElement.style.display='none'">&times;</span>
     <strong>Éxito:</strong> La información de pago se envió correctamente.
   </div>
-  
-
-<footer class="ui inverted vertical footer segment">
-    <div class="ui container">
-        <p>Hecho con <i class="heart icon"></i></p>
-    </div>
-    </footer>
-
 
 </form>
 
+  <footer class="ui inverted vertical footer segment">
+          <div class="ui container">
+              <p>Hecho con <i class="heart icon"></i></p>
+          </div>
+  </footer>
 
 </body>
 </html>
