@@ -3,9 +3,8 @@
     background: white !important;
     color: var(--color-texto) !important;
     box-shadow: 0 4px 24px rgba(154,156,234,0.12);
-    border: 12px solid #ffffff ;
+    border: 5px solid #ffffff ;
     border-radius: 0px;
-    padding: 5px;
 }
 .ui.menu .item {
     color: var(--color-primario) !important;
