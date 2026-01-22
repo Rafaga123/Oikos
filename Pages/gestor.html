@@ -5,16 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor</title>
     <link rel="shortcut icon" href="Images/logo.ico" />
-    <script src="../../Scripts/jquery-3.7.1.min.js"></script>
-    <script src="../../Scripts/semantic.min.js"></script>
     <link rel="stylesheet" type="text/CSS" href="../../CSS/semantic.css">       
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"> 
-    <script src="../../Scripts/admin.js"></script>
-    <link rel="stylesheet" href="../../CSS/admin.css">
+    <link rel="stylesheet" href="../CSS/admin.css">
+    <script src="../Scripts/seguridad.js"></script>
 </head>
 <body>
-
-  <!-- Sidebar -->
     <div class="ui vertical inverted sidebar menu sidebar-menu" style="background-color: #9A9CEA;">
         <div class="item">
             <div class="header">
@@ -33,26 +29,26 @@
                     <i class="home icon"></i>
                     Panel de Control
                 </a>
-                <a class="item" href="gestion_habitantes.html">
+                <a class="item" href="./gestion_habitantes.html">
                     <i class="users icon"></i>
                     Habitantes
                 </a>
-                <a class="item" href="solicitudes.html">
+                <a class="item" href="./solicitudes.html">
                     <i class="chart bar icon"></i>
                     Solicitudes
                 </a>
                 
             </div>
         </div>
-        <div class="item">
+        <div class="item" >
             <div class="ui divider"></div>
-            <a class="item" href="../index.html">
+            <a class="item" onclick="cerrarSesion()">
                 <i class="sign out icon"></i>
                 Cerrar Sesión
             </a>
         </div>
         <div class="sidebar-footer-image">
-            <img src="../../Images/logopng.png" alt="Decoración de Sidebar">
+            <img src="../Images/logopng.png" alt="Decoración de Sidebar">
         </div>
     </div>
 
@@ -78,7 +74,7 @@
                             <a class="item"><i class="user icon"></i> Mi Perfil</a>
                             
                             <div class="divider"></div>
-                            <a class="item" href="../index.html"><i class="sign out icon"></i> Cerrar Sesión</a>
+                            <a class="item" onclick="cerrarSesion()"><i class="sign out icon"></i> Cerrar Sesión</a>
                         </div>
                     </div>
                 </div>
@@ -287,7 +283,8 @@
         </div>
     </div>
 
-
-
+    <script src="../../Scripts/jquery-3.7.1.min.js"></script>
+    <script src="../../Scripts/semantic.min.js"></script>
+    <script src="../../Scripts/admin.js"></script>
 </body>
 </html>

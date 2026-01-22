@@ -16,12 +16,11 @@
                 <img src="../Images/logoproyecto.png" alt="Por definir" width="40" height="35"/>
             </a>
             <a class="item" href="../index.html">Inicio</a>
-            <a class="item" href="Acerca_nuestro.html">¿Quiénes somos?</a>
-            <a class="item" href="mision.html">Misión</a>
-            <a class="item" href="vision.html">Visión</a>
+            <a class="item" href="./Acerca_nuestro.html">¿Quiénes somos?</a>
+            <a class="item" href="./mision_vision.html">Misión y Visión</a>
             <div class="right menu">
-                <a class="ui button" href="login.html">Iniciar sesión</a>
-                <a class="ui button" href="register.html">Registrarme</a>
+                <a class="ui button" href="./login.html">Iniciar sesión</a>
+                <a class="ui button" href="./register.html">Registrarme</a>
             </div>
         </div>
     </header>
@@ -78,11 +77,21 @@
             <div class="step" id="step-3" style="display: none;">
                 <div class="field">
                     <label>Contraseña</label>
-                    <input type="password" id="password" name="password" placeholder="Contraseña" required>
+                    <div class="ui action input" style="width: 100%;">
+                        <input type="password" id="password" name="password" placeholder="Contraseña" required>
+                        <button type="button" class="ui icon button" onclick="togglePassword('password', this)" aria-label="Mostrar contraseña">
+                            <i class="eye slash icon"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="field">
                     <label>Confirmar Contraseña</label>
-                    <input type="password" id="confirmar" name="confirmar" placeholder="Confirmar Contraseña" required>
+                    <div class="ui action input" style="width: 100%;">
+                        <input type="password" id="confirmar" name="confirmar" placeholder="Confirmar Contraseña" required>
+                        <button type="button" class="ui icon button" onclick="togglePassword('confirmar', this)" aria-label="Mostrar contraseña">
+                            <i class="eye slash icon"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="ui two buttons">
                     <button class="ui button back-btn" type="button">Volver</button>
@@ -97,7 +106,7 @@
     </main>
     <main class="container">
         <div class="ui message" style="text-align: center;">
-            ¿Ya tienes una cuenta? <a href="login.html">Inicia sesión</a>
+            ¿Ya tienes una cuenta? <a href="./login.html">Inicia sesión</a>
         </div>
     </main>
 
@@ -110,5 +119,19 @@
     <script src="../Scripts/semantic.min.js"></script>
     <script src="../Scripts/register.js"></script>
     <script src="../Scripts/script.js"></script>
+    <script>
+    function togglePassword(inputId, button) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        const showing = input.type === 'text';
+        input.type = showing ? 'password' : 'text';
+        const icon = button.querySelector('i');
+        if (icon) {
+            icon.classList.toggle('eye');
+            icon.classList.toggle('eye slash');
+        }
+        button.setAttribute('aria-label', showing ? 'Mostrar contraseña' : 'Ocultar contraseña');
+    }
+    </script>
 </body>
 </html>

@@ -10,6 +10,7 @@
     <link rel="stylesheet" type="text/CSS" href="../CSS/semantic.css">       
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"> 
     <link rel="stylesheet" href="../CSS/profile_css.css">
+    <script src="../Scripts/seguridad.js"></script>
 </head>
 
 <body>
@@ -17,7 +18,7 @@
     <!-- Menú izquierdo -->
     <div class="item">
       <img src="../Images/logopng.png" alt="Logo">
-      <a class="item" href="home_page.html" style="color: white;">Volver al Inicio</a>
+      <a class="item" href="./home_page.html" style="color: white;">Volver al Inicio</a>
     </div>
 
     <!-- Menú derecho -->
@@ -26,7 +27,7 @@
         Perfil <i class="dropdown icon"></i>
         <div class="menu">
           <a class="item" href="../Pages/pagar.html">Pagar</a>
-          <a class="item" href="../index.html">Cerrar sesión</a>
+          <a class="item" onclick="cerrarSesion()">Cerrar sesión</a>
         </div>
       </div>
     </div>

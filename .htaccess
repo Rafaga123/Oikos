@@ -1,0 +1,6 @@
+# Activar el motor de reescritura
+RewriteEngine On
+
+# Ruta de error
+ErrorDocument 404 /Proyectoquinto/Pages/404.html
+Options -Indexes

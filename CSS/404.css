@@ -1,0 +1,4 @@
+body { background-color: #f4f4f4; height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; }
+    .error-container { max-width: 500px; padding: 40px; background: white; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    .error-code { font-size: 6rem; font-weight: bold; color: #db2828; margin: 0; }
+    .icon-ghost { font-size: 4rem; color: #db2828; margin-bottom: 20px; }

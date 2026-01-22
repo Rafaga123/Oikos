@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginErrorMessage = document.getElementById('login-error-message');
   const forgotForm = document.getElementById('forgotForm');
   const forgotErrorMessage = document.getElementById('forgot-error-message');
+  const forgotSubmitBtn = document.getElementById('forgotSubmit');
 
   if (!loginForm) return;
 
@@ -53,8 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const rol = data.usuario.rol;
       if (data.usuario.estado_solicitud === 'SIN_COMUNIDAD') {
         window.location.href = 'bienvenida.html'; // <--- El usuario nuevo va aquí
+      }else if (data.usuario.estado_solicitud === 'PENDIENTE'){
+        window.location.href = '../index.html'
       } else if (rol === 'ENCARGADO_COMUNIDAD') {
-        window.location.href = 'admin.html'; // página de gestor (debo estar pendiente de cambiar el nombre luego)
+        window.location.href = 'gestor.html'; // página de gestor (debo estar pendiente de cambiar el nombre luego)
       } else if (rol === 'ADMINISTRADOR') {
         window.location.href = '/administrador/administrador.html'; // página de administrador
       } else {
@@ -69,6 +72,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (forgotForm) forgotForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (forgotErrorMessage) forgotErrorMessage.style.display = 'none';
+    if (forgotSubmitBtn) {
+      forgotSubmitBtn.classList.add('loading', 'disabled');
+      forgotSubmitBtn.disabled = true;
+    }
     
     const email = document.getElementById('forgotEmail').value.trim();
 
@@ -79,24 +86,45 @@ document.addEventListener('DOMContentLoaded', () => {
             body: JSON.stringify({ email })
         });
         const data = await res.json();
-        // Mensaje genérico
-        alert('Si el correo existe, se envió un enlace de recuperación.');
+        const isOk = res.ok;
 
-        // En desarrollo (Ethereal), mostramos preview y acceso directo
+        if (isOk) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Correo enviado',
+            text: 'Si el correo existe, se envió un enlace de recuperación.',
+            timer: 10000,
+            timerProgressBar: true,
+            confirmButtonText: 'Aceptar'
+          }).then(() => {
+            if (forgotForm && loginForm) {
+              forgotForm.style.display = 'none';
+              loginForm.style.display = 'block';
+            }
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'No se pudo enviar',
+            text: data?.error || 'Hubo un problema al enviar el correo.'
+          });
+        }
+
         if (data?.previewUrl) {
           console.log('Preview email (Ethereal):', data.previewUrl);
         }
-        // Volver al login
-        if (forgotForm && loginForm) {
-          forgotForm.style.display = 'none';
-          loginForm.style.display = 'block';
-        }
 
     } catch (error) {
-        if (forgotErrorMessage) {
-          forgotErrorMessage.textContent = 'Error de conexión';
-          forgotErrorMessage.style.display = 'block';
-        }
+        Swal.fire({
+          icon: 'error',
+          title: 'Error de conexión',
+          text: 'No se pudo contactar al servidor. Inténtalo nuevamente.'
+        });
+    } finally {
+      if (forgotSubmitBtn) {
+        forgotSubmitBtn.classList.remove('loading', 'disabled');
+        forgotSubmitBtn.disabled = false;
+      }
     }
   });
 });

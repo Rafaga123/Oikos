@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="CSS/semantic.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"/>
     <link rel="stylesheet" href="../CSS/auth.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Inicio de sesión</title>
 </head>
 <body>
@@ -17,12 +18,11 @@
                 <img src="../Images/logoproyecto.png" alt="Por definir" width="40" height="35"/>
             </a>
             <a class="item" href="../index.html">Inicio</a>
-            <a class="item" href="Acerca_nuestro.html">¿Quiénes somos?</a>
-            <a class="item" href="mision.html">Misión</a>
-            <a class="item" href="vision.html">Visión</a>
+            <a class="item" href="./Acerca_nuestro.html">¿Quiénes somos?</a>
+            <a class="item" href="./mision_vision.html">Misión y Visión</a>
             <div class="right menu">
-                <a class="ui button" href="login.html">Iniciar sesión</a>
-                <a class="ui button" href="register.html">Registrarme</a>
+                <a class="ui button" href="./login.html">Iniciar sesión</a>
+                <a class="ui button" href="./register.html">Registrarme</a>
             </div>
         </div>
     </header>
@@ -36,12 +36,17 @@
             </div>
             <div class="field">
                 <label for="password">Contraseña</label>
-                <input type="password" id="password" name="password" placeholder="Contraseña" required>
+                <div class="ui action input" style="width: 100%;">
+                    <input type="password" id="password" name="password" placeholder="Contraseña" required>
+                    <button type="button" class="ui icon button" onclick="togglePassword('password', this)" aria-label="Mostrar contraseña">
+                        <i class="eye slash icon"></i>
+                    </button>
+                </div>
                 <span class="forgot-password-link" id="forgotPasswordLink">¿Olvidaste tu contraseña?</span>
             </div>
             <button class="ui button primary fluid" type="submit">Entrar</button>
             <div class="form-links">
-                ¿No tienes cuenta? <a href="register.html">Regístrate</a>
+                ¿No tienes cuenta? <a href="./register.html">Regístrate</a>
             </div>
             <div id="login-error-message" class="ui red message" style="display: none; margin-top: 1rem;"></div>
         </form>
@@ -51,7 +56,7 @@
                 <label for="forgotEmail">Correo electrónico</label>
                 <input type="email" id="forgotEmail" name="forgotEmail" placeholder="Ingresa tu correo" required>
             </div>
-            <button class="ui button primary fluid" type="submit">Enviar enlace</button>
+            <button class="ui button primary fluid" type="submit" id="forgotSubmit">Enviar enlace</button>
             <div class="form-links">
                 <a href="#" id="backToLogin">Volver a iniciar sesión</a>
             </div>
@@ -69,6 +74,19 @@
     <script src="../Scripts/login.js"></script>
     <script src="../Scripts/script.js"></script>
     <script>
+    function togglePassword(inputId, button) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        const showing = input.type === 'text';
+        input.type = showing ? 'password' : 'text';
+        const icon = button.querySelector('i');
+        if (icon) {
+            icon.classList.toggle('eye');
+            icon.classList.toggle('eye slash');
+        }
+        button.setAttribute('aria-label', showing ? 'Mostrar contraseña' : 'Ocultar contraseña');
+    }
+
     $(function() {
         $('#forgotPasswordLink').on('click', function(e) {
             e.preventDefault();

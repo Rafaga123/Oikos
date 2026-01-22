@@ -4,48 +4,69 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="../Images/logo.ico" />
-  <link rel="stylesheet" href="CSS/semantic.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"/>
-  <link rel="stylesheet" href="../CSS/auth.css" />
-  <title>Restablecer contraseña</title>
+    <link rel="stylesheet" href="CSS/semantic.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"/>
+    <link rel="stylesheet" href="../CSS/auth.css" />
+    <title>Restablecer contraseña</title>
 </head>
 <body>
-  <header class="ui menu">
-    <div class="ui container">
-      <a href="../index.html">
-        <img src="../Images/logoproyecto.png" alt="Por definir" width="40" height="35"/>
-      </a>
-      <a class="item" href="../index.html">Inicio</a>
-    </div>
-  </header>
+    <header class="ui menu">
+        <div class="ui container">
+            <a href="../index.html">
+                <img src="../Images/logoproyecto.png" alt="Por definir" width="40" height="35"/>
+            </a>
+            <a class="item" href="../index.html">Inicio</a>
+        </div>
+    </header>
 
-  <main class="centered-form-container">
-    <form class="ui form attached fluid segment" id="resetForm">
-      <h2 class="ui center aligned header" style="margin-bottom:1.5rem;">Restablecer contraseña</h2>
-      <div class="field">
-        <label>Nueva contraseña</label>
-        <input type="password" id="newPassword" placeholder="Nueva contraseña" required>
-      </div>
-      <div class="field">
-        <label>Confirmar contraseña</label>
-        <input type="password" id="confirmPassword" placeholder="Confirmar contraseña" required>
-      </div>
-      <button class="ui button primary fluid" type="submit">Actualizar contraseña</button>
-      <div id="reset-error-message" class="ui red message" style="display: none; margin-top: 1rem;"></div>
-    </form>
-    <div class="ui message" style="text-align:center;">
-      <a href="login.html">Volver a iniciar sesión</a>
-    </div>
-  </main>
-
-  <footer class="ui inverted vertical footer segment">
-    <div class="ui container">
-      <p>Hecho con <i class="heart icon"></i></p>
-    </div>
-  </footer>
-  <script src="../Scripts/jquery-3.7.1.min.js"></script>
-  <script src="../Scripts/semantic.min.js"></script>
-  <script src="../Scripts/reset_password.js"></script>
-  <script src="../Scripts/script.js"></script>
+    <main class="centered-form-container">
+        <form class="ui form attached fluid segment" id="resetForm">
+            <h2 class="ui center aligned header" style="margin-bottom:1.5rem;">Restablecer contraseña</h2>
+            <div class="field">
+                <label>Nueva contraseña</label>
+                <div class="ui action input" style="width: 100%;">
+                    <input type="password" id="newPassword" placeholder="Nueva contraseña" required>
+                    <button type="button" class="ui icon button" onclick="togglePassword('newPassword', this)" aria-label="Mostrar contraseña">
+                        <i class="eye slash icon"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="field">
+                <label>Confirmar contraseña</label>
+                <div class="ui action input" style="width: 100%;">
+                    <input type="password" id="confirmPassword" placeholder="Confirmar contraseña" required>
+                    <button type="button" class="ui icon button" onclick="togglePassword('confirmPassword', this)" aria-label="Mostrar contraseña">
+                        <i class="eye slash icon"></i>
+                    </button>
+                </div>
+            </div>
+            <button class="ui button primary fluid" type="submit">Actualizar contraseña</button>
+            <div id="reset-error-message" class="ui red message" style="display: none; margin-top: 1rem;"></div>
+        </form>
+    </main>
+    
+    <footer class="ui inverted vertical footer segment">
+        <div class="ui container">
+            <p>Hecho con <i class="heart icon"></i></p>
+        </div>
+    </footer>
+    <script src="../Scripts/jquery-3.7.1.min.js"></script>
+    <script src="../Scripts/semantic.min.js"></script>
+    <script src="../Scripts/reset_password.js"></script>
+    <script src="../Scripts/script.js"></script>
+    <script>
+    function togglePassword(inputId, button) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        const showing = input.type === 'text';
+        input.type = showing ? 'password' : 'text';
+        const icon = button.querySelector('i');
+        if (icon) {
+            icon.classList.toggle('eye');
+            icon.classList.toggle('eye slash');
+        }
+        button.setAttribute('aria-label', showing ? 'Mostrar contraseña' : 'Ocultar contraseña');
+    }
+    </script>
 </body>
 </html>

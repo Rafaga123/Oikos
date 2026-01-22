@@ -1,4 +1,12 @@
-body { background-color: #f4f4f4; display: flex; align-items: center; justify-content: center; height: 100vh; }
+:root {
+    --color-primario: #9A9CEA;
+    --color-secundario: #A2B9EE;
+    --color-terciario: #A2DCEE;
+    --color-cuaternario: #ADEEE2;
+    --color-texto: #213547;
+}
+
+body { background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-terciario) 100%);; display: flex; align-items: center; justify-content: center; height: 100vh; }
 .welcome-container { max-width: 600px; width: 100%; padding: 20px; }
 .action-card { cursor: pointer; transition: transform 0.2s; }
 .action-card:hover { transform: translateY(-5px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }

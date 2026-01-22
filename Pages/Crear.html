@@ -5,14 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear</title>
     <link rel="shortcut icon" href="../Images/logo.ico" />
-    
-    <!-- jQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    
-    <!-- Semantic UI -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
     <link rel="stylesheet" href="../CSS/crear.css">
+    <script src="../Scripts/seguridad.js"></script>
 </head>
 <body>
     <!-- Sidebar -->
@@ -30,15 +27,15 @@
         </div>
         <div class="item">
             <div class="menu">
-                <a class="active item" href="admin.html">
+                <a class="active item" href="./gestor.html">
                     <i class="home icon"></i>
                     Panel de Control
                 </a>
-                <a class="item" href="gestion_habitantes.html">
+                <a class="item" href="./gestion_habitantes.html">
                     <i class="users icon"></i>
                     Habitantes
                 </a>
-                <a class="item" href="solicitudes.html">
+                <a class="item" href="./solicitudes.html">
                     <i class="chart bar icon"></i>
                     Solicitudes
                 </a>
@@ -47,7 +44,7 @@
         </div>
         <div class="item">
             <div class="ui divider"></div>
-            <a class="item" href="../index.html">
+            <a class="item" onclick="cerrarSesion()">
                 <i class="sign out icon"></i>
                 Cerrar Sesión
             </a>
@@ -79,7 +76,7 @@
                             <a class="item"><i class="user icon"></i> Mi Perfil</a>
                             <a class="item"><i class="cog icon"></i> Configuración</a>
                             <div class="divider"></div>
-                            <a class="item" href="../index.html"><i class="sign out icon"></i> Cerrar Sesión</a>
+                            <a class="item" onclick="cerrarSesion()"><i class="sign out icon"></i> Cerrar Sesión</a>
                         </div>
                     </div>
                 </div>
