@@ -54,8 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const rol = data.usuario.rol;
       if (data.usuario.estado_solicitud === 'SIN_COMUNIDAD') {
         window.location.href = 'bienvenida.html'; // <--- El usuario nuevo va aquí
+      }else if (data.usuario.estado_solicitud === 'PENDIENTE'){
+        window.location.href = '../index.html'
       } else if (rol === 'ENCARGADO_COMUNIDAD') {
-        window.location.href = 'admin.html'; // página de gestor (debo estar pendiente de cambiar el nombre luego)
+        window.location.href = 'gestor.html'; // página de gestor (debo estar pendiente de cambiar el nombre luego)
       } else if (rol === 'ADMINISTRADOR') {
         window.location.href = '/administrador/administrador.html'; // página de administrador
       } else {
