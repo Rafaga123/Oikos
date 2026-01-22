@@ -78,7 +78,7 @@ body {
     margin-right: auto; 
 }
 
-.header-content-wrapper {
+.header-content-wrapper { 
     display: flex;
     justify-content: center; 
     align-items: center; 
