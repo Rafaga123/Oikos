@@ -4,11 +4,14 @@ const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
-// 1. Importar Mailjet
+// Importar Mailjet
 const Mailjet = require('node-mailjet');
 
-// 2. Conectar con Mailjet
+// Conectar con Mailjet
 const mailjet = Mailjet.apiConnect(
     process.env.MJ_APIKEY_PUBLIC,
     process.env.MJ_APIKEY_PRIVATE
@@ -93,6 +96,25 @@ async function enviarCorreo(destinatario, asunto, titulo, mensajeHTML) {
         return false;
     }
 }
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const dir = './uploads';
+        if (!fs.existsSync(dir)){
+            fs.mkdirSync(dir);
+        }
+        cb(null, dir);
+    },
+    filename: function (req, file, cb) {
+        // Nombre único: id_usuario + fecha + extensión
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, 'perfil-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({ storage: storage });
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // --- ENDPOINTS ---
 
@@ -315,7 +337,7 @@ app.post('/api/comunidades', verificarToken, async (req, res) => {
 
     // Generar código único simple (ej: "RES-8821")
     const aleatorio = Math.floor(1000 + Math.random() * 9000); 
-    const codigo_unico = `RES-${aleatorio}`;
+    const codigo_unico = `${aleatorio}`;
 
     // Transacción: Hacemos todo o nada para asegurar integridad
     const resultado = await prisma.$transaction(async (tx) => {
@@ -504,8 +526,8 @@ app.post('/api/incidencias', verificarToken, async (req, res) => {
                 `Nuevo Reporte: ${titulo}`,
                 "Se ha reportado una incidencia",
                 `<p><strong>Vecino:</strong> ${usuario.primer_nombre} ${usuario.primer_apellido}</p>
-                 <p><strong>Problema:</strong> ${descripcion}</p>
-                 <p>Revisa el panel de incidencias para gestionarlo.</p>`
+                <p><strong>Problema:</strong> ${descripcion}</p>
+                <p>Revisa el panel de incidencias para gestionarlo.</p>`
             );
         }
 
@@ -514,6 +536,64 @@ app.post('/api/incidencias', verificarToken, async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al crear reporte' });
+    }
+});
+
+// --- ENDPOINTS DE PERFIL ---
+
+/**
+ * 1. OBTENER DATOS COMPLETOS DEL PERFIL
+ * Trae usuario, comunidad y pagos recientes
+ */
+app.get('/api/perfil', verificarToken, async (req, res) => {
+    try {
+        const idUsuario = req.usuario.id;
+
+        const usuario = await prisma.usuario.findUnique({
+            where: { id: idUsuario },
+            include: {
+                comunidad: true, // Traer datos de su edificio
+                pagos: {         // Traer sus últimos 5 pagos
+                    take: 5,
+                    orderBy: { fecha_pago: 'desc' }
+                }
+            }
+        });
+
+        if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+        // Ocultar contraseña antes de enviar
+        const { password_hash, ...datosSeguros } = usuario;
+        res.json(datosSeguros);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al cargar perfil' });
+    }
+});
+
+/**
+ * 2. SUBIR FOTO DE PERFIL
+ */
+app.post('/api/perfil/foto', verificarToken, upload.single('foto'), async (req, res) => {
+    try {
+        if (!req.file) return res.status(400).json({ error: 'No se subió ninguna imagen' });
+
+        const idUsuario = req.usuario.id;
+        // Construir la URL de la imagen (ajusta el puerto si es necesario)
+        const fotoUrl = `http://localhost:3000/uploads/${req.file.filename}`;
+
+        // Actualizar BD
+        await prisma.usuario.update({
+            where: { id: idUsuario },
+            data: { foto_perfil_url: fotoUrl }
+        });
+
+        res.json({ mensaje: 'Foto actualizada', url: fotoUrl });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al subir la foto' });
     }
 });
 

@@ -4,27 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="../Images/logo.ico" />
-    <title>Perfil</title>
+    <title>Perfil - Oikos</title>
+    
     <script src="../Scripts/jquery-3.7.1.min.js"></script>
     <script src="../Scripts/semantic.min.js"></script>
     <link rel="stylesheet" type="text/CSS" href="../CSS/semantic.css">       
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"> 
     <link rel="stylesheet" href="../CSS/profile_css.css">
+    
     <script src="../Scripts/seguridad.js"></script>
 </head>
 
 <body>
   <div class="ui top fixed menu" style="background-color: #9A9CEA;">
-    <!-- Menú izquierdo -->
     <div class="item">
       <img src="../Images/logopng.png" alt="Logo">
       <a class="item" href="./home_page.html" style="color: white;">Volver al Inicio</a>
     </div>
 
-    <!-- Menú derecho -->
     <div class="right menu">
-      <div class="ui dropdown item" style="color: white;" ><i class="user icon"></i>
-        Perfil <i class="dropdown icon"></i>
+      <div class="ui dropdown item" style="color: white;">
+        <i class="user icon"></i> Perfil <i class="dropdown icon"></i>
         <div class="menu">
           <a class="item" href="../Pages/pagar.html">Pagar</a>
           <a class="item" onclick="cerrarSesion()">Cerrar sesión</a>
@@ -33,189 +33,128 @@
     </div>
   </div>
   
-  <p></p>
-  <p></p>
-  
-  <div style="background-image: url(/Images/Fondopagina.png); min-height: 100vh; padding: 2em;"> <!--Color de fondo de la pagina web-->
+  <div style="height: 60px;"></div> <div style="background-image: url(/Images/Fondopagina.png); min-height: 100vh; padding: 2em; background-size: cover;"> 
     <div class="ui stackable container">
-      <h1 class="ui header" style="margin-top: 2em;">Perfil usuario</h1>
+      
+      <h1 class="ui header" style="margin-top: 1em; color: #003049;">Perfil de Usuario</h1>
 
       <div class="ui stackable grid">
-        <!-- Columna izquierda: tarjeta con imagen -->
-        <div class="six wide column"><!--tamaño que abarcará la columna con la foto del usuario-->
-          <div class="ui special card">
+        
+        <div class="six wide column">
+          <div class="ui special card fluid">
+            
             <div class="blurring dimmable image">
-              <div class="ui dimmer"><!--dimmer es lo del efecto de profundidad-->
+              <div class="ui dimmer">
                 <div class="content">
                   <div class="center">
-                    <div class="ui inverted button" onclick="document.getElementById('fileInput').click()">Cambiar foto</div><!--Botón para cambiar la img del usuario-->
-                    <input type="file" id="fileInput" accept=".jpg,.jpeg,.png" style="display: none;" onchange="previewImage(event)"> <!--input escondido que abrirá el gestor de archivos para buscar la img-->
+                    <div class="ui inverted button" onclick="document.getElementById('fileInput').click()">
+                      Cambiar foto
+                    </div>
+                    <input type="file" id="fileInput" accept=".jpg,.jpeg,.png" style="display: none;"> 
                   </div>
                 </div>
               </div>
-              <img src="../Images/perfil.jpg" alt="Foto de Sofia"><!--Ruta para la img del usuario-->
+              <img id="avatar-img" src="../Images/default.jpg" alt="Foto de Perfil">
             </div>
+
             <div class="content" style="background-color: #A2B9EE;">
-              <!--Sección de abajo de la foto del perfil del usuario-->
-              <div class="header" style="color:white">Sofia Herrera</div>
-              <div class="meta">
-                <span class="date" style="color:white">Se unió en 2025.</span>
+              <div id="nombre-completo" class="header" style="color:white; font-size: 1.3em;">
+                Cargando...
+              </div>
+              <div class="meta" style="margin-top: 5px;">
+                <span id="nombre-comunidad" style="color:white; opacity: 0.9;"></span>
+              </div>
+              <div class="description" style="color: white; margin-top: 5px;">
+                <small id="email-usuario-card"></small> 
               </div>
             </div>
+
           </div>
         </div>
 
-        <!-- Columna derecha: tabla de historial -->
-        <div class="eight wide column">
+        <div class="ten wide column">
           <h3 class="ui header">Historial de pagos</h3>
-          <table class="ui celled table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Fecha</th>
-                <th>Monto</th>
-                <th>Método</th>
-                <th>Banco emisor</th>
-                <th>Referencia</th>
-                <th>Estatus</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>13/11/2025</td>
-                <td>1671.54</td>
-                <td>Pago móvil</td>
-                <td>Banesco</td>
-                <td>0003456</td>
-                <td><span class="ui green label">Validado</span></td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>05/11/2025</td>
-                <td>820.00</td>
-                <td>Pago móvil</td>
-                <td>Banesco</td>
-                <td>0007654</td>
-                <td><span class="ui yellow label">Pendiente</span></td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>28/10/2025</td>
-                <td>450.75</td>
-                <td>Transferencia bancaria</td>
-                <td>Mercantil</td>
-                <td>0006789</td>
-                <td><span class="ui red label">Rechazado</span></td>
-              </tr>
-              <tr>
-                <td>4</td>
-                <td>05/10/2025</td>
-                <td>450.75</td>
-                <td>Transferencia bancaria</td>
-                <td>Mercantil</td>
-                <td>0006789</td>
-                <td><span class="ui green label">Validado</span></td>
-              </tr>
-              <tr>
-                <td>5</td>
-                <td>12/10/2025</td>
-                <td>450.75</td>
-                <td>Transferencia bancaria</td>
-                <td>Mercantil</td>
-                <td>0006789</td>
-                <td><span class="ui green label">Validado</span></td>
-              </tr>
-            </tbody>
-          </table>
+          <div style="overflow-x: auto;">
+              <table class="ui celled table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Concepto</th>
+                        <th>Monto</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-pagos-body">
+                    </tbody>
+              </table>
+          </div>
         </div>
 
-        <!-- Columna derecha: información adicional -->
         <div class="sixteen wide column">
-          <h3 class="ui header" style="color:#003049; margin-bottom: 1em;">Información del usuario</h3>
+          <h3 class="ui header" style="color:#003049; margin-bottom: 1em; margin-top: 1em;">Información detallada</h3>
 
-          <!-- Recuadro: Nombre -->
           <div class="ui raised segment" style="border-radius: 1em; background-color: #A2B9EE;">
             <div class="ui list">
               <div class="item">
                 <i class="edit icon"></i>
                 <div class="content">
-                  <div class="header" style="color: white;">Nombre</div>
-                  <div class="description" style="color: white;">Sofia Herrera</div>
+                  <div class="header" style="color: white;">Nombre Completo</div>
+                  <div id="info-nombre" class="description" style="color: white;">...</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Recuadro: Correo -->
           <div class="ui raised segment" style="border-radius: 1em; background-color: #A2B9EE; margin-top: 1em;">
             <div class="ui list">
               <div class="item">
                 <i class="mail icon"></i>
                 <div class="content">
                   <div class="header" style="color: white;">Correo electrónico</div>
-                  <div class="description" style="color: white;">Sof@gmail.com</div>
+                  <span id="info-email" class="description" style="color: white;">...</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Recuadro: Cédula + botón -->
           <div class="ui raised segment" style="border-radius: 1em; background-color: #A2B9EE; margin-top: 1em;">
             <div class="ui list">
               <div class="item">
                 <i class="address card outline icon"></i>
                 <div class="content">
-                  <div class="header" style="color:white;">Cédula</div>
-                  <div class="description" style="color: white;">31.754.635</div>
+                  <div class="header" style="color:white;">Cédula de Identidad</div>
+                  <span id="info-cedula" class="description" style="color: white;">...</span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        
-      </div> <!-- Cierre del div class="ui stackable grid" -->
-      
-      <!-- Botón fuera del grid -->
-      <div style="margin-top: 2em; clear: both;">
-        <button class="ui button" id="modificarBtn">Modificar datos</button>
-      </div>
+          
+          <div style="margin-top: 2em; text-align: right;">
+            <button class="ui button primary" id="modificarBtn">
+                <i class="pencil icon"></i> Modificar datos
+            </button>
+          </div>
 
-      <!--Modal para que salga el menú de modificación de datos-->
-      <div class="ui small modal" id="modalModificar">
+        </div> </div> <div class="ui small modal" id="modalModificar">
         <div class="header">Modificar datos del usuario</div>
         <div class="content">
           <form class="ui form">
             <div class="field">
               <label>Nombre</label>
-              <input type="text" name="nombre" placeholder="Ej: Sofia Herrera">
+              <input type="text" name="nombre">
             </div>
-            <div class="field">
-              <label>Correo electrónico</label>
-              <input type="email" name="correo" placeholder="Ej: Sof@gmail.com">
-            </div>
-            <div class="field">
-              <label>Cédula</label>
-              <input type="text" name="fecha" placeholder="Ej: 13.234.598">
-            </div>
-          </form>
-        </div>
+            </form>
+        </div>  
         <div class="actions">
-          <div class="ui approve button" id="guardarCambios">Guardar</div>
+          <div class="ui approve button primary" id="guardarCambios">Guardar</div>
           <div class="ui cancel button">Cancelar</div>
         </div>
       </div>
       
-      <!--Alerta de exito-->
-      <div class="alert success" id="alertSuccess" style="display: none;">
-        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-        <strong>Éxito:</strong> La información personal ha sido modificada correctamente.
-      </div>
-      
-    </div> <!-- Cierre del div class="ui stackable container" -->
-  </div> <!-- Cierre del div del fondo -->
-
-
-  <script src="../Scripts/scripts_profile.js"></script>
+    </div> </div> <script src="../Scripts/scripts_profile.js"></script>
+  <script>
+    // Inicializar dropdown del menú
+    $('.ui.dropdown').dropdown();
+  </script>
 </body>    
 </html>
