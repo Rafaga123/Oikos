@@ -4,7 +4,15 @@ const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
-const nodemailer = require('nodemailer');
+
+// 1. Importar Mailjet
+const Mailjet = require('node-mailjet');
+
+// 2. Conectar con Mailjet
+const mailjet = Mailjet.apiConnect(
+    process.env.MJ_APIKEY_PUBLIC,
+    process.env.MJ_APIKEY_PRIVATE
+);
 
 const prisma = new PrismaClient();
 const app = express();
@@ -57,18 +65,34 @@ function buildResetToken(payload) {
   return jwt.sign(payload, process.env.JWT_SECRET || 'secreto_super_seguro', { expiresIn: '1h' });
 }
 
-// Configuración de Nodemailer (Gmail SMTP)
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER, // <--- Lee del archivo .env
-    pass: process.env.EMAIL_PASS  // <--- Lee del archivo .env
-  },
-  logger: true,
-  debug: true
-});
+async function enviarCorreo(destinatario, asunto, titulo, mensajeHTML) {
+    try {
+        const request = await mailjet.post("send", { 'version': 'v3.1' }).request({
+            "Messages": [{
+                "From": {
+                    "Email": process.env.MJ_SENDER_EMAIL,
+                    "Name": "Oikos - Gestión Residencial"
+                },
+                "To": [{ "Email": destinatario }],
+                "Subject": asunto,
+                "HTMLPart": `
+                    <div style="font-family: Arial, sans-serif; color: #333;">
+                        <h2 style="color: #0d6efd;">${titulo}</h2>
+                        <hr>
+                        ${mensajeHTML}
+                        <br>
+                        <p style="font-size: 12px; color: #777;">Este es un mensaje automático de Oikos.</p>
+                    </div>
+                `
+            }]
+        });
+        console.log(`📧 Correo enviado a ${destinatario}`);
+        return true;
+    } catch (error) {
+        console.error("❌ Error enviando correo Mailjet:", error.statusCode);
+        return false;
+    }
+}
 
 // --- ENDPOINTS ---
 
@@ -113,6 +137,15 @@ app.post('/api/registro', async (req, res) => {
 
     console.log("Usuario registrado:", nuevoUsuario.email); // Borrar esto luego Log de confirmación
     
+    await enviarCorreo(
+    nuevoUsuario.email, 
+    "¡Bienvenido a Oikos!", 
+    `Hola, ${nuevoUsuario.primer_nombre}`,
+    `<p>Gracias por registrarte en la plataforma.</p>
+    <p>Ahora puedes unirte a tu comunidad usando el código de tu edificio o crear una nueva.</p>
+    <a href="http://localhost/Proyectoquinto/Pages/login.html">Iniciar Sesión</a>` // cambiar luego
+    );
+
     res.status(201).json({
       mensaje: 'Usuario registrado exitosamente',
       usuario: { id: nuevoUsuario.id, email: nuevoUsuario.email }
@@ -139,38 +172,34 @@ app.post('/api/password/forgot', async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Correo requerido' });
 
-    // Buscar usuario;
+    // 1. Buscar usuario (La variable se llama 'user')
     const user = await prisma.usuario.findUnique({ where: { email } });
 
-    // Generar token solo si el usuario existe
-    let previewUrl = null;
-    let resetUrl = null;
+    // 2. Solo si el usuario existe, procesamos (pero no decimos nada si no existe)
     if (user) {
-      const token = buildResetToken({ id: user.id, tipo: 'RESET' });
+      // Generar token (Usamos user.password_hash como secreto extra por seguridad)
+      const secret = process.env.JWT_SECRET + user.password_hash;
+      const token = jwt.sign({ id: user.id, email: user.email }, secret, { expiresIn: '15m' });
 
-      // URL de frontend 
-      resetUrl = `http://localhost/proyectoquinto/Pages/restablecer.html?token=${encodeURIComponent(token)}`;
+      // URL de frontend (¡Corregido: usamos user.id, no usuario.id!)
+      const enlace = `http://localhost/Proyectoquinto/Pages/restablecer.html?id=${user.id}&token=${token}`;
 
-      const info = await transporter.sendMail({
-        from: `"Soporte Oikos" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: 'Restablecer contraseña',
-        text: `Para restablecer tu contraseña, visita: ${resetUrl}\nEste enlace expira en 1 hora.`,
-        html: `<p>Para restablecer tu contraseña, haz clic en el siguiente enlace:</p>
-              <p><a href="${resetUrl}">Restablecer contraseña</a></p>
-              <p>El enlace expira en 1 hora.</p>`
-      });
-      console.log('Password reset email enviado:', { messageId: info.messageId, response: info.response, resetUrl });
-      if (nodemailer.getTestMessageUrl) {
-        previewUrl = nodemailer.getTestMessageUrl(info);
-      }
-    }
+      // Usar la función Mailjet (¡Corregido: usamos user.primer_nombre!)
+      await enviarCorreo(
+        email,
+        "Recuperación de Contraseña",
+        `Hola, ${user.primer_nombre}`,
+        `<p>Has solicitado cambiar tu clave. Haz clic abajo:</p>
+         <a href="${enlace}" style="background:#0d6efd;color:white;padding:10px;border-radius:5px;text-decoration:none;">Restablecer ahora</a>
+         <p>Expira en 15 minutos.</p>`
+      );
+    } 
+    // 3. Respuesta Genérica (Por seguridad siempre decimos lo mismo)
+    res.json({ mensaje: 'Si el correo existe, se envió un enlace.' });
 
-    // Respuesta genérica
-    res.json({ mensaje: 'Si el correo existe, se envió un enlace.', resetUrl, previewUrl });
   } catch (error) {
     console.error('Error en forgot password:', error);
-    res.status(200).json({ mensaje: 'Si el correo existe, se envió un enlace.' });
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
@@ -336,36 +365,49 @@ app.post('/api/comunidades', verificarToken, async (req, res) => {
  */
 app.post('/api/comunidades/unirse', verificarToken, async (req, res) => {
   try {
-    const { codigo, tipo_habitante, numero_casa } = req.body;
+    const { codigo, numero_casa, tipo_habitante } = req.body;
     const idUsuario = req.usuario.id;
+    const nombreSolicitante = req.usuario.email; // O busca el nombre completo si prefieres
 
-    if (!codigo) return res.status(400).json({ error: 'El código es obligatorio' });
+    // 1. Buscar Comunidad
+    const comunidad = await prisma.comunidad.findUnique({ where: { codigo_unico: codigo } });
+    if (!comunidad) return res.status(404).json({ error: 'Código inválido' });
 
-    // A. Buscar la comunidad
-    const comunidad = await prisma.comunidad.findUnique({
-      where: { codigo_unico: codigo }
-    });
-
-    if (!comunidad) {
-      return res.status(404).json({ error: 'No existe ninguna comunidad con ese código' });
-    }
-
-    // B. Actualizar usuario
+    // 2. Actualizar Usuario (Solicitud Pendiente)
     await prisma.usuario.update({
       where: { id: idUsuario },
       data: {
         id_comunidad: comunidad.id,
-        estado_solicitud: 'PENDIENTE', // Queda esperando aprobación
-        tipo_habitante: tipo_habitante || 'OTRO',
-        numero_casa: numero_casa
+        estado_solicitud: 'PENDIENTE',
+        numero_casa,
+        tipo_habitante
       }
     });
 
-    res.json({ mensaje: 'Solicitud enviada. Espera a que el encargado te acepte.' });
+    // 3. --- NOTIFICACIÓN AL GESTOR ---
+    // Buscamos quién es el encargado de esta comunidad
+    const encargado = await prisma.usuario.findFirst({
+        where: {
+            id_comunidad: comunidad.id,
+            rol: { nombre: 'ENCARGADO_COMUNIDAD' }
+        }
+    });
+
+    if (encargado) {
+        await enviarCorreo(
+            encargado.email,
+            "Nueva Solicitud de Ingreso - Oikos",
+            "Un vecino quiere unirse",
+            `<p>El usuario <strong>${nombreSolicitante}</strong> (Casa: ${numero_casa}) ha solicitado unirse a "${comunidad.nombre}".</p>
+             <p>Por favor, ingresa a tu panel para Aceptar o Rechazar la solicitud.</p>`
+        );
+    }
+
+    res.json({ mensaje: 'Solicitud enviada y notificada al encargado.' });
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al unirse a la comunidad' });
+    res.status(500).json({ error: 'Error al unirse' });
   }
 });
 
@@ -424,15 +466,59 @@ app.get('/api/anuncios', verificarToken, async (req, res) => {
   }
 });
 
+app.post('/api/incidencias', verificarToken, async (req, res) => {
+    try {
+        const { titulo, descripcion, foto_url } = req.body;
+        const idUsuario = req.usuario.id;
+
+        // 1. Obtener datos del usuario para saber su comunidad
+        const usuario = await prisma.usuario.findUnique({ 
+            where: { id: idUsuario },
+            include: { comunidad: true }
+        });
+
+        if (!usuario.id_comunidad) return res.status(400).json({ error: 'No tienes comunidad' });
+
+        // 2. Crear la incidencia
+        const nuevaIncidencia = await prisma.incidencia.create({
+            data: {
+                titulo,
+                descripcion,
+                foto_url,
+                id_usuario: idUsuario,
+                estado: 'ABIERTO' // Default del Enum
+            }
+        });
+
+        // 3. --- NOTIFICACIÓN AL GESTOR ---
+        const encargado = await prisma.usuario.findFirst({
+            where: {
+                id_comunidad: usuario.id_comunidad,
+                rol: { nombre: 'ENCARGADO_COMUNIDAD' }
+            }
+        });
+
+        if (encargado) {
+            await enviarCorreo(
+                encargado.email,
+                `Nuevo Reporte: ${titulo}`,
+                "Se ha reportado una incidencia",
+                `<p><strong>Vecino:</strong> ${usuario.primer_nombre} ${usuario.primer_apellido}</p>
+                 <p><strong>Problema:</strong> ${descripcion}</p>
+                 <p>Revisa el panel de incidencias para gestionarlo.</p>`
+            );
+        }
+
+        res.status(201).json(nuevaIncidencia);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al crear reporte' });
+    }
+});
+
 // Iniciar servidor
 app.listen(port, async () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
   await inicializarRoles(); // <--- IMPORTANTE: Esto crea los roles
-  transporter.verify((error, success) => {
-    if (error) {
-      console.error('SMTP no disponible para enviar correos:', error);
-    } else {
-      console.log('SMTP listo para enviar correos');
-    }
-  });
 });
