@@ -3,7 +3,7 @@
     background: white !important;
     color: var(--color-texto) !important;
     box-shadow: 0 4px 24px rgba(154,156,234,0.12);
-    border: 5px solid #ffffff ;
+    border: 10px solid #ffffff;
     border-radius: 0px;
 }
 .ui.menu .item {
@@ -78,7 +78,8 @@ body {
     margin-right: auto; 
 }
 
-.header-content-wrapper { 
+.header-content-wrapper {
+    margin-bottom: 20px;
     display: flex;
     justify-content: center; 
     align-items: center; 
@@ -99,7 +100,6 @@ body {
 }
 
 /* Estilos para el carrusel de Introducción*/
-/*kjhj*/
 
 .carousel-container {
     position: relative;
