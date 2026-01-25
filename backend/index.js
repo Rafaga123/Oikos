@@ -706,6 +706,101 @@ app.post('/api/foro/:id/like', verificarToken, async (req, res) => {
     }
 });
 
+// ----- ENDPOINTS ACEPTAR HABITANTE NUEVO A LA COMUNIDAD ----
+
+/**
+ * 1. OBTENER SOLICITUDES PENDIENTES (Solo para el Gestor)
+ */
+app.get('/api/gestor/solicitudes', verificarToken, async (req, res) => {
+    try {
+        const idGestor = req.usuario.id;
+
+        // 1. Averiguar la comunidad del gestor
+        const gestor = await prisma.usuario.findUnique({ where: { id: idGestor } });
+        
+        if (!gestor.id_comunidad) {
+            return res.status(403).json({ error: 'No gestionas ninguna comunidad.' });
+        }
+
+        // 2. Buscar usuarios PENDIENTES de esa comunidad
+        // Filtramos para que no se traiga a sí mismo ni a otros aprobados
+        const solicitudes = await prisma.usuario.findMany({
+            where: {
+                id_comunidad: gestor.id_comunidad,
+                estado_solicitud: { in: ['PENDIENTE', 'RECHAZADO', 'ACEPTADO'] }, // Traemos historial también si quieres
+                rol: { nombre: 'HABITANTE' } // Solo habitantes normales
+            },
+            select: {
+                id: true,
+                primer_nombre: true,
+                primer_apellido: true,
+                email: true,
+                telefono: true,
+                numero_casa: true,     // Casa solicitada
+                tipo_habitante: true,  // Propietario/Inquilino
+                estado_solicitud: true,
+                fecha_registro: true,
+                foto_perfil_url: true
+            },
+            orderBy: { fecha_registro: 'desc' }
+        });
+
+        res.json(solicitudes);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al cargar solicitudes' });
+    }
+});
+
+/**
+ * 2. APROBAR O RECHAZAR SOLICITUD
+ */
+app.post('/api/gestor/responder-solicitud', verificarToken, async (req, res) => {
+    try {
+        const { idUsuario, accion, motivo } = req.body; // accion: 'APROBAR' o 'RECHAZAR'
+        const idGestor = req.usuario.id;
+
+        // Validaciones básicas
+        if (!['APROBAR', 'RECHAZAR'].includes(accion)) {
+            return res.status(400).json({ error: 'Acción no válida' });
+        }
+
+        // Actualizar el estado del usuario
+        const nuevoEstado = accion === 'APROBAR' ? 'ACEPTADO' : 'RECHAZADO';
+        
+        // Si es RECHAZADO, podrías querer borrarle el id_comunidad para que pueda pedir otra vez
+        // Pero por ahora solo cambiamos el estado para mantener el registro.
+
+        const usuarioActualizado = await prisma.usuario.update({
+            where: { id: parseInt(idUsuario) },
+            data: { 
+                estado_solicitud: nuevoEstado,
+                // Si rechazamos, guardamos el motivo en algún log o enviamos correo (opcional)
+            }
+        });
+
+        // NOTIFICAR POR CORREO (Usando la función que creamos antes)
+        const asunto = accion === 'APROBAR' ? '¡Bienvenido a la Comunidad!' : 'Solicitud Rechazada';
+        const mensaje = accion === 'APROBAR' 
+            ? `<p>Felicidades, has sido aceptado en la comunidad. Ya puedes iniciar sesión y acceder a todos los servicios.</p>`
+            : `<p>Tu solicitud ha sido rechazada por el gestor.</p><p><strong>Motivo:</strong> ${motivo || 'No especificado'}</p>`;
+
+        await enviarCorreo(
+            usuarioActualizado.email,
+            asunto,
+            `Respuesta a tu solicitud`,
+            mensaje
+        );
+
+        res.json({ mensaje: `Solicitud ${accion === 'APROBAR' ? 'aprobada' : 'rechazada'} correctamente` });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al procesar solicitud' });
+    }
+});
+
 // Iniciar servidor
 app.listen(port, async () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
