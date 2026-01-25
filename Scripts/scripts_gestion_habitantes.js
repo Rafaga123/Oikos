@@ -1,397 +1,327 @@
-// Datos de ejemplo para simular una base de datos
-        let habitantes = [
-            { 
-                id: 1, 
-                cedula: "12345678", 
-                nombre: "María", 
-                apellido: "González", 
-                correo: "maria.gonzalez@email.com",
-                anio_registro: "2023", 
-                estado: "activo",
-                pagos: [
-                    { fecha: "2023-05-15", monto: 150.00, metodo_pago: "transferencia", banco_emisor: "banco1", estatus: "validado" },
-                    { fecha: "2023-04-10", monto: 150.00, metodo_pago: "transferencia", banco_emisor: "banco1", estatus: "validado" }
-                ]
-            },
-            { 
-                id: 2, 
-                cedula: "23456789", 
-                nombre: "Carlos", 
-                apellido: "López", 
-                correo: "carlos.lopez@email.com",
-                anio_registro: "2022", 
-                estado: "activo",
-                pagos: [
-                    { fecha: "2023-05-20", monto: 120.00, metodo_pago: "efectivo", banco_emisor: "", estatus: "pendiente" }
-                ]
-            },
-            { 
-                id: 3, 
-                cedula: "34567890", 
-                nombre: "Ana", 
-                apellido: "Martínez", 
-                correo: "ana.martinez@email.com",
-                anio_registro: "2023", 
-                estado: "activo",
-                pagos: [
-                    { fecha: "2023-05-18", monto: 180.00, metodo_pago: "transferencia", banco_emisor: "banco2", estatus: "validado" },
-                    { fecha: "2023-04-18", monto: 180.00, metodo_pago: "transferencia", banco_emisor: "banco2", estatus: "rechazado" }
-                ]
-            },
-            { 
-                id: 4, 
-                cedula: "45678901", 
-                nombre: "Javier", 
-                apellido: "Rodríguez", 
-                correo: "javier.rodriguez@email.com",
-                anio_registro: "2021", 
-                estado: "inactivo",
-                pagos: []
-            }
-        ];
+let habitantes = []; 
+let currentHabitantId = null;
+let editingId = null;
 
-        let editingId = null;
-        let currentHabitantId = null;
+// Variables para los filtros
+let filtroTexto = '';
+let filtroAnio = 'all';
 
-        $(document).ready(function() {
-            // Inicializar componentes de Semantic UI
-            $('.ui.dropdown').dropdown();
-            $('.ui.search').search({
-                source: habitantes.map(h => ({
-                    title: `${h.nombre} ${h.apellido}`,
-                    id: h.id
-                }))
-            });
+$(document).ready(function() {
+    // 1. Inicializar componentes
+    $('.ui.dropdown').dropdown();
+    $('#habitant-modal').modal();
+    $('#payment-modal').modal();
+    $('#add-payment-modal').modal();
+    
+    // Sidebar toggle
+    $('#sidebar-toggle').click(() => $('.ui.sidebar').sidebar('toggle'));
 
-            
-            // Controlar sidebar en móviles
-            $('#sidebar-toggle').click(function() {
-                $('.ui.sidebar').sidebar('toggle');
-            });
+    // 2. Cargar Datos
+    loadHabitantsFromAPI();
 
-            //fijar sidebar
-            if ($(window).width() > 768) {
-                $('.ui.sidebar').addClass('hide');
-                $('.ui.sidebar').sidebar({
-                    context: $('.pusher'),
-                    transition: 'overlay'
+    // ------------------------------------------------------
+    // 3. LÓGICA DE BÚSQUEDA Y FILTROS (CORREGIDO)
+    // ------------------------------------------------------
+    
+    // A. Buscador de Texto (Nombre, Cedula, Correo)
+    $('.ui.search input').on('input', function() {
+        filtroTexto = $(this).val().toLowerCase();
+        aplicarFiltros();
+    });
+
+    // B. Filtro por Año
+    $('.ui.selection.dropdown').dropdown({
+        onChange: function(value) {
+            filtroAnio = value;
+            aplicarFiltros();
+        }
+    });
+
+    // ------------------------------------------------------
+    // 4. EVENTOS DEL MODAL DE EDICIÓN
+    // ------------------------------------------------------
+    $('#save-habitant').click(async function() {
+        if ($('#habitant-form')[0].checkValidity()) {
+            const id = editingId;
+            const data = {
+                nombre: $('input[name="nombre"]').val(),
+                apellido: $('input[name="apellido"]').val(),
+                // Nota: No enviamos cedula ni correo porque el backend ya no los actualiza
+                estado_solicitud: $('select[name="estado"]').val()
+            };
+
+            try {
+                const res = await fetch(`http://localhost:3000/api/gestor/habitante/${id}`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(data)
                 });
-            }
-            
-            // Inicializar modales
-            $('#habitant-modal').modal({
-                onHide: function() {
-                    $('#habitant-form')[0].reset();
-                    editingId = null;
-                    $('#modal-title').text('Agregar Nuevo Habitante');
-                }
-            });
-            
-            $('#payment-modal').modal();
-            $('#add-payment-modal').modal();
-            
-            // Cargar tabla con datos
-            loadHabitantsTable();
-            
-            // Abrir modal para agregar habitante
-            $('#add-habitant').click(function() {
-                $('#habitant-modal').modal('show');
-            });
-            
-            // Guardar habitante
-            $('#save-habitant').click(function() {
-                if ($('#habitant-form')[0].checkValidity()) {
-                    const formData = {
-                        cedula: $('input[name="cedula"]').val(),
-                        nombre: $('input[name="nombre"]').val(),
-                        apellido: $('input[name="apellido"]').val(),
-                        correo: $('input[name="correo"]').val(),
-                        anio_registro: $('select[name="anio_registro"]').val(),
-                        estado: $('select[name="estado"]').val(),
-                        pagos: []
-                    };
-                    
-                    if (editingId) {
-                        // Editar habitante existente
-                        const index = habitantes.findIndex(h => h.id === editingId);
-                        if (index !== -1) {
-                            // Mantener los pagos existentes
-                            formData.pagos = habitantes[index].pagos;
-                            habitantes[index] = { ...habitantes[index], ...formData };
-                        }
-                    } else {
-                        // Agregar nuevo habitante
-                        const newId = Math.max(...habitantes.map(h => h.id)) + 1;
-                        habitantes.push({
-                            id: newId,
-                            ...formData
-                        });
-                    }
-                    
-                    loadHabitantsTable();
+                
+                if(res.ok) {
+                    alert('Datos actualizados correctamente');
                     $('#habitant-modal').modal('hide');
+                    loadHabitantsFromAPI();
                 } else {
-                    $('.ui.form').addClass('error');
+                    alert('Error al actualizar');
                 }
-            });
-            
-            // Filtrar tabla por año
-            $('.ui.selection.dropdown').dropdown({
-                onChange: function(value) {
-                    if (value === 'all') {
-                        loadHabitantsTable();
-                    } else {
-                        const filtered = habitantes.filter(h => h.anio_registro === value);
-                        renderTable(filtered);
-                    }
-                }
-            });
-            
-            // Buscar habitantes
-            $('.ui.search').search({
-                onSelect: function(result) {
-                    const habitant = habitantes.find(h => h.id === result.id);
-                    if (habitant) {
-                        const filtered = [habitant];
-                        renderTable(filtered);
-                    }
-                }
-            });
-            
-            // Agregar pago
-            $('#add-payment').click(function() {
-                $('#add-payment-modal').modal('show');
-            });
-            
-            // Guardar pago
-            $('#save-payment').click(function() {
-                if ($('#payment-form')[0].checkValidity()) {
-                    const formData = {
-                        fecha: $('input[name="fecha"]').val(),
-                        monto: parseFloat($('input[name="monto"]').val()),
-                        metodo_pago: $('select[name="metodo_pago"]').val(),
-                        banco_emisor: $('select[name="banco_emisor"]').val(),
-                        estatus: $('select[name="estatus"]').val()
-                    };
-                    
-                    const habitantIndex = habitantes.findIndex(h => h.id === currentHabitantId);
-                    if (habitantIndex !== -1) {
-                        if (!habitantes[habitantIndex].pagos) {
-                            habitantes[habitantIndex].pagos = [];
-                        }
-                        habitantes[habitantIndex].pagos.push(formData);
-                        loadPaymentHistory(currentHabitantId);
-                    }
-                    
+            } catch (e) { console.error(e); }
+        } else {
+            $('.ui.form').addClass('error');
+        }
+    });
+
+    // Evento Guardar Pago (Igual que antes)
+    $('#save-payment').click(async function() {
+        if ($('#payment-form')[0].checkValidity()) {
+            const pagoData = {
+                id_usuario: currentHabitantId,
+                fecha: $('input[name="fecha"]').val(),
+                monto: $('input[name="monto"]').val(),
+                metodo: $('select[name="metodo_pago"]').val(),
+                banco: $('select[name="banco_emisor"]').val(),
+                estatus: $('select[name="estatus"]').val()
+            };
+
+            try {
+                const res = await fetch('http://localhost:3000/api/gestor/pagos', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(pagoData)
+                });
+
+                if (res.ok) {
+                    alert('Pago registrado');
                     $('#add-payment-modal').modal('hide');
-                    $('#payment-form')[0].reset();
+                    loadHabitantsFromAPI(); 
                 } else {
-                    $('#payment-form').addClass('error');
+                    alert('Error registrando pago');
                 }
-            });
+            } catch (e) { console.error(e); }
+        }
+    });
+});
+
+// --- FUNCIONES LÓGICAS ---
+
+async function loadHabitantsFromAPI() {
+    const token = localStorage.getItem('token');
+    try {
+        const res = await fetch('http://localhost:3000/api/gestor/habitantes', {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
         
-        function loadHabitantsTable() {
-            renderTable(habitantes);
-        }
+        if (!res.ok) throw new Error('Error API');
         
-        function renderTable(data) {
-            const tbody = $('#habitantes-table-body');
-            tbody.empty();
-            
-            if (data.length === 0) {
-                tbody.append(`
-                    <tr>
-                        <td colspan="9" class="center aligned">No se encontraron habitantes</td>
-                    </tr>
-                `);
-                return;
-            }
-            
-            data.forEach(habitant => {
-                const row = `
-                    <tr>
-                        <td>${habitant.id}</td>
-                        <td>${habitant.cedula}</td>
-                        <td>${habitant.nombre}</td>
-                        <td>${habitant.apellido}</td>
-                        <td>${habitant.correo}</td>
-                        <td>${habitant.anio_registro}</td>
-                        <td>
-                            <span class="ui ${habitant.estado === 'activo' ? 'green' : 'red'} horizontal label">
-                                ${habitant.estado === 'activo' ? 'Activo' : 'Inactivo'}
-                            </span>
-                        </td>
-                        <td class="payment-history">
-                            ${renderPaymentHistory(habitant.pagos)}
-                        </td>
-                        <td>
-                            <div class="table-actions">
-                                <button class="ui compact icon button edit-btn" data-id="${habitant.id}">
-                                    <i class="edit icon"></i>
-                                </button>
-                                <button class="ui compact icon button payment-btn" data-id="${habitant.id}">
-                                    <i class="dollar sign icon"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                tbody.append(row);
-            });
-            
-            // Agregar eventos a los botones
-            $('.edit-btn').click(function() {
-                const id = $(this).data('id');
-                editHabitant(id);
-            });
-            
-            $('.payment-btn').click(function() {
-                const id = $(this).data('id');
-                showPaymentHistory(id);
-            });
-            
-            $('.delete-btn').click(function() {
-                const id = $(this).data('id');
-                deleteHabitant(id);
-            });
-        }
+        const data = await res.json();
         
-        function renderPaymentHistory(pagos) {
-            if (!pagos || pagos.length === 0) {
-                return '<span class="ui grey text">Sin pagos</span>';
-            }
-            
-            let html = '<div class="ui list">';
-            pagos.slice(0, 2).forEach(pago => {
-                const statusColor = pago.estatus === 'validado' ? 'green' : 
-                                  pago.estatus === 'pendiente' ? 'yellow' : 'red';
-                html += `
-                    <div class="item">
-                        <div class="content">
-                            <div class="header">$${pago.monto.toFixed(2)}</div>
-                            <div class="description">
-                                ${pago.fecha} 
-                                <span class="ui ${statusColor} horizontal mini label">${pago.estatus}</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            if (pagos.length > 2) {
-                html += `<div class="item">
-                    <div class="content">
-                        <span class="ui grey text">+${pagos.length - 2} más</span>
-                    </div>
-                </div>`;
-            }
-            
-            html += '</div>';
-            return html;
-        }
-        
-        function editHabitant(id) {
-            const habitant = habitantes.find(h => h.id === id);
-            if (habitant) {
-                editingId = id;
-                $('input[name="nombre"]').val(habitant.nombre);
-                $('input[name="apellido"]').val(habitant.apellido);
-                $('input[name="cedula"]').val(habitant.cedula);
-                $('input[name="correo"]').val(habitant.correo);
-                $('select[name="anio_registro"]').dropdown('set selected', habitant.anio_registro);
-                $('select[name="estado"]').dropdown('set selected', habitant.estado);
-                $('#modal-title').text('Editar Habitante');
-                $('#habitant-modal').modal('show');
-            }
-        }
-        
-        function showPaymentHistory(id) {
-            currentHabitantId = id;
-            const habitant = habitantes.find(h => h.id === id);
-            if (habitant) {
-                $('#payment-habitant-name').text(`Pagos de ${habitant.nombre} ${habitant.apellido}`);
-                loadPaymentHistory(id);
-                $('#payment-modal').modal('show');
-            }
-        }
-        
-        function loadPaymentHistory(id) {
-            const habitant = habitantes.find(h => h.id === id);
-            const paymentList = $('#payment-history-list');
-            paymentList.empty();
-            
-            if (!habitant.pagos || habitant.pagos.length === 0) {
-                paymentList.append('<p>No hay pagos registrados</p>');
-                return;
-            }
-            
-            habitant.pagos.forEach((pago, index) => {
-                const statusColor = pago.estatus === 'validado' ? 'green' : 
-                                  pago.estatus === 'pendiente' ? 'yellow' : 'red';
-                
-                const paymentItem = `
-                    <div class="item">
-                        <div class="content">
-                            <div class="header">Pago #${index + 1} - $${pago.monto.toFixed(2)}</div>
-                            <div class="meta">
-                                <span class="date">${pago.fecha}</span>
-                                <span class="ui ${statusColor} horizontal mini label">${pago.estatus}</span>
-                            </div>
-                            <div class="description">
-                                <p><strong>Método:</strong> ${pago.metodo_pago}</p>
-                                <p><strong>Banco:</strong> ${pago.banco_emisor || 'No aplica'}</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                paymentList.append(paymentItem);
-            });
-        }
-        
-        function deleteHabitant(id) {
-            if (confirm('¿Estás seguro de que deseas eliminar este habitante?')) {
-                habitantes = habitantes.filter(h => h.id !== id);
-                loadHabitantsTable();
-            }
-        }
+        habitantes = data.map(u => ({
+            id: u.id,
+            cedula: u.cedula,
+            nombre: u.primer_nombre,
+            apellido: u.primer_apellido,
+            correo: u.email,
+            anio_registro: new Date(u.fecha_registro).getFullYear().toString(),
+            estado: u.estado_solicitud === 'ACEPTADO' ? 'activo' : 'inactivo',
+            rol: u.rol.nombre, // Guardamos el rol para bloquear el botón
+            pagos: u.pagos
+        }));
 
-        const allToggleSelectors = '#sidebar-toggle, .sidebar-toggle-btn';
+        aplicarFiltros(); // Renderizar inicial
 
-        //Inicializamos y controlamos el sidebar usando la API de Semantic UI
-    $('.ui.sidebar').sidebar({
-        context: $('.pusher'),
-        transition: 'overlay'
+    } catch (error) {
+        console.error(error);
+        $('#habitantes-table-body').html('<tr><td colspan="9">Error cargando datos</td></tr>');
+    }
+}
+
+// Función maestra de filtrado
+function aplicarFiltros() {
+    const filtrados = habitantes.filter(h => {
+        // 1. Filtro Texto (Busca en nombre, apellido, cedula o correo)
+        const coincideTexto = 
+            h.nombre.toLowerCase().includes(filtroTexto) ||
+            h.apellido.toLowerCase().includes(filtroTexto) ||
+            h.cedula.includes(filtroTexto) ||
+            h.correo.toLowerCase().includes(filtroTexto);
+
+        // 2. Filtro Año
+        const coincideAnio = (filtroAnio === 'all') || (h.anio_registro === filtroAnio);
+
+        return coincideTexto && coincideAnio;
     });
 
-    $(allToggleSelectors).click(function() {
-        //La función 'toggle' lo abrirá si está cerrado, y lo cerrará si está abierto.
-        $('.ui.sidebar').sidebar('toggle');
+    renderTable(filtrados);
+}
 
-    });
+function renderTable(data) {
+    const tbody = $('#habitantes-table-body');
+    tbody.empty();
     
-function exportarExcel() {
-        // Obtener la tabla
-        const tabla = document.getElementById("miTabla");
-        
-        // Crear contenido HTML para el archivo
-        let html = tabla.outerHTML;
-        
-        // Crear un blob (archivo binario) con el contenido
-        const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
-        
-        // Crear un enlace temporal para descargar
-        const enlace = document.createElement("a");
-        enlace.href = URL.createObjectURL(blob);
-        enlace.download = "tabla.xls"; // Nombre del archivo
-        
-        // Simular click en el enlace
-        document.body.appendChild(enlace);
-        enlace.click();
-        
-        // Limpiar
-        document.body.removeChild(enlace);
+    if (data.length === 0) {
+        tbody.append('<tr><td colspan="9" class="center aligned">No se encontraron habitantes</td></tr>');
+        return;
     }
     
+    data.forEach(habitant => {
+        // Lógica del botón Gestor: Si YA es encargado, deshabilitar y cambiar color
+        const esGestor = habitant.rol === 'ENCARGADO_COMUNIDAD' || habitant.rol === 'ADMINISTRADOR';
+        const btnGestorClass = esGestor ? 'grey disabled' : 'blue';
+        const btnGestorIcon = esGestor ? 'user' : 'user shield';
+        const btnGestorTitle = esGestor ? 'Ya es gestor' : 'Promover a Gestor';
 
+        const row = `
+            <tr>
+                <td>${habitant.id}</td>
+                <td>${habitant.cedula}</td>
+                <td>${habitant.nombre}</td>
+                <td>${habitant.apellido}</td>
+                <td>${habitant.correo}</td>
+                <td>${habitant.anio_registro}</td>
+                <td>
+                    <span class="ui ${habitant.estado === 'activo' ? 'green' : 'red'} horizontal label">
+                        ${habitant.estado === 'activo' ? 'Activo' : 'Inactivo'}
+                    </span>
+                </td>
+                <td class="payment-history">
+                    ${renderPaymentHistory(habitant.pagos)}
+                </td>
+                <td>
+                    <div class="table-actions">
+                        <button class="ui compact icon button edit-btn" onclick="openEditModal(${habitant.id})">
+                            <i class="edit icon"></i>
+                        </button>
+                        <button class="ui compact icon button payment-btn" onclick="openPaymentModal(${habitant.id})">
+                            <i class="dollar sign icon"></i>
+                        </button>
+                        <button class="ui compact icon button ${btnGestorClass}" onclick="promoverGestor(${habitant.id})" title="${btnGestorTitle}">
+                            <i class="${btnGestorIcon} icon"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+        tbody.append(row);
+    });
+}
+
+function renderPaymentHistory(pagos) {
+    if (!pagos || pagos.length === 0) return '<span class="ui grey text">Sin pagos</span>';
     
+    let html = '<div class="ui list">';
+    pagos.slice(0, 2).forEach(pago => {
+        let color = 'yellow';
+        if (pago.estado === 'APROBADO') color = 'green';
+        if (pago.estado === 'RECHAZADO') color = 'red';
+
+        html += `
+            <div class="item">
+                <div class="content">
+                    <div class="header">$${parseFloat(pago.monto).toFixed(2)}</div>
+                    <div class="description">
+                        ${new Date(pago.fecha_pago).toLocaleDateString()}
+                        <span class="ui ${color} horizontal mini label">${pago.estado}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    if (pagos.length > 2) html += `<div class="item"><span class="ui grey text">+${pagos.length - 2} más</span></div>`;
+    html += '</div>';
+    return html;
+}
+
+// --- MODALES Y ACCIONES ---
+
+window.openEditModal = function(id) {
+    const habitant = habitantes.find(h => h.id === id);
+    if (!habitant) return;
+    
+    editingId = id;
+    $('input[name="nombre"]').val(habitant.nombre);
+    $('input[name="apellido"]').val(habitant.apellido);
+    
+    // Campos Bloqueados (CORRECCIÓN)
+    const inputCedula = $('input[name="cedula"]');
+    const inputCorreo = $('input[name="correo"]');
+    
+    inputCedula.val(habitant.cedula).prop('disabled', true); // Bloquear
+    inputCorreo.val(habitant.correo).prop('disabled', true); // Bloquear
+    
+    $('select[name="estado"]').dropdown('set selected', habitant.estado);
+    $('#modal-title').text('Editar Habitante');
+    $('#habitant-modal').modal('show');
+};
+
+window.openPaymentModal = function(id) {
+    currentHabitantId = id;
+    const habitant = habitantes.find(h => h.id === id);
+    $('#payment-habitant-name').text(`Pagos de ${habitant.nombre} ${habitant.apellido}`);
+    
+    const list = $('#payment-history-list');
+    list.empty();
+    
+    if(!habitant.pagos || habitant.pagos.length === 0) {
+        list.append('<p>No hay pagos registrados.</p>');
+    } else {
+        habitant.pagos.forEach(pago => {
+            let color = 'yellow';
+            if (pago.estado === 'APROBADO') color = 'green';
+            if (pago.estado === 'RECHAZADO') color = 'red';
+            
+            list.append(`
+                <div class="item">
+                    <div class="content">
+                        <div class="header">Monto: $${pago.monto}</div>
+                        <div class="meta">Fecha: ${new Date(pago.fecha_pago).toLocaleDateString()}</div>
+                        <div class="description">
+                            Concepto: ${pago.concepto} <br>
+                            Estado: <span class="ui ${color} label">${pago.estado}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui divider"></div>
+            `);
+        });
+    }
+    $('#payment-modal').modal('show');
+    $('#add-payment').off('click').on('click', () => $('#add-payment-modal').modal('show'));
+};
+
+window.promoverGestor = async function(id) {
+    // Verificamos si ya es gestor antes de preguntar (doble seguridad)
+    const user = habitantes.find(h => h.id === id);
+    if (user && (user.rol === 'ENCARGADO_COMUNIDAD' || user.rol === 'ADMINISTRADOR')) return;
+
+    if(!confirm('¿Seguro que quieres dar permisos de GESTOR?')) return;
+    
+    try {
+        const res = await fetch(`http://localhost:3000/api/gestor/promover/${id}`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        if(res.ok) {
+            alert('Usuario promovido correctamente.');
+            loadHabitantsFromAPI(); 
+        } else {
+            alert('Error al promover.');
+        }
+    } catch(e) { console.error(e); }
+};
+
+window.exportarExcel = function() {
+    const tabla = document.getElementById("miTabla");
+    const html = tabla.outerHTML;
+    const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+    const enlace = document.createElement("a");
+    enlace.href = URL.createObjectURL(blob);
+    enlace.download = "habitantes_oikos.xls";
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+};

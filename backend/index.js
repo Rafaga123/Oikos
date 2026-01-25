@@ -801,6 +801,113 @@ app.post('/api/gestor/responder-solicitud', verificarToken, async (req, res) => 
     }
 });
 
+// --- GESTIÓN DE HABITANTES (PANEL DEL ENCARGADO) ---
+
+/**
+ * 1. LISTAR TODOS LOS HABITANTES (De mi comunidad)
+ */
+app.get('/api/gestor/habitantes', verificarToken, async (req, res) => {
+    try {
+        const idGestor = req.usuario.id;
+        // Obtener comunidad del gestor
+        const gestor = await prisma.usuario.findUnique({ where: { id: idGestor } });
+        
+        if (!gestor.id_comunidad) return res.status(403).json({ error: 'No tienes comunidad.' });
+
+        // Traer todos los usuarios de esa comunidad (menos al gestor mismo si quieres)
+        const habitantes = await prisma.usuario.findMany({
+            where: { id_comunidad: gestor.id_comunidad },
+            include: {
+                rol: true,
+                pagos: {
+                    orderBy: { fecha_pago: 'desc' },
+                    take: 5
+                }
+            }
+        });
+
+        res.json(habitantes);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al listar habitantes' });
+    }
+});
+
+/**
+ * 2. EDITAR HABITANTE
+ */
+app.put('/api/gestor/habitante/:id', verificarToken, async (req, res) => {
+    try {
+        const idHabitante = parseInt(req.params.id);
+        const { nombre, apellido, cedula, correo, estado_solicitud } = req.body; // 'estado' en el frontend es 'estado_solicitud' en BD?
+        
+        await prisma.usuario.update({
+            where: { id: idHabitante },
+            data: {
+                primer_nombre: nombre,
+                primer_apellido: apellido,
+                // cedula: cedula,  <--- ELIMINADO (No se debe editar)
+                // email: correo,   <--- ELIMINADO (No se debe editar)
+                estado_solicitud: estado_solicitud === 'activo' ? 'ACEPTADO' : 'RECHAZADO'
+            }
+        });
+// ...
+
+        res.json({ mensaje: 'Habitante actualizado' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al actualizar habitante' });
+    }
+});
+
+/**
+ * 3. AGREGAR PAGO (Manualmente por el Gestor)
+ */
+app.post('/api/gestor/pagos', verificarToken, async (req, res) => {
+    try {
+        const { id_usuario, monto, fecha, metodo, banco, estatus } = req.body;
+        
+        // Crear el pago
+        await prisma.pago.create({
+            data: {
+                id_usuario: parseInt(id_usuario),
+                monto: parseFloat(monto),
+                fecha_pago: new Date(fecha),
+                concepto: `Pago registrado por Gestor (${metodo})`,
+                referencia: banco || 'Efectivo',
+                estado: estatus === 'validado' ? 'APROBADO' : (estatus === 'rechazado' ? 'RECHAZADO' : 'PENDIENTE')
+            }
+        });
+
+        res.json({ mensaje: 'Pago registrado exitosamente' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al registrar pago' });
+    }
+});
+
+/**
+ * 4. PROMOVER A GESTOR (Dar permisos)
+ */
+app.post('/api/gestor/promover/:id', verificarToken, async (req, res) => {
+    try {
+        const idUsuario = parseInt(req.params.id);
+        
+        // Buscar el rol de ENCARGADO
+        const rolEncargado = await prisma.rol.findUnique({ where: { nombre: 'ENCARGADO_COMUNIDAD' } });
+        
+        await prisma.usuario.update({
+            where: { id: idUsuario },
+            data: { id_rol: rolEncargado.id }
+        });
+
+        res.json({ mensaje: 'Usuario promovido a Encargado correctamente.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al promover usuario' });
+    }
+});
+
 // Iniciar servidor
 app.listen(port, async () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
