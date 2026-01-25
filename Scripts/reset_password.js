@@ -7,7 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!form) return;
 
   const showError = (msg) => {
-    if (!errorBox) return alert(msg);
+    if (!errorBox) {
+      Swal.fire({
+        icon: 'error',
+        title: 'No se pudo actualizar',
+        text: msg
+      });
+      return;
+    }
     errorBox.textContent = msg;
     errorBox.style.display = 'block';
   };
@@ -46,8 +53,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json();
       if (!res.ok) return showError(data?.error || 'No se pudo actualizar');
 
-      alert('Contraseña actualizada. Ahora puedes iniciar sesión.');
-      window.location.href = 'login.html';
+      Swal.fire({
+        icon: 'success',
+        title: 'Contraseña actualizada',
+        text: 'Ahora puedes iniciar sesión.'
+      }).then(() => {
+        window.location.href = 'login.html';
+      });
     } catch (err) {
       console.error(err);
       showError('Error de conexión con el servidor');

@@ -11,7 +11,6 @@
         localStorage.clear();
 
         // 3. Redirigir
-        alert("Debes iniciar sesión para ver esta página.");  // esto se debe eliminar luego
         window.location.href = '../index.html'; 
     }
     

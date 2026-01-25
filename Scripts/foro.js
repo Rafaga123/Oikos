@@ -121,7 +121,11 @@ async function publicarPost() {
             $('#alertSuccess').fadeIn().delay(2000).fadeOut();
             cargarPosts(); // Recargar todo para ver el nuevo post
         } else {
-            alert('Error al publicar');
+            Swal.fire({
+                icon: 'error',
+                title: 'No se publicó',
+                text: 'Hubo un problema al crear la publicación.'
+            });
         }
     } catch (error) {
         console.error(error);

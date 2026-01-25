@@ -143,9 +143,18 @@ async function subirFoto(e) {
         if (res.ok) {
             // Actualizar la imagen inmediatamente
             document.getElementById('avatar-img').src = data.url;
-            alert('¡Foto actualizada correctamente!');
+            Swal.fire({
+                icon: 'success',
+                title: 'Foto actualizada',
+                timer: 1500,
+                showConfirmButton: false
+            });
         } else {
-            alert('Error: ' + data.error);
+            Swal.fire({
+                icon: 'error',
+                title: 'No se pudo actualizar',
+                text: data.error || 'Intenta nuevamente.'
+            });
         }
         
         // Restaurar nombre
@@ -153,7 +162,11 @@ async function subirFoto(e) {
 
     } catch (error) {
         console.error(error);
-        alert('Error al subir la imagen');
+        Swal.fire({
+            icon: 'error',
+            title: 'Error al subir la imagen',
+            text: 'Revisa tu conexión e inténtalo de nuevo.'
+        });
     } finally {
         // Aseguramos que los datos estén frescos
         cargarPerfil();

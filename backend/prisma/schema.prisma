@@ -186,6 +186,8 @@ model Incidencia {
   id            Int              @id @default(autoincrement())
   titulo        String
   descripcion   String           @db.Text
+  categoria     String?
+  importancia   String?
   fecha_reporte DateTime         @default(now())
   foto_url      String?
   estado        EstadoIncidencia @default(ABIERTO)

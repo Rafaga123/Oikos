@@ -10,7 +10,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!loginForm) return;
 
   const showError = (msg) => {
-    if (!loginErrorMessage) return alert(msg);
+    if (!loginErrorMessage) {
+      Swal.fire({
+        icon: 'error',
+        title: 'No se pudo iniciar sesión',
+        text: msg
+      });
+      return;
+    }
     loginErrorMessage.textContent = msg;
     loginErrorMessage.style.display = 'block';
   };

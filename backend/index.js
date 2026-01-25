@@ -490,7 +490,7 @@ app.get('/api/anuncios', verificarToken, async (req, res) => {
 
 app.post('/api/incidencias', verificarToken, async (req, res) => {
     try {
-        const { titulo, descripcion, foto_url } = req.body;
+        const { titulo, descripcion, categoria, importancia, foto_url } = req.body;
         const idUsuario = req.usuario.id;
 
         // 1. Obtener datos del usuario para saber su comunidad
@@ -504,11 +504,13 @@ app.post('/api/incidencias', verificarToken, async (req, res) => {
         // 2. Crear la incidencia
         const nuevaIncidencia = await prisma.incidencia.create({
             data: {
-                titulo,
+                titulo,        
                 descripcion,
+                categoria,     
+                importancia,   
                 foto_url,
                 id_usuario: idUsuario,
-                estado: 'ABIERTO' // Default del Enum
+                estado: 'ABIERTO'
             }
         });
 
@@ -905,6 +907,118 @@ app.post('/api/gestor/promover/:id', verificarToken, async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al promover usuario' });
+    }
+});
+
+// --- GESTIÓN DE INCIDENCIAS (Quejas y Solicitudes) ---
+
+/**
+ * 1. LISTAR INCIDENCIAS (Del edificio del gestor)
+ */
+app.get('/api/gestor/incidencias', verificarToken, async (req, res) => {
+    try {
+        const idGestor = req.usuario.id;
+        const gestor = await prisma.usuario.findUnique({ where: { id: idGestor } });
+
+        if (!gestor.id_comunidad) return res.status(403).json({ error: 'No tienes comunidad.' });
+
+        // Buscar usuarios de la comunidad para filtrar sus incidencias
+        // O mejor: buscar incidencias donde el usuario autor pertenezca a la comunidad
+        const incidencias = await prisma.incidencia.findMany({
+            where: {
+                usuario: {
+                    id_comunidad: gestor.id_comunidad
+                }
+            },
+            include: {
+                usuario: {
+                    select: {
+                        primer_nombre: true,
+                        primer_apellido: true,
+                        numero_casa: true
+                    }
+                }
+            },
+            orderBy: { fecha_reporte: 'desc' }
+        });
+
+        res.json(incidencias);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al cargar incidencias' });
+    }
+});
+
+/**
+ * 2. CAMBIAR ESTADO DE INCIDENCIA
+ */
+app.put('/api/gestor/incidencias/:id', verificarToken, async (req, res) => {
+    try {
+        const idIncidencia = parseInt(req.params.id);
+        const { estado } = req.body; // ABIERTO, EN_PROGRESO, RESUELTO, CERRADO
+
+        // Validar que el estado sea uno de los permitidos en el ENUM de Prisma
+        const estadosValidos = ['ABIERTO', 'EN_PROGRESO', 'RESUELTO', 'CERRADO'];
+        if (!estadosValidos.includes(estado)) {
+            return res.status(400).json({ error: 'Estado no válido' });
+        }
+
+        const incidenciaActualizada = await prisma.incidencia.update({
+            where: { id: idIncidencia },
+            data: { estado: estado }
+        });
+
+        res.json({ mensaje: 'Estado actualizado', incidencia: incidenciaActualizada });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al actualizar incidencia' });
+    }
+});
+
+/**
+ * 3. MARCAR TODO COMO REVISADO (En realidad, pasar de ABIERTO a EN_PROGRESO)
+ */
+app.post('/api/gestor/incidencias/revisar-todo', verificarToken, async (req, res) => {
+    try {
+        const idGestor = req.usuario.id;
+        const gestor = await prisma.usuario.findUnique({ where: { id: idGestor } });
+
+        // Actualizar masivamente todas las incidencias ABIERTAS de esa comunidad a EN_PROGRESO
+        const resultado = await prisma.incidencia.updateMany({
+            where: {
+                estado: 'ABIERTO',
+                usuario: { id_comunidad: gestor.id_comunidad }
+            },
+            data: { estado: 'EN_PROGRESO' }
+        });
+
+        res.json({ mensaje: `Se marcaron ${resultado.count} solicitudes como revisadas.` });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error masivo' });
+    }
+});
+
+/**
+ * 4. OBTENER MIS REPORTES (Para el Habitante)
+ */
+app.get('/api/incidencias/mis-reportes', verificarToken, async (req, res) => {
+    try {
+        const idUsuario = req.usuario.id;
+
+        const misReportes = await prisma.incidencia.findMany({
+            where: { id_usuario: idUsuario },
+            orderBy: { fecha_reporte: 'desc' }
+        });
+
+        res.json(misReportes);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al cargar tus reportes' });
     }
 });
 

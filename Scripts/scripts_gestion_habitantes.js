@@ -61,11 +61,20 @@ $(document).ready(function() {
                 });
                 
                 if(res.ok) {
-                    alert('Datos actualizados correctamente');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Datos actualizados',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
                     $('#habitant-modal').modal('hide');
                     loadHabitantsFromAPI();
                 } else {
-                    alert('Error al actualizar');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'No se pudo actualizar',
+                        text: 'Intenta nuevamente.'
+                    });
                 }
             } catch (e) { console.error(e); }
         } else {
@@ -96,11 +105,20 @@ $(document).ready(function() {
                 });
 
                 if (res.ok) {
-                    alert('Pago registrado');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Pago registrado',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
                     $('#add-payment-modal').modal('hide');
                     loadHabitantsFromAPI(); 
                 } else {
-                    alert('Error registrando pago');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'No se registró el pago',
+                        text: 'Revisa los datos e inténtalo de nuevo.'
+                    });
                 }
             } catch (e) { console.error(e); }
         }
@@ -297,19 +315,36 @@ window.promoverGestor = async function(id) {
     // Verificamos si ya es gestor antes de preguntar (doble seguridad)
     const user = habitantes.find(h => h.id === id);
     if (user && (user.rol === 'ENCARGADO_COMUNIDAD' || user.rol === 'ADMINISTRADOR')) return;
+    const { isConfirmed } = await Swal.fire({
+        icon: 'question',
+        title: 'Dar permisos de gestor',
+        text: 'El usuario podrá administrar la comunidad.',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, promover',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true
+    });
+    if (!isConfirmed) return;
 
-    if(!confirm('¿Seguro que quieres dar permisos de GESTOR?')) return;
-    
     try {
         const res = await fetch(`http://localhost:3000/api/gestor/promover/${id}`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
         if(res.ok) {
-            alert('Usuario promovido correctamente.');
+            Swal.fire({
+                icon: 'success',
+                title: 'Usuario promovido',
+                timer: 1500,
+                showConfirmButton: false
+            });
             loadHabitantsFromAPI(); 
         } else {
-            alert('Error al promover.');
+            Swal.fire({
+                icon: 'error',
+                title: 'No se pudo promover',
+                text: 'Inténtalo nuevamente.'
+            });
         }
     } catch(e) { console.error(e); }
 };

@@ -1,138 +1,183 @@
 document.addEventListener('DOMContentLoaded', function(){
     initSidebar();
     
-    //inicializar los dropdown
-    $('.ui.dropdown').dropdown({
-        placeholder: 'auto'
-    });
+    // Inicializar dropdowns
+    if(window.jQuery) {
+        $('.ui.dropdown').dropdown({ placeholder: 'auto' });
+    }
+
+    // Cargar reportes existentes de la BD
+    cargarMisReportes();
 });
 
-//SIDEBAR
-function initSidebar() {
+// --- API Y LÓGICA DE DATOS ---
 
-    //Botones de control
-    const allToggleSelectors = '#sidebar-toggle, .sidebar-toggle-btn';
+async function cargarMisReportes() {
+    const token = localStorage.getItem('token');
+    const contenedor = document.getElementById('contenedor-reportes');
+    
+    try {
+        const res = await fetch('http://localhost:3000/api/incidencias/mis-reportes', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
 
-    //Inicializamos y controlamos el sidebar usando la API de Semantic UI
-    $('.ui.sidebar').sidebar({
-        context: $('.pusher'),
-        transition: 'overlay'
-    });
+        if (!res.ok) throw new Error('Error al cargar reportes');
 
-    $(allToggleSelectors).click(function() {
-        //La función 'toggle' lo abrirá si está cerrado, y lo cerrará si está abierto.
-        $('.ui.sidebar').sidebar('toggle');
-    });
+        const reportes = await res.json();
+        contenedor.innerHTML = ''; // Limpiar
+
+        if (reportes.length === 0) {
+            contenedor.innerHTML = `
+                <div class="ui placeholder segment">
+                    <div class="ui icon header">
+                        <i class="file alternate outline icon"></i>
+                        No has realizado reportes aún.
+                    </div>
+                </div>`;
+            return;
+        }
+
+    reportes.forEach(rep => {
+        const html = crearHtmlReporte(
+            rep.categoria,   
+            rep.descripcion, 
+            new Date(rep.fecha_reporte).toLocaleDateString(), 
+            rep.importancia, 
+            rep.estado
+        );
+        contenedor.insertAdjacentHTML('beforeend', html);
+    }); 
+
+    } catch (error) {
+        console.error(error);
+        contenedor.innerHTML = '<div class="ui negative message">Error cargando tus reportes.</div>';
+    }
 }
 
-function crearHtmlReporte(categoria, texto, fecha, importancia) {
-    // Definimos los colores para la barra según la categoría
+async function enviarReporte() {
+    const cat = document.getElementById('input-categoria').value; // Ej: "Mantenimiento"
+    const imp = document.getElementById('input-importancia').value; // Ej: "Alto"
+    const txt = document.getElementById('input-texto').value;
+    
+    if (!cat || !imp || !txt) {
+        mostrarError("Completa todos los campos");
+        return;
+    }
+
+    const token = localStorage.getItem('token');
+    
+    // AHORA ENVIAMOS CAMPOS LIMPIOS Y SEPARADOS
+    const datosParaEnviar = {
+        titulo: `Reporte de ${cat}`, // Un título genérico o podrías pedir un input de titulo
+        descripcion: txt,
+        categoria: cat,       // <--- Campo nuevo BD
+        importancia: imp,     // <--- Campo nuevo BD
+        foto_url: ""
+    };
+
+    try {
+        const res = await fetch('http://localhost:3000/api/incidencias', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(datosParaEnviar)
+        });
+
+        if (res.ok) {
+            mostrarExito("Reporte enviado correctamente.");
+            document.getElementById('input-texto').value = "";
+            cargarMisReportes(); 
+        } else {
+            mostrarError("Error al enviar reporte");
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+// --- GENERADOR DE HTML ---
+
+function crearHtmlReporte(categoria, texto, fecha, importancia, estadoBD) {
+    // Colores visuales
     const coloresBarra = {
         'Mantenimiento': 'blue',
         'Seguridad': 'red',
         'Limpieza': 'green',
-        'Otros': 'grey'          // Gris
+        'Otros': 'grey'
     };
 
-    // Definimos los colores de Semantic UI para las etiquetas de importancia
     const coloresImportancia = {
-        'Alto': 'red',
-        'Medio': 'yellow',
-        'Bajo': 'green'
+        'Alto': 'red', 'Alta': 'red',
+        'Medio': 'yellow', 'Media': 'yellow',
+        'Bajo': 'green', 'Baja': 'green'
     };
+
+    // Mapeo de Estado BD -> Visual
+    let estadoLabel = 'Pendiente';
+    let estadoColor = 'orange';
+
+    if (estadoBD === 'EN_PROGRESO') { estadoLabel = 'En Revisión'; estadoColor = 'blue'; }
+    if (estadoBD === 'RESUELTO') { estadoLabel = 'Resuelto'; estadoColor = 'green'; }
+    if (estadoBD === 'CERRADO') { estadoLabel = 'Rechazado'; estadoColor = 'red'; }
 
     const colorBarra = coloresBarra[categoria] || 'grey';
-    const colorLabel = coloresImportancia[importancia] || 'grey';
+    const colorImp = coloresImportancia[importancia] || 'grey';
 
     return `
-        <div class="report-item">
-            <div style="display: flex; justify-content: space-between;">
-                <strong>Reporte de ${categoria}</strong>
+        <div class="report-item" style="background: white; border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong>${categoria}</strong>
                 <div>
-                    <div class="ui ${colorLabel} mini label">${importancia}</div>
-                    <div class="ui orange mini label">Pendiente</div>
+                    <div class="ui ${colorImp} mini label">${importancia}</div>
+                    <div class="ui ${estadoColor} mini label">${estadoLabel}</div>
                 </div>
             </div>
             
-            <div class="ui ${colorBarra} basic label mini" style="margin-top:5px">${categoria}</div>
-            
-            <div class="report-body" style="border-left: 4px solid ${colorBarra};">
+            <div class="report-body" style="border-left: 4px solid ${colorBarra}; padding-left: 10px; margin: 10px 0; color: #555;">
                 ${texto}
             </div>
 
-            <div class="meta-info">
-                <i class="user icon"></i> Residente 3A | <i class="calendar icon"></i> ${fecha}
+            <div class="meta-info" style="font-size: 0.85em; color: #888;">
+                <i class="calendar icon"></i> ${fecha}
             </div>
-            <div style="clear:both"></div>
         </div>
     `;
 }
 
-//Lo que sucede al darle click al botón
-function enviarReporte() {
-    const cat = document.getElementById('input-categoria').value;
-    const imp = document.getElementById('input-importancia').value;
-    const txt = document.getElementById('input-texto').value;
-    const contenedor = document.getElementById('contenedor-reportes');
+// --- UTILIDADES DE UI ---
 
-    if (!txt || txt.length < 10) {
-        mostrarError("El reporte es demasiado corto. Por favor, detalle mejor la situación.");
-        return;
-    }
-
-    const fechaHoy = new Date().toLocaleDateString();
-    
-    // Generamos el HTML usando la maqueta y lo ponemos al principio
-    const nuevoReporte = crearHtmlReporte(cat, txt, fechaHoy, imp);
-    contenedor.insertAdjacentHTML('afterbegin', nuevoReporte);
-
-    //Alerta de éxito
-    mostrarExito("Tu reporte ha sido enviado y ya aparece en tu historial.");
-
-    // Limpiamos
-    document.getElementById('input-texto').value = "";
+function initSidebar() {
+    const allToggleSelectors = '#sidebar-toggle, .sidebar-toggle-btn';
+    $('.ui.sidebar').sidebar({ context: $('.pusher'), transition: 'overlay' });
+    $(allToggleSelectors).click(function() {
+        $('.ui.sidebar').sidebar('toggle');
+    });
 }
 
-//FUNCIONES PARA MOSTRAR LA ALERTAS
 function mostrarError(mensaje) {
     const alerta = document.getElementById('alertFail');
     const textoAlerta = document.getElementById('alertMessage');
-
-    //Cambiamos el texto y mostramos el bloque
     textoAlerta.innerText = mensaje;
     alerta.style.display = 'flex';
+    alerta.style.opacity = '1';
     
-    //Delay para que la transición de opacidad funcione
-    setTimeout(() => {
-        alerta.style.opacity = '1';
-    }, 10);
-
-    //Desvanecer y ocultar después de 4 segundos
     setTimeout(() => {
         alerta.style.opacity = '0';
-        setTimeout(() => {
-            alerta.style.display = 'none';
-        }, 600); //Espera a que termine la animación CSS
+        setTimeout(() => alerta.style.display = 'none', 600);
     }, 4000);
 }
 
 function mostrarExito(mensaje) {
     const alerta = document.getElementById('alertSuccess');
     const textoAlerta = document.getElementById('successMessage');
-
     textoAlerta.innerText = mensaje;
     alerta.style.display = 'flex';
-    
-    setTimeout(() => {
-        alerta.style.opacity = '1';
-    }, 10);
+    alerta.style.opacity = '1';
 
     setTimeout(() => {
         alerta.style.opacity = '0';
-        setTimeout(() => {
-            alerta.style.display = 'none';
-        }, 600);
-    }, 3000); // 3 segundos es suficiente para un éxito
+        setTimeout(() => alerta.style.display = 'none', 600);
+    }, 3000);
 }
-
-enviarReporte();

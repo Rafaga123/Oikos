@@ -173,7 +173,11 @@ async function enviarRespuesta() {
 
     // Si es rechazo, obligar motivo (opcional)
     if (accionPendiente === 'RECHAZAR' && !motivo) {
-        alert('Por favor escribe un motivo.');
+        Swal.fire({
+            icon: 'warning',
+            title: 'Falta el motivo',
+            text: 'Explica por qué rechazas la solicitud.'
+        });
         return;
     }
 
@@ -192,15 +196,29 @@ async function enviarRespuesta() {
         });
 
         if (res.ok) {
-            alert('Acción realizada con éxito');
             $('#action-modal').modal('hide');
-            loadSolicitudes(); // Recargar lista
+            Swal.fire({
+                icon: 'success',
+                title: 'Acción realizada',
+                timer: 1500,
+                showConfirmButton: false
+            }).then(() => {
+                loadSolicitudes(); // Recargar lista
+            });
         } else {
-            alert('Error al procesar la solicitud');
+            Swal.fire({
+                icon: 'error',
+                title: 'No se pudo procesar',
+                text: 'Intenta nuevamente.'
+            });
         }
 
     } catch (error) {
         console.error(error);
-        alert('Error de conexión');
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de conexión',
+            text: 'Revisa tu red e inténtalo otra vez.'
+        });
     }
 }
