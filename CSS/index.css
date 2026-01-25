@@ -3,7 +3,7 @@
     background: white !important;
     color: var(--color-texto) !important;
     box-shadow: 0 4px 24px rgba(154,156,234,0.12);
-    border: 5px solid #ffffff ;
+    border: 10px solid #ffffff;
     border-radius: 0px;
 }
 .ui.menu .item {
@@ -79,6 +79,7 @@ body {
 }
 
 .header-content-wrapper {
+    margin-bottom: 20px;
     display: flex;
     justify-content: center; 
     align-items: center; 
@@ -99,7 +100,6 @@ body {
 }
 
 /* Estilos para el carrusel de Introducción*/
-/*kjhj*/
 
 .carousel-container {
     position: relative;
@@ -110,6 +110,10 @@ body {
     background: linear-gradient(135deg, #a2b9ee, #ADEEE2) !important;   
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     min-height: 250px;
+
+    flex: 1; /* Empuja el footer al fondo automáticamente */
+    margin-top: 2em;    /* Espacio externo arriba */
+    margin-bottom: 2em; /* Espacio externo abajo */
 }
 
 .carousel-slide {

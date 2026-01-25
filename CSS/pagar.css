@@ -1,4 +1,4 @@
- body {
+body {
   font-family: "Segoe UI", Tahoma, sans-serif; 
   background-image: url('../Images/Fondopagina.png');
   background-size: cover; /* cubre toda la pantalla*/ 
@@ -10,27 +10,35 @@
   padding:140px; 
 }
 
-
-
-    .container { 
+  .main-form-container { 
     max-width:980px; 
     margin:0 auto; 
     padding:20px; 
     box-shadow:0 6px 24px rgba(16,24,40,0.06); 
     background: #a2b9ee;
     border-radius: 14px;
-    
   }
+
+  /*Estilos para el footer*/
+.ui.vertical.footer {
+    background-color: #A2B9EE;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    bottom: 0;
+    width: 100%;
+    align-items: flex-end;
+}
     
     h2 { 
       margin:0 0 14px;
-     }
+    }
     .payment-methods {
-       display:flex; 
-       gap:10px; 
-       margin-bottom:18px; 
-       flex-wrap:wrap;
-       }
+      display:flex; 
+      gap:10px; 
+      margin-bottom:18px; 
+      flex-wrap:wrap;
+    }
     .pm-btn { 
       padding:10px 14px; 
       border:1px solid #9a9cea; 
@@ -41,7 +49,7 @@
     .pm-btn.active { 
       background:#a2dcee; 
       box-shadow:0 0 0 3px rgba(22,119,255,0.06);
-       border-color:#cfe3ff; 
+      border-color:#cfe3ff; 
       }
 
     .payment-grid { display:grid; 
@@ -49,7 +57,7 @@
       gap:20px; 
       align-items:start;
       margin-top:10px;
-     }
+    }
     label { 
       display:block; 
       margin:12px 0 6px; 
@@ -99,7 +107,7 @@
       color:#24324a; 
       font-size:13px; 
     }
-     .actions-row { 
+    .actions-row { 
       display:flex; 
       justify-content:space-between; 
       gap:12px;
@@ -137,7 +145,7 @@
       display:none; 
       opacity:0; 
       transition:opacity .45s ease;
-     }
+    }
 
     .alert.success { background:#4caf50; }
     .alert.danger  { background:#f44336; }
@@ -153,5 +161,7 @@
       .payment-grid { grid-template-columns:1fr; }
       .actions-row { 
         flex-direction:column-reverse;
-         align-items:stretch; }
+        align-items:stretch; }
     }
+
+

@@ -1,4 +1,54 @@
-body { background-color: #f4f4f4; height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; }
-    .error-container { max-width: 500px; padding: 40px; background: white; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-    .error-code { font-size: 6rem; font-weight: bold; color: #db2828; margin: 0; }
-    .icon-ghost { font-size: 4rem; color: #db2828; margin-bottom: 20px; }
+body {
+    background-image: url('../Images/Fondopagina.png');
+    background-color: #f4f4f4;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+    .error-container {
+        max-width: 500px;
+        padding: 40px;
+        background: linear-gradient(to bottom, #adeee2, #a2dcee);
+        border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+    }
+
+    .error-code { 
+        font-size: 6rem; 
+        font-weight: bold; 
+        color: #6066d8;
+        margin: 0; 
+    }
+
+    .icon-ghost { 
+        font-size: 4rem; 
+        color: #db2828; 
+        margin-bottom: 20px; 
+    }
+
+    .button-margin-top {
+    margin-top: 50px;    /* Espacio arriba para separarlo de las tarjetas */
+    margin-bottom: 50px; /* Espacio abajo para separarlo del borde inferior */
+}
+
+/* Aplicamos todos los efectos a la clase principal del botón */
+.ui.huge.primary.button {
+    background-color: #9A9CEA;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    transition: all 0.2s ease-in-out;
+}
+
+/*Levatamiento al colocar el cursor*/
+.ui.huge.primary.button:hover {
+    background-color: #7b7fd6;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.25); 
+    transform: translateY(-2px); 
+}
+
+/*Presionado*/
+.ui.huge.primary.button:active {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); 
+    transform: translateY(1px); 
+}
