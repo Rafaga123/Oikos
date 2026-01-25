@@ -110,6 +110,10 @@ body {
     background: linear-gradient(135deg, #a2b9ee, #ADEEE2) !important;   
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     min-height: 250px;
+
+    flex: 1; /* Esto empuja el footer al fondo automáticamente */
+    margin-top: 2em;    /* Espacio externo arriba */
+    margin-bottom: 2em; /* Espacio externo abajo */
 }
 
 .carousel-slide {
