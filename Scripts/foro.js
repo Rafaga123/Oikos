@@ -1,98 +1,189 @@
+// --- ESTRUCTURA DE DATOS: PILA (STACK) ---
+class PilaPosts {
+    constructor() {
+        this.items = [];
+    }
+    // Agregar elemento al tope
+    push(element) {
+        this.items.push(element);
+    }
+    // Sacar elemento del tope
+    pop() {
+        if (this.items.length === 0) return null;
+        return this.items.pop();
+    }
+    isEmpty() {
+        return this.items.length === 0;
+    }
+    limpiar() {
+        this.items = [];
+    }
+}
+
+// Instancia global de la pila
+const pilaDelForo = new PilaPosts();
+
 document.addEventListener('DOMContentLoaded', function() {
     initSidebar();
-    formForo();
+    configurarModal();
+    cargarPosts(); // Cargar datos reales al iniciar
 
-    //Inicializar dropdowns
+    // Inicializar componentes Semantic
     $('.ui.dropdown').dropdown();
 });
 
-//SIDEBAR
+// --- LÓGICA DE API Y RENDERIZADO ---
+
+async function cargarPosts() {
+    const token = localStorage.getItem('token');
+    const contenedor = document.getElementById('contenedor-posts'); // OJO: Debes agregar este ID en el HTML
+    
+    // Limpiamos visualmente y la pila
+    contenedor.innerHTML = '<div class="ui active loader"></div>'; 
+    pilaDelForo.limpiar();
+
+    try {
+        const res = await fetch('http://localhost:3000/api/foro', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!res.ok) throw new Error('Error al cargar posts');
+        
+        const posts = await res.json();
+        contenedor.innerHTML = ''; // Quitar loader
+
+        // 1. LLENAR LA PILA
+        // El servidor los manda por fecha ascendente (viejos primero).
+        // Al hacer push, el más nuevo queda en el tope (ultimo index).
+        posts.forEach(post => pilaDelForo.push(post));
+
+        // 2. VACIAR LA PILA PARA RENDERIZAR
+        // Al hacer pop, sacamos el más nuevo primero (LIFO) y lo pintamos arriba.
+        while (!pilaDelForo.isEmpty()) {
+            const post = pilaDelForo.pop();
+            const htmlPost = crearHTMLPost(post);
+            contenedor.innerHTML += htmlPost; // Añadir al DOM
+        }
+
+    } catch (error) {
+        console.error(error);
+        contenedor.innerHTML = '<p style="text-align:center">No se pudieron cargar los posts.</p>';
+    }
+}
+
+function crearHTMLPost(post) {
+    const fecha = new Date(post.fecha_creacion).toLocaleDateString();
+    const avatar = post.usuario.foto_perfil_url || '../Images/default.jpg';
+    const claseLike = post.dio_like ? 'red' : ''; // Corazón rojo si ya dio like
+
+    return `
+    <div class="column">
+        <div class="ui fluid card">
+            <div class="content">
+                <div class="right floated meta">${fecha}</div>
+                <img class="ui avatar image" src="${avatar}"> ${post.usuario.primer_nombre}
+            </div>
+            <div class="content">
+                <div class="header">${post.titulo}</div>
+                <div class="description">
+                    <p>${post.contenido}</p>
+                </div>
+            </div>
+            <div class="extra content">
+                <span class="left floated like-btn" onclick="toggleLike(${post.id}, this)" style="cursor: pointer;">
+                    <i class="${claseLike} like icon"></i>
+                    <span class="count">${post.cantidad_likes}</span> Likes
+                </span>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+async function publicarPost() {
+    const token = localStorage.getItem('token');
+    const titulo = document.querySelector('input[name="Tema"]').value;
+    const contenido = document.querySelector('input[name="Descripción"]').value;
+
+    try {
+        const res = await fetch('http://localhost:3000/api/foro', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ titulo, contenido })
+        });
+
+        if (res.ok) {
+            // Éxito
+            $('#modalAgregar').modal('hide');
+            $('#alertSuccess').fadeIn().delay(2000).fadeOut();
+            cargarPosts(); // Recargar todo para ver el nuevo post
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'No se publicó',
+                text: 'Hubo un problema al crear la publicación.'
+            });
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function toggleLike(idPost, elementoHtml) {
+    const token = localStorage.getItem('token');
+    const icono = elementoHtml.querySelector('i');
+    const contador = elementoHtml.querySelector('.count');
+    let numeroLikes = parseInt(contador.innerText);
+
+    try {
+        const res = await fetch(`http://localhost:3000/api/foro/${idPost}/like`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await res.json();
+
+        if (data.dio_like) {
+            icono.classList.add('red');
+            contador.innerText = numeroLikes + 1;
+        } else {
+            icono.classList.remove('red');
+            contador.innerText = numeroLikes - 1;
+        }
+
+    } catch (error) {
+        console.error('Error dando like', error);
+    }
+}
+
+// --- CONFIGURACIÓN VISUAL (LO QUE YA TENÍAS) ---
+
 function initSidebar() {
-    //Botones de control
-    const allToggleSelectors = '#sidebar-toggle, .sidebar-toggle-btn';
-
-    //Inicializamos y controlamos el sidebar usando la API de Semantic UI
-    $('.ui.sidebar').sidebar({
-        context: $('.pusher'),
-        transition: 'overlay'
-    });
-
-    $(allToggleSelectors).click(function() {
-        //La función 'toggle' lo abrirá si está cerrado, y lo cerrará si está abierto.
+    $('.ui.sidebar').sidebar({ context: $('.pusher'), transition: 'overlay' });
+    $('#sidebar-toggle, .sidebar-toggle-btn').click(function() {
         $('.ui.sidebar').sidebar('toggle');
     });
 }
 
-//FORO
-function formForo(){
-    //Activar dropdown
-    $('.ui.dropdown').dropdown();
-
-    //Activar dimmer
-    $('.special.card .image').dimmer({ on: 'hover' });
-
-    //Inicialización y configuración del Modal
-    $('#modalAgregar').modal({
-        // Validación de campos obligatorios al intentar publicar
-        onApprove: function() {
-            //El form dentro del modal
-            const $form = $('#modalAgregar .ui.form');
-
-            //Se utiliza el semantic ui form validation para verificar los campos requeridos
-            $form.form({
-                fields: {
-                    Tema: 'empty', //El campo con name="Tema" no puede estar vacío
-                    Descripción: 'empty', //El campo con name="Descripción" no puede estar vacío
-                }
-            });
-
-            //Si la validación falla, Semantic UI automáticamente muestra los mensajes
-            if ($form.form('is valid')) {
-                //Si el formulario es válido, podemos proceder a mostrar la alerta de éxito.
-                
-                //Muestra la alerta de éxito
-                setTimeout(() => {
-                    $('#alertSuccess').fadeIn();
-
-                    // Oculta la alerta después de 3 segundos
-                    setTimeout(() => {
-                        $('#alertSuccess').fadeOut();
-                    }, 3000);
-                }, 500);
-                
-                //retorna true para permitir que el modal cierre
-                return true; 
-            }
-            
-            //Muestra la alerta de éxito
-            setTimeout(() => {
-                $('#alertFail').fadeIn();
-
-                //Oculta la alerta después de 3 segundos
-                setTimeout(() => {
-                    $('#alertFail').fadeOut();
-                }, 3000);
-            }, 500);
-            //Si el formulario no es válido, retorna false para mantener el modal abierto
-            return false;
-        },
-
-        //preguntar si está seguro al intentar 'Cancelar'
-        onDeny: function() {
-            //Utilizamos la función de confirmación nativa del navegador
-            const confirmar = confirm('¿Estás seguro de que deseas cancelar? Se perderán los cambios.');
-            
-            //Retorna true si el usuario confirma (permite que el modal se cierre)
-            // Retorna FALSE si el usuario cancela (mantiene el modal abierto)
-            return confirmar; 
-        }
-    });
-
-    //Abrir el modal
+function configurarModal() {
     $('#agregarBtn').on('click', function() {
-        //Reinicia el estado del formulario (mensajes de error) antes de mostrarlo
         $('#modalAgregar .ui.form').form('clear');
         $('#modalAgregar').modal('show');
     });
-    
+
+    // Lógica del botón "Publicar" del modal
+    $('#publicar').on('click', function() {
+        const $form = $('#modalAgregar .ui.form');
+        // Validar visualmente
+        if( !$('input[name="Tema"]').val() || !$('input[name="Descripción"]').val() ) {
+             $('#alertFail').fadeIn().delay(2000).fadeOut();
+             return false;
+        }
+        // Si pasa, enviar a API
+        publicarPost();
+        return false; // Evitamos que cierre el modal automáticamente hasta que responda la API
+    });
 }

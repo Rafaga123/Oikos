@@ -46,17 +46,58 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const data = await res.json();
             if (res.ok) {
-                alert(`¡Éxito! Tu código de comunidad es: ${data.codigo}\nGuárdalo para dárselo a tus vecinos.`);
+                const codigo = data.codigo;
+
                 // Actualizar usuario en localStorage para reflejar el nuevo rol
                 let usuario = JSON.parse(localStorage.getItem('usuario'));
                 usuario.rol = 'ENCARGADO_COMUNIDAD';
                 localStorage.setItem('usuario', JSON.stringify(usuario));
-                
-                window.location.href = 'home_page.html';
+
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Comunidad creada!',
+                    html: `Tu código es <strong>${codigo}</strong>. Guárdalo y compártelo con tus vecinos.`,
+                    showCancelButton: true,
+                    confirmButtonText: 'Copiar código',
+                    cancelButtonText: 'Ir al inicio',
+                    reverseButtons: true
+                }).then(async (result) => {
+                    const goHome = () => { window.location.href = 'gestor.html'; };
+                    if (result.isConfirmed) {
+                        try {
+                            await navigator.clipboard.writeText(codigo);
+                            await Swal.fire({
+                                icon: 'success',
+                                title: 'Código copiado',
+                                timer: 1400,
+                                showConfirmButton: false
+                            });
+                        } catch (copyErr) {
+                            console.error(copyErr);
+                            await Swal.fire({
+                                icon: 'warning',
+                                title: 'No se pudo copiar',
+                                text: 'Copia el código manualmente si lo necesitas.'
+                            });
+                        }
+                    }
+                    goHome();
+                });
             } else {
-                alert(data.error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'No se pudo crear',
+                    text: data.error || 'Intenta nuevamente.'
+                });
             }
-        } catch (err) { alert('Error de conexión'); }
+        } catch (err) { 
+            console.error(err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de conexión',
+                text: 'No pudimos comunicarnos con el servidor.'
+            }); 
+        }
     });
 
     // --- LÓGICA: UNIRSE A COMUNIDAD ---
@@ -78,11 +119,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await res.json();
             if (res.ok) {
-                alert('Solicitud enviada. Espera a que el encargado te apruebe.');
-                window.location.href = 'home_page.html'; // O una página de "Pendiente"
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Solicitud enviada',
+                    text: 'El encargado revisará tu solicitud pronto.'
+                }).then(() => {
+                    window.location.href = 'home_page.html';
+                });
             } else {
-                alert(data.error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'No se pudo enviar',
+                    text: data.error || 'Revisa el código o intenta más tarde.'
+                });
             }
-        } catch (err) { alert('Error de conexión'); }
+        } catch (err) { 
+            console.error(err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de conexión',
+                text: 'No pudimos comunicarnos con el servidor.'
+            }); 
+        }
     });
 });

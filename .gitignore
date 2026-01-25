@@ -404,3 +404,6 @@ FodyWeavers.xsd
 
 # Ignorar archivos de entorno
 .env
+
+#Carga de archivos de foto de perfil
+uploads/

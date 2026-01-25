@@ -165,8 +165,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!resp.ok) {
         return setError(data?.error || 'No se pudo registrar. Intente nuevamente.');
       } else {
-      alert('¡Registro exitoso! Por favor inicia sesión.');
-      window.location.href = 'login.html';
+        Swal.fire({
+          icon: 'success',
+          title: '¡Registro exitoso!',
+          text: 'Inicia sesión para continuar.'
+        }).then(() => {
+          window.location.href = 'login.html';
+        });
       }
 
 

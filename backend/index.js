@@ -4,7 +4,18 @@ const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
-const nodemailer = require('nodemailer');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Importar Mailjet
+const Mailjet = require('node-mailjet');
+
+// Conectar con Mailjet
+const mailjet = Mailjet.apiConnect(
+    process.env.MJ_APIKEY_PUBLIC,
+    process.env.MJ_APIKEY_PRIVATE
+);
 
 const prisma = new PrismaClient();
 const app = express();
@@ -57,18 +68,53 @@ function buildResetToken(payload) {
   return jwt.sign(payload, process.env.JWT_SECRET || 'secreto_super_seguro', { expiresIn: '1h' });
 }
 
-// Configuración de Nodemailer (Gmail SMTP)
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER, // <--- Lee del archivo .env
-    pass: process.env.EMAIL_PASS  // <--- Lee del archivo .env
-  },
-  logger: true,
-  debug: true
+async function enviarCorreo(destinatario, asunto, titulo, mensajeHTML) {
+    try {
+        const request = await mailjet.post("send", { 'version': 'v3.1' }).request({
+            "Messages": [{
+                "From": {
+                    "Email": process.env.MJ_SENDER_EMAIL,
+                    "Name": "Oikos - Gestión Residencial"
+                },
+                "To": [{ "Email": destinatario }],
+                "Subject": asunto,
+                "HTMLPart": `
+                    <div style="font-family: Arial, sans-serif; color: #333;">
+                        <h2 style="color: #0d6efd;">${titulo}</h2>
+                        <hr>
+                        ${mensajeHTML}
+                        <br>
+                        <p style="font-size: 12px; color: #777;">Este es un mensaje automático de Oikos.</p>
+                    </div>
+                `
+            }]
+        });
+        console.log(`📧 Correo enviado a ${destinatario}`);
+        return true;
+    } catch (error) {
+        console.error("❌ Error enviando correo Mailjet:", error.statusCode);
+        return false;
+    }
+}
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const dir = './uploads';
+        if (!fs.existsSync(dir)){
+            fs.mkdirSync(dir);
+        }
+        cb(null, dir);
+    },
+    filename: function (req, file, cb) {
+        // Nombre único: id_usuario + fecha + extensión
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, 'perfil-' + uniqueSuffix + path.extname(file.originalname));
+    }
 });
+
+const upload = multer({ storage: storage });
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // --- ENDPOINTS ---
 
@@ -113,6 +159,15 @@ app.post('/api/registro', async (req, res) => {
 
     console.log("Usuario registrado:", nuevoUsuario.email); // Borrar esto luego Log de confirmación
     
+    await enviarCorreo(
+    nuevoUsuario.email, 
+    "¡Bienvenido a Oikos!", 
+    `Hola, ${nuevoUsuario.primer_nombre}`,
+    `<p>Gracias por registrarte en la plataforma.</p>
+    <p>Ahora puedes unirte a tu comunidad usando el código de tu edificio o crear una nueva.</p>
+    <a href="http://localhost/Proyectoquinto/Pages/login.html">Iniciar Sesión</a>` // cambiar luego
+    );
+
     res.status(201).json({
       mensaje: 'Usuario registrado exitosamente',
       usuario: { id: nuevoUsuario.id, email: nuevoUsuario.email }
@@ -139,38 +194,34 @@ app.post('/api/password/forgot', async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Correo requerido' });
 
-    // Buscar usuario;
+    // 1. Buscar usuario (La variable se llama 'user')
     const user = await prisma.usuario.findUnique({ where: { email } });
 
-    // Generar token solo si el usuario existe
-    let previewUrl = null;
-    let resetUrl = null;
+    // 2. Solo si el usuario existe, procesamos (pero no decimos nada si no existe)
     if (user) {
-      const token = buildResetToken({ id: user.id, tipo: 'RESET' });
+      // Generar token (Usamos user.password_hash como secreto extra por seguridad)
+      const secret = process.env.JWT_SECRET + user.password_hash;
+      const token = jwt.sign({ id: user.id, email: user.email }, secret, { expiresIn: '15m' });
 
-      // URL de frontend 
-      resetUrl = `http://localhost/proyectoquinto/Pages/restablecer.html?token=${encodeURIComponent(token)}`;
+      // URL de frontend (¡Corregido: usamos user.id, no usuario.id!)
+      const enlace = `http://localhost/Proyectoquinto/Pages/restablecer.html?id=${user.id}&token=${token}`;
 
-      const info = await transporter.sendMail({
-        from: `"Soporte Oikos" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: 'Restablecer contraseña',
-        text: `Para restablecer tu contraseña, visita: ${resetUrl}\nEste enlace expira en 1 hora.`,
-        html: `<p>Para restablecer tu contraseña, haz clic en el siguiente enlace:</p>
-              <p><a href="${resetUrl}">Restablecer contraseña</a></p>
-              <p>El enlace expira en 1 hora.</p>`
-      });
-      console.log('Password reset email enviado:', { messageId: info.messageId, response: info.response, resetUrl });
-      if (nodemailer.getTestMessageUrl) {
-        previewUrl = nodemailer.getTestMessageUrl(info);
-      }
-    }
+      // Usar la función Mailjet (¡Corregido: usamos user.primer_nombre!)
+      await enviarCorreo(
+        email,
+        "Recuperación de Contraseña",
+        `Hola, ${user.primer_nombre}`,
+        `<p>Has solicitado cambiar tu clave. Haz clic abajo:</p>
+         <a href="${enlace}" style="background:#0d6efd;color:white;padding:10px;border-radius:5px;text-decoration:none;">Restablecer ahora</a>
+         <p>Expira en 15 minutos.</p>`
+      );
+    } 
+    // 3. Respuesta Genérica (Por seguridad siempre decimos lo mismo)
+    res.json({ mensaje: 'Si el correo existe, se envió un enlace.' });
 
-    // Respuesta genérica
-    res.json({ mensaje: 'Si el correo existe, se envió un enlace.', resetUrl, previewUrl });
   } catch (error) {
     console.error('Error en forgot password:', error);
-    res.status(200).json({ mensaje: 'Si el correo existe, se envió un enlace.' });
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
 
@@ -286,7 +337,7 @@ app.post('/api/comunidades', verificarToken, async (req, res) => {
 
     // Generar código único simple (ej: "RES-8821")
     const aleatorio = Math.floor(1000 + Math.random() * 9000); 
-    const codigo_unico = `RES-${aleatorio}`;
+    const codigo_unico = `${aleatorio}`;
 
     // Transacción: Hacemos todo o nada para asegurar integridad
     const resultado = await prisma.$transaction(async (tx) => {
@@ -336,36 +387,49 @@ app.post('/api/comunidades', verificarToken, async (req, res) => {
  */
 app.post('/api/comunidades/unirse', verificarToken, async (req, res) => {
   try {
-    const { codigo, tipo_habitante, numero_casa } = req.body;
+    const { codigo, numero_casa, tipo_habitante } = req.body;
     const idUsuario = req.usuario.id;
+    const nombreSolicitante = req.usuario.email; // O busca el nombre completo si prefieres
 
-    if (!codigo) return res.status(400).json({ error: 'El código es obligatorio' });
+    // 1. Buscar Comunidad
+    const comunidad = await prisma.comunidad.findUnique({ where: { codigo_unico: codigo } });
+    if (!comunidad) return res.status(404).json({ error: 'Código inválido' });
 
-    // A. Buscar la comunidad
-    const comunidad = await prisma.comunidad.findUnique({
-      where: { codigo_unico: codigo }
-    });
-
-    if (!comunidad) {
-      return res.status(404).json({ error: 'No existe ninguna comunidad con ese código' });
-    }
-
-    // B. Actualizar usuario
+    // 2. Actualizar Usuario (Solicitud Pendiente)
     await prisma.usuario.update({
       where: { id: idUsuario },
       data: {
         id_comunidad: comunidad.id,
-        estado_solicitud: 'PENDIENTE', // Queda esperando aprobación
-        tipo_habitante: tipo_habitante || 'OTRO',
-        numero_casa: numero_casa
+        estado_solicitud: 'PENDIENTE',
+        numero_casa,
+        tipo_habitante
       }
     });
 
-    res.json({ mensaje: 'Solicitud enviada. Espera a que el encargado te acepte.' });
+    // 3. --- NOTIFICACIÓN AL GESTOR ---
+    // Buscamos quién es el encargado de esta comunidad
+    const encargado = await prisma.usuario.findFirst({
+        where: {
+            id_comunidad: comunidad.id,
+            rol: { nombre: 'ENCARGADO_COMUNIDAD' }
+        }
+    });
+
+    if (encargado) {
+        await enviarCorreo(
+            encargado.email,
+            "Nueva Solicitud de Ingreso - Oikos",
+            "Un vecino quiere unirse",
+            `<p>El usuario <strong>${nombreSolicitante}</strong> (Casa: ${numero_casa}) ha solicitado unirse a "${comunidad.nombre}".</p>
+             <p>Por favor, ingresa a tu panel para Aceptar o Rechazar la solicitud.</p>`
+        );
+    }
+
+    res.json({ mensaje: 'Solicitud enviada y notificada al encargado.' });
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al unirse a la comunidad' });
+    res.status(500).json({ error: 'Error al unirse' });
   }
 });
 
@@ -424,15 +488,542 @@ app.get('/api/anuncios', verificarToken, async (req, res) => {
   }
 });
 
+app.post('/api/incidencias', verificarToken, async (req, res) => {
+    try {
+        const { titulo, descripcion, categoria, importancia, foto_url } = req.body;
+        const idUsuario = req.usuario.id;
+
+        // 1. Obtener datos del usuario para saber su comunidad
+        const usuario = await prisma.usuario.findUnique({ 
+            where: { id: idUsuario },
+            include: { comunidad: true }
+        });
+
+        if (!usuario.id_comunidad) return res.status(400).json({ error: 'No tienes comunidad' });
+
+        // 2. Crear la incidencia
+        const nuevaIncidencia = await prisma.incidencia.create({
+            data: {
+                titulo,        
+                descripcion,
+                categoria,     
+                importancia,   
+                foto_url,
+                id_usuario: idUsuario,
+                estado: 'ABIERTO'
+            }
+        });
+
+        // 3. --- NOTIFICACIÓN AL GESTOR ---
+        const encargado = await prisma.usuario.findFirst({
+            where: {
+                id_comunidad: usuario.id_comunidad,
+                rol: { nombre: 'ENCARGADO_COMUNIDAD' }
+            }
+        });
+
+        if (encargado) {
+            await enviarCorreo(
+                encargado.email,
+                `Nuevo Reporte: ${titulo}`,
+                "Se ha reportado una incidencia",
+                `<p><strong>Vecino:</strong> ${usuario.primer_nombre} ${usuario.primer_apellido}</p>
+                <p><strong>Problema:</strong> ${descripcion}</p>
+                <p>Revisa el panel de incidencias para gestionarlo.</p>`
+            );
+        }
+
+        res.status(201).json(nuevaIncidencia);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al crear reporte' });
+    }
+});
+
+// --- ENDPOINTS DE PERFIL ---
+
+/**
+ * 1. OBTENER DATOS COMPLETOS DEL PERFIL
+ * Trae usuario, comunidad y pagos recientes
+ */
+app.get('/api/perfil', verificarToken, async (req, res) => {
+    try {
+        const idUsuario = req.usuario.id;
+
+        const usuario = await prisma.usuario.findUnique({
+            where: { id: idUsuario },
+            include: {
+                comunidad: true, // Traer datos de su edificio
+                pagos: {         // Traer sus últimos 5 pagos
+                    take: 5,
+                    orderBy: { fecha_pago: 'desc' }
+                }
+            }
+        });
+
+        if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+        // Ocultar contraseña antes de enviar
+        const { password_hash, ...datosSeguros } = usuario;
+        res.json(datosSeguros);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al cargar perfil' });
+    }
+});
+
+/**
+ * 2. SUBIR FOTO DE PERFIL
+ */
+app.post('/api/perfil/foto', verificarToken, upload.single('foto'), async (req, res) => {
+    try {
+        if (!req.file) return res.status(400).json({ error: 'No se subió ninguna imagen' });
+
+        const idUsuario = req.usuario.id;
+        // Construir la URL de la imagen (ajusta el puerto si es necesario)
+        const fotoUrl = `http://localhost:3000/uploads/${req.file.filename}`;
+
+        // Actualizar BD
+        await prisma.usuario.update({
+            where: { id: idUsuario },
+            data: { foto_perfil_url: fotoUrl }
+        });
+
+        res.json({ mensaje: 'Foto actualizada', url: fotoUrl });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al subir la foto' });
+    }
+});
+
+// --- ENDPOINTS DEL FORO ---
+
+/**
+ * 1. OBTENER POSTS (Solo de mi comunidad)
+ */
+app.get('/api/foro', verificarToken, async (req, res) => {
+    try {
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+        
+        if (!usuario.id_comunidad) {
+            return res.status(403).json({ error: 'Debes pertenecer a una comunidad para ver el foro.' });
+        }
+
+        const posts = await prisma.post.findMany({
+            where: { id_comunidad: usuario.id_comunidad },
+            include: {
+                usuario: { select: { primer_nombre: true, foto_perfil_url: true } }, // Datos del autor
+                likes: { where: { id_usuario: req.usuario.id } } // Para saber si YO le di like
+            },
+            orderBy: { fecha_creacion: 'asc' } // Traemos los viejos primero para meterlos a la Pila
+        });
+
+        // Formateamos para el frontend
+        const postsFormateados = posts.map(p => ({
+            ...p,
+            dio_like: p.likes.length > 0 // True si le di like
+        }));
+
+        res.json(postsFormateados);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error obteniendo posts' });
+    }
+});
+
+/**
+ * 2. CREAR POST
+ */
+app.post('/api/foro', verificarToken, async (req, res) => {
+    try {
+        const { titulo, contenido } = req.body;
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        if (!usuario.id_comunidad) {
+            return res.status(403).json({ error: 'No tienes comunidad asignada.' });
+        }
+
+        const nuevoPost = await prisma.post.create({
+            data: {
+                titulo,
+                contenido,
+                id_usuario: usuario.id,
+                id_comunidad: usuario.id_comunidad
+            },
+            include: { // Devolvemos datos del autor para mostrarlo al instante
+                usuario: { select: { primer_nombre: true, foto_perfil_url: true } }
+            }
+        });
+
+        res.status(201).json(nuevoPost);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al publicar' });
+    }
+});
+
+/**
+ * 3. DAR / QUITAR LIKE
+ */
+app.post('/api/foro/:id/like', verificarToken, async (req, res) => {
+    try {
+        const idPost = parseInt(req.params.id);
+        const idUsuario = req.usuario.id;
+
+        // Verificar si ya existe el like
+        const existeLike = await prisma.like.findUnique({
+            where: { id_usuario_id_post: { id_usuario: idUsuario, id_post: idPost } }
+        });
+
+        if (existeLike) {
+            // QUITAR LIKE (Dislike)
+            await prisma.like.delete({
+                where: { id_usuario_id_post: { id_usuario: idUsuario, id_post: idPost } }
+            });
+            await prisma.post.update({
+                where: { id: idPost },
+                data: { cantidad_likes: { decrement: 1 } }
+            });
+            res.json({ dio_like: false });
+        } else {
+            // DAR LIKE
+            await prisma.like.create({
+                data: { id_usuario: idUsuario, id_post: idPost }
+            });
+            await prisma.post.update({
+                where: { id: idPost },
+                data: { cantidad_likes: { increment: 1 } }
+            });
+            res.json({ dio_like: true });
+        }
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error en like' });
+    }
+});
+
+// ----- ENDPOINTS ACEPTAR HABITANTE NUEVO A LA COMUNIDAD ----
+
+/**
+ * 1. OBTENER SOLICITUDES PENDIENTES (Solo para el Gestor)
+ */
+app.get('/api/gestor/solicitudes', verificarToken, async (req, res) => {
+    try {
+        const idGestor = req.usuario.id;
+
+        // 1. Averiguar la comunidad del gestor
+        const gestor = await prisma.usuario.findUnique({ where: { id: idGestor } });
+        
+        if (!gestor.id_comunidad) {
+            return res.status(403).json({ error: 'No gestionas ninguna comunidad.' });
+        }
+
+        // 2. Buscar usuarios PENDIENTES de esa comunidad
+        // Filtramos para que no se traiga a sí mismo ni a otros aprobados
+        const solicitudes = await prisma.usuario.findMany({
+            where: {
+                id_comunidad: gestor.id_comunidad,
+                estado_solicitud: { in: ['PENDIENTE', 'RECHAZADO', 'ACEPTADO'] }, // Traemos historial también si quieres
+                rol: { nombre: 'HABITANTE' } // Solo habitantes normales
+            },
+            select: {
+                id: true,
+                primer_nombre: true,
+                primer_apellido: true,
+                email: true,
+                telefono: true,
+                numero_casa: true,     // Casa solicitada
+                tipo_habitante: true,  // Propietario/Inquilino
+                estado_solicitud: true,
+                fecha_registro: true,
+                foto_perfil_url: true
+            },
+            orderBy: { fecha_registro: 'desc' }
+        });
+
+        res.json(solicitudes);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al cargar solicitudes' });
+    }
+});
+
+/**
+ * 2. APROBAR O RECHAZAR SOLICITUD
+ */
+app.post('/api/gestor/responder-solicitud', verificarToken, async (req, res) => {
+    try {
+        const { idUsuario, accion, motivo } = req.body; // accion: 'APROBAR' o 'RECHAZAR'
+        const idGestor = req.usuario.id;
+
+        // Validaciones básicas
+        if (!['APROBAR', 'RECHAZAR'].includes(accion)) {
+            return res.status(400).json({ error: 'Acción no válida' });
+        }
+
+        // Actualizar el estado del usuario
+        const nuevoEstado = accion === 'APROBAR' ? 'ACEPTADO' : 'RECHAZADO';
+        
+        // Si es RECHAZADO, podrías querer borrarle el id_comunidad para que pueda pedir otra vez
+        // Pero por ahora solo cambiamos el estado para mantener el registro.
+
+        const usuarioActualizado = await prisma.usuario.update({
+            where: { id: parseInt(idUsuario) },
+            data: { 
+                estado_solicitud: nuevoEstado,
+                // Si rechazamos, guardamos el motivo en algún log o enviamos correo (opcional)
+            }
+        });
+
+        // NOTIFICAR POR CORREO (Usando la función que creamos antes)
+        const asunto = accion === 'APROBAR' ? '¡Bienvenido a la Comunidad!' : 'Solicitud Rechazada';
+        const mensaje = accion === 'APROBAR' 
+            ? `<p>Felicidades, has sido aceptado en la comunidad. Ya puedes iniciar sesión y acceder a todos los servicios.</p>`
+            : `<p>Tu solicitud ha sido rechazada por el gestor.</p><p><strong>Motivo:</strong> ${motivo || 'No especificado'}</p>`;
+
+        await enviarCorreo(
+            usuarioActualizado.email,
+            asunto,
+            `Respuesta a tu solicitud`,
+            mensaje
+        );
+
+        res.json({ mensaje: `Solicitud ${accion === 'APROBAR' ? 'aprobada' : 'rechazada'} correctamente` });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al procesar solicitud' });
+    }
+});
+
+// --- GESTIÓN DE HABITANTES (PANEL DEL ENCARGADO) ---
+
+/**
+ * 1. LISTAR TODOS LOS HABITANTES (De mi comunidad)
+ */
+app.get('/api/gestor/habitantes', verificarToken, async (req, res) => {
+    try {
+        const idGestor = req.usuario.id;
+        // Obtener comunidad del gestor
+        const gestor = await prisma.usuario.findUnique({ where: { id: idGestor } });
+        
+        if (!gestor.id_comunidad) return res.status(403).json({ error: 'No tienes comunidad.' });
+
+        // Traer todos los usuarios de esa comunidad (menos al gestor mismo si quieres)
+        const habitantes = await prisma.usuario.findMany({
+            where: { id_comunidad: gestor.id_comunidad },
+            include: {
+                rol: true,
+                pagos: {
+                    orderBy: { fecha_pago: 'desc' },
+                    take: 5
+                }
+            }
+        });
+
+        res.json(habitantes);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al listar habitantes' });
+    }
+});
+
+/**
+ * 2. EDITAR HABITANTE
+ */
+app.put('/api/gestor/habitante/:id', verificarToken, async (req, res) => {
+    try {
+        const idHabitante = parseInt(req.params.id);
+        const { nombre, apellido, cedula, correo, estado_solicitud } = req.body; // 'estado' en el frontend es 'estado_solicitud' en BD?
+        
+        await prisma.usuario.update({
+            where: { id: idHabitante },
+            data: {
+                primer_nombre: nombre,
+                primer_apellido: apellido,
+                // cedula: cedula,  <--- ELIMINADO (No se debe editar)
+                // email: correo,   <--- ELIMINADO (No se debe editar)
+                estado_solicitud: estado_solicitud === 'activo' ? 'ACEPTADO' : 'RECHAZADO'
+            }
+        });
+// ...
+
+        res.json({ mensaje: 'Habitante actualizado' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al actualizar habitante' });
+    }
+});
+
+/**
+ * 3. AGREGAR PAGO (Manualmente por el Gestor)
+ */
+app.post('/api/gestor/pagos', verificarToken, async (req, res) => {
+    try {
+        const { id_usuario, monto, fecha, metodo, banco, estatus } = req.body;
+        
+        // Crear el pago
+        await prisma.pago.create({
+            data: {
+                id_usuario: parseInt(id_usuario),
+                monto: parseFloat(monto),
+                fecha_pago: new Date(fecha),
+                concepto: `Pago registrado por Gestor (${metodo})`,
+                referencia: banco || 'Efectivo',
+                estado: estatus === 'validado' ? 'APROBADO' : (estatus === 'rechazado' ? 'RECHAZADO' : 'PENDIENTE')
+            }
+        });
+
+        res.json({ mensaje: 'Pago registrado exitosamente' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al registrar pago' });
+    }
+});
+
+/**
+ * 4. PROMOVER A GESTOR (Dar permisos)
+ */
+app.post('/api/gestor/promover/:id', verificarToken, async (req, res) => {
+    try {
+        const idUsuario = parseInt(req.params.id);
+        
+        // Buscar el rol de ENCARGADO
+        const rolEncargado = await prisma.rol.findUnique({ where: { nombre: 'ENCARGADO_COMUNIDAD' } });
+        
+        await prisma.usuario.update({
+            where: { id: idUsuario },
+            data: { id_rol: rolEncargado.id }
+        });
+
+        res.json({ mensaje: 'Usuario promovido a Encargado correctamente.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al promover usuario' });
+    }
+});
+
+// --- GESTIÓN DE INCIDENCIAS (Quejas y Solicitudes) ---
+
+/**
+ * 1. LISTAR INCIDENCIAS (Del edificio del gestor)
+ */
+app.get('/api/gestor/incidencias', verificarToken, async (req, res) => {
+    try {
+        const idGestor = req.usuario.id;
+        const gestor = await prisma.usuario.findUnique({ where: { id: idGestor } });
+
+        if (!gestor.id_comunidad) return res.status(403).json({ error: 'No tienes comunidad.' });
+
+        // Buscar usuarios de la comunidad para filtrar sus incidencias
+        // O mejor: buscar incidencias donde el usuario autor pertenezca a la comunidad
+        const incidencias = await prisma.incidencia.findMany({
+            where: {
+                usuario: {
+                    id_comunidad: gestor.id_comunidad
+                }
+            },
+            include: {
+                usuario: {
+                    select: {
+                        primer_nombre: true,
+                        primer_apellido: true,
+                        numero_casa: true
+                    }
+                }
+            },
+            orderBy: { fecha_reporte: 'desc' }
+        });
+
+        res.json(incidencias);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al cargar incidencias' });
+    }
+});
+
+/**
+ * 2. CAMBIAR ESTADO DE INCIDENCIA
+ */
+app.put('/api/gestor/incidencias/:id', verificarToken, async (req, res) => {
+    try {
+        const idIncidencia = parseInt(req.params.id);
+        const { estado } = req.body; // ABIERTO, EN_PROGRESO, RESUELTO, CERRADO
+
+        // Validar que el estado sea uno de los permitidos en el ENUM de Prisma
+        const estadosValidos = ['ABIERTO', 'EN_PROGRESO', 'RESUELTO', 'CERRADO'];
+        if (!estadosValidos.includes(estado)) {
+            return res.status(400).json({ error: 'Estado no válido' });
+        }
+
+        const incidenciaActualizada = await prisma.incidencia.update({
+            where: { id: idIncidencia },
+            data: { estado: estado }
+        });
+
+        res.json({ mensaje: 'Estado actualizado', incidencia: incidenciaActualizada });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al actualizar incidencia' });
+    }
+});
+
+/**
+ * 3. MARCAR TODO COMO REVISADO (En realidad, pasar de ABIERTO a EN_PROGRESO)
+ */
+app.post('/api/gestor/incidencias/revisar-todo', verificarToken, async (req, res) => {
+    try {
+        const idGestor = req.usuario.id;
+        const gestor = await prisma.usuario.findUnique({ where: { id: idGestor } });
+
+        // Actualizar masivamente todas las incidencias ABIERTAS de esa comunidad a EN_PROGRESO
+        const resultado = await prisma.incidencia.updateMany({
+            where: {
+                estado: 'ABIERTO',
+                usuario: { id_comunidad: gestor.id_comunidad }
+            },
+            data: { estado: 'EN_PROGRESO' }
+        });
+
+        res.json({ mensaje: `Se marcaron ${resultado.count} solicitudes como revisadas.` });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error masivo' });
+    }
+});
+
+/**
+ * 4. OBTENER MIS REPORTES (Para el Habitante)
+ */
+app.get('/api/incidencias/mis-reportes', verificarToken, async (req, res) => {
+    try {
+        const idUsuario = req.usuario.id;
+
+        const misReportes = await prisma.incidencia.findMany({
+            where: { id_usuario: idUsuario },
+            orderBy: { fecha_reporte: 'desc' }
+        });
+
+        res.json(misReportes);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al cargar tus reportes' });
+    }
+});
+
 // Iniciar servidor
 app.listen(port, async () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
   await inicializarRoles(); // <--- IMPORTANTE: Esto crea los roles
-  transporter.verify((error, success) => {
-    if (error) {
-      console.error('SMTP no disponible para enviar correos:', error);
-    } else {
-      console.log('SMTP listo para enviar correos');
-    }
-  });
 });

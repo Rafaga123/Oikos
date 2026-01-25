@@ -4,7 +4,7 @@
             $('.ui.dropdown').dropdown();
             $('.ui.checkbox').checkbox();
             
-            // Sidebar toggle (usando tu lógica existente)
+            // Sidebar toggle 
             $('#sidebar-toggle').click(function() {
                 $('.ui.sidebar').sidebar('toggle');
             });
@@ -148,13 +148,25 @@
             $('#announcementForm').submit(function(e) {
                 e.preventDefault();
                 // Aquí iría la lógica para guardar el anuncio
-                alert('Anuncio creado exitosamente!');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Anuncio creado',
+                    text: 'Tu anuncio se publicó correctamente.',
+                    timer: 1800,
+                    showConfirmButton: false
+                });
             });
             
             $('#surveyForm').submit(function(e) {
                 e.preventDefault();
                 // Aquí iría la lógica para guardar la encuesta
-                alert('Encuesta creada exitosamente!');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Encuesta creada',
+                    text: 'Se ha guardado la encuesta.',
+                    timer: 1800,
+                    showConfirmButton: false
+                });
             });
             
             // Helper para nombres de categoría
