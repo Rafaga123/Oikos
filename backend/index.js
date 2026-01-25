@@ -597,6 +597,115 @@ app.post('/api/perfil/foto', verificarToken, upload.single('foto'), async (req, 
     }
 });
 
+// --- ENDPOINTS DEL FORO ---
+
+/**
+ * 1. OBTENER POSTS (Solo de mi comunidad)
+ */
+app.get('/api/foro', verificarToken, async (req, res) => {
+    try {
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+        
+        if (!usuario.id_comunidad) {
+            return res.status(403).json({ error: 'Debes pertenecer a una comunidad para ver el foro.' });
+        }
+
+        const posts = await prisma.post.findMany({
+            where: { id_comunidad: usuario.id_comunidad },
+            include: {
+                usuario: { select: { primer_nombre: true, foto_perfil_url: true } }, // Datos del autor
+                likes: { where: { id_usuario: req.usuario.id } } // Para saber si YO le di like
+            },
+            orderBy: { fecha_creacion: 'asc' } // Traemos los viejos primero para meterlos a la Pila
+        });
+
+        // Formateamos para el frontend
+        const postsFormateados = posts.map(p => ({
+            ...p,
+            dio_like: p.likes.length > 0 // True si le di like
+        }));
+
+        res.json(postsFormateados);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error obteniendo posts' });
+    }
+});
+
+/**
+ * 2. CREAR POST
+ */
+app.post('/api/foro', verificarToken, async (req, res) => {
+    try {
+        const { titulo, contenido } = req.body;
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        if (!usuario.id_comunidad) {
+            return res.status(403).json({ error: 'No tienes comunidad asignada.' });
+        }
+
+        const nuevoPost = await prisma.post.create({
+            data: {
+                titulo,
+                contenido,
+                id_usuario: usuario.id,
+                id_comunidad: usuario.id_comunidad
+            },
+            include: { // Devolvemos datos del autor para mostrarlo al instante
+                usuario: { select: { primer_nombre: true, foto_perfil_url: true } }
+            }
+        });
+
+        res.status(201).json(nuevoPost);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al publicar' });
+    }
+});
+
+/**
+ * 3. DAR / QUITAR LIKE
+ */
+app.post('/api/foro/:id/like', verificarToken, async (req, res) => {
+    try {
+        const idPost = parseInt(req.params.id);
+        const idUsuario = req.usuario.id;
+
+        // Verificar si ya existe el like
+        const existeLike = await prisma.like.findUnique({
+            where: { id_usuario_id_post: { id_usuario: idUsuario, id_post: idPost } }
+        });
+
+        if (existeLike) {
+            // QUITAR LIKE (Dislike)
+            await prisma.like.delete({
+                where: { id_usuario_id_post: { id_usuario: idUsuario, id_post: idPost } }
+            });
+            await prisma.post.update({
+                where: { id: idPost },
+                data: { cantidad_likes: { decrement: 1 } }
+            });
+            res.json({ dio_like: false });
+        } else {
+            // DAR LIKE
+            await prisma.like.create({
+                data: { id_usuario: idUsuario, id_post: idPost }
+            });
+            await prisma.post.update({
+                where: { id: idPost },
+                data: { cantidad_likes: { increment: 1 } }
+            });
+            res.json({ dio_like: true });
+        }
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error en like' });
+    }
+});
+
 // Iniciar servidor
 app.listen(port, async () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
