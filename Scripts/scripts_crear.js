@@ -4,7 +4,7 @@
             $('.ui.dropdown').dropdown();
             $('.ui.checkbox').checkbox();
             
-            // Sidebar toggle (usando tu lógica existente)
+            // Sidebar toggle 
             $('#sidebar-toggle').click(function() {
                 $('.ui.sidebar').sidebar('toggle');
             });

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitudes</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+    <!-- Semantic UI -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     <link rel="stylesheet" href="../CSS/solicitudes_nuevas.css">
+     
+
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="ui vertical inverted sidebar menu sidebar-menu" style="background-color: #9A9CEA;">
+        <div class="item">
+            <div class="header">
+                <h2 class="ui inverted header">
+                    <i class="cog icon"></i>
+                    <div class="content">
+                        Panel Gestor
+                        <div class="sub header">Gestión de Habitantes</div>
+                    </div>
+                </h2>
+            </div>
+        </div>
+        <div class="item">
+            <div class="menu">
+                <a class="active item">
+                    <i class="home icon"></i>
+                    Panel de Control
+                </a>
+                <a class="item" href="./gestion_habitantes.html">
+                    <i class="users icon"></i>
+                    Habitantes
+                </a>
+                <a class="item" href="./solicitudes.html">
+                    <i class="chart bar icon"></i>
+                    Solicitudes
+                </a>
+                
+            </div>
+        </div>
+        <div class="item" >
+            <div class="ui divider"></div>
+            <a class="item" onclick="cerrarSesion()">
+                <i class="sign out icon"></i>
+                Cerrar Sesión
+            </a>
+        </div>
+        <div class="sidebar-footer-image">
+            <img src="../Images/logopng.png" alt="Decoración de Sidebar">
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="pusher">
+        <!--Menú Superior-->
+        <div class="ui top fixed menu" style="background-color: #9A9CEA;">
+            <div class="ui container">
+                <div class="item">
+                    <img src="../Images/logopng.png" alt="Logo"> <!--logo de la pagina-->
+                </div>
+                <a class="item" id="sidebar-toggle"><!--activador del sidebar-->
+                    <i class="sidebar icon" style="color: white;"></i><!--Icono del sidebar-->
+                </a>
+                <div class="header item" style="color: white;"><!--color y titulo del menu superior-->
+                    Solicitudes de Ingreso
+                </div>
+                <div class="right menu">
+                    <div class="ui dropdown item" style="color: white;">
+                        <i class="user icon" style="color: white;"></i> Gestor
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <a class="item"><i class="user icon"></i> Mi Perfil</a>
+                            
+                            <div class="divider"></div>
+                            <a class="item" onclick="cerrarSesion()"><i class="sign out icon"></i> Cerrar Sesión</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="ui container">
+                <!-- Header -->
+                <div class="ui header">
+                    <h1>
+                        <i class="clipboard list icon"></i>
+                        Solicitudes de Ingreso
+                        <div class="sub header">Revisa y gestiona las solicitudes de nuevos habitantes</div>
+                    </h1>
+                </div>
+                
+                <div class="ui divider"></div>
+                
+                <!-- Estadísticas -->
+                <div class="dashboard-stats">
+                    <div class="stat-card total">
+                        <div class="stat-number" id="total-solicitudes">0</div>
+                        <div class="stat-label">
+                            <i class="clipboard list icon"></i>
+                            Total Solicitudes
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card pending">
+                        <div class="stat-number" id="pending-solicitudes">0</div>
+                        <div class="stat-label">
+                            <i class="clock icon"></i>
+                            Pendientes
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card approved">
+                        <div class="stat-number" id="approved-solicitudes">0</div>
+                        <div class="stat-label">
+                            <i class="check circle icon"></i>
+                            Aprobadas
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card rejected">
+                        <div class="stat-number" id="rejected-solicitudes">0</div>
+                        <div class="stat-label">
+                            <i class="times circle icon"></i>
+                            Rechazadas
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contenedor de Solicitudes -->
+                <div class="solicitudes-container">
+                    <!-- Barra de Filtros -->
+                    <div class="filters-bar">
+                        <div class="filter-btn active" data-filter="all">
+                            <i class="clipboard list icon"></i> Todas
+                        </div>
+                        <div class="filter-btn" data-filter="pending">
+                            <i class="clock icon"></i> Pendientes
+                        </div>
+                        <div class="filter-btn" data-filter="approved">
+                            <i class="check circle icon"></i> Aprobadas
+                        </div>
+                        <div class="filter-btn" data-filter="rejected">
+                            <i class="times circle icon"></i> Rechazadas
+                        </div>
+                        
+                        
+                        
+                        
+                    </div>
+                    
+                    <!-- Lista de Solicitudes -->
+                    <div class="solicitudes-list" id="solicitudes-list">
+                        <!-- Las solicitudes se cargarán aquí dinámicamente -->
+                        <div class="empty-state">
+                            <i class="clipboard list icon"></i>
+                            <h3>No hay solicitudes pendientes</h3>
+                            <p>Todas las solicitudes han sido procesadas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Ver Detalles -->
+    <div class="ui modal" id="detail-modal">
+        <i class="close icon"></i>
+        <div class="header" id="modal-header">
+            <i class="user icon"></i>
+            Detalles de Solicitud
+        </div>
+        <div class="modal-content" id="modal-content">
+            <!-- Contenido dinámico -->
+        </div>
+        <div class="actions" id="modal-actions">
+            <!-- Acciones dinámicas -->
+        </div>
+    </div>
+
+    <!-- Modal para Aprobar/Rechazar -->
+    <div class="ui small modal" id="action-modal">
+        <div class="header" id="action-modal-header">Confirmar Acción</div>
+        <div class="content" id="action-modal-content">
+            <p id="action-message"></p>
+            <div class="ui form" id="rejection-form" style="display: none;">
+                <div class="field">
+                    <label>Motivo del rechazo</label>
+                    <textarea id="rejection-reason" rows="3" placeholder="Especifica el motivo del rechazo..."></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui button cancel-action">Cancelar</div>
+            <div class="ui button approve-action" style="display: none;">
+                <i class="check icon"></i> Aprobar
+            </div>
+            <div class="ui red button reject-action" style="display: none;">
+                <i class="times icon"></i> Rechazar
+            </div>
+            <div class="ui primary button confirm-action" style="display: none;">
+                <i class="paper plane icon"></i> Confirmar
+            </div>
+        </div>
+    </div>
+
+    <script src="../Scripts/solicitudes_nuevas.js"></script>
+</body>
+</html>
