@@ -1,115 +1,123 @@
 document.addEventListener('DOMContentLoaded', function() {
     initSidebar();
-    initSurvey();
+    
+    // Obtener ID de la URL (ej: encuesta.html?id=5)
+    const urlParams = new URLSearchParams(window.location.search);
+    const idEncuesta = urlParams.get('id');
 
-    $('.ui.dropdown').dropdown();
+    if (idEncuesta) {
+        cargarDetalleEncuesta(idEncuesta);
+    } else {
+        alert('Encuesta no especificada');
+        window.location.href = 'selecEncuesta.html';
+    }
 });
 
-// SIDEBAR
-function initSidebar() {
-    const allToggleSelectors = '#sidebar-toggle, .sidebar-toggle-btn';
+async function cargarDetalleEncuesta(id) {
+    const token = localStorage.getItem('token');
+    
+    try {
+        const res = await fetch(`http://localhost:3000/api/encuestas/${id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!res.ok) throw new Error('Error al cargar');
+        
+        const encuesta = await res.json();
+        renderSurvey(encuesta); // Función que dibuja el HTML
 
-    $('.ui.sidebar').sidebar({
-        context: $('.pusher'),
-        transition: 'overlay'
+    } catch (error) {
+        console.error(error);
+        $('#titulo-encuesta').text('Error al cargar la encuesta');
+    }
+}
+
+function renderSurvey(data) {
+    $('#titulo-encuesta').text(data.titulo);
+    $('#descripcion-encuesta').text(data.descripcion);
+
+    const $container = $('#contenedor-preguntas');
+    $container.empty();
+
+    // Generar opciones (Asumiendo encuesta simple de 1 pregunta principal por ahora o estructura flexible)
+    // En tu modelo actual, Encuesta tiene Titulo/Desc y una lista de Opciones. 
+    // Es como una "Pregunta única con varias opciones".
+    
+    let optionsHTML = '';
+    data.opciones.forEach(opcion => {
+        optionsHTML += `
+            <div class="field">
+                <div class="ui radio checkbox">
+                    <input type="radio" name="opcion_elegida" value="${opcion.id}" required>
+                    <label>${opcion.texto}</label>
+                </div>
+            </div>
+        `;
     });
 
-    $(allToggleSelectors).click(function() {
-        $('.ui.sidebar').sidebar('toggle');
+    const questionHTML = `
+        <div class="pregunta-item">
+            <h3 class="ui header texto-pregunta">Seleccione una opción:</h3>
+            <div class="grouped fields">
+                ${optionsHTML}
+            </div>
+        </div>
+    `;
+    $container.append(questionHTML);
+    $('.ui.radio.checkbox').checkbox(); // Activar Semantic UI
+    
+    // Configurar envío
+    configurarEnvio(data.id);
+}
+
+function configurarEnvio(idEncuesta) {
+    $('#form-responder-encuesta').off('submit').on('submit', async function(e) {
+        e.preventDefault();
+        
+        // Obtener opción seleccionada
+        const idOpcion = $('input[name=opcion_elegida]:checked').val();
+        
+        if (!idOpcion) {
+            alert('Debes seleccionar una opción');
+            return;
+        }
+
+        const token = localStorage.getItem('token');
+        
+        try {
+            const res = await fetch(`http://localhost:3000/api/encuestas/${idEncuesta}/votar`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ idOpcion: idOpcion })
+            });
+
+            if (res.ok) {
+                mostrarExito();
+            } else {
+                const err = await res.json();
+                alert(err.error || 'Error al votar');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Error de conexión');
+        }
     });
 }
 
-//LÓGICA PARA GENERAR LA ENCUESTA
-function initSurvey() {
-    //datos simulados mientras la conexion con la no este lista
-    const surveyMock = {
-        titulo: "Cuota de Mantenimiento Diciembre",
-        descripcion: "Su opinión es vital para definir las prioridades del condominio este mes.",
-        preguntas: [
-            {
-                id: 101,
-                texto: "¿Cómo califica el servicio de limpieza de las áreas comunes?",
-                opciones: ["Excelente", "Bueno", "Regular", "Deficiente"]
-            },
-            {
-                id: 102,
-                texto: "¿Está de acuerdo con la propuesta de pintura de fachadas?",
-                opciones: ["Sí", "No", "Prefiero otra prioridad"]
-            }
-        ]
-    };
+function mostrarExito() {
+    const alerta = document.getElementById('alertSuccess');
+    alerta.style.display = 'flex';
+    setTimeout(() => { alerta.style.opacity = '1'; }, 10);
+    
+    setTimeout(() => {
+        window.location.href = "selecEncuesta.html";
+    }, 2000);
+}
 
-    function mostrarExito(mensaje) {
-        const alerta = document.getElementById('alertSuccess');
-        const textoAlerta = document.getElementById('successMessage');
-
-        textoAlerta.innerText = mensaje;
-        alerta.style.display = 'flex'; //flex para que el icono y texto alineen bien
-
-        //delay para que el navegador note el cambio de display antes de la opacidad
-        setTimeout(() => {
-            alerta.style.opacity = '1';
-        }, 10);
-
-        //Ciclo de cierre
-        setTimeout(() => {
-            alerta.style.opacity = '0';
-            setTimeout(() => {
-                alerta.style.display = 'none';
-                //Una vez que la alerta desaparece, volvemos al listado
-                window.location.href = "selecEncuesta.html";
-            }, 600);
-        }, 3000); 
-    }
-
-    //Renderizado dinámico
-    function renderSurvey(data) {
-        $('#titulo-encuesta').text(data.titulo);
-        $('#descripcion-encuesta').text(data.descripcion);
-
-        const $container = $('#contenedor-preguntas');
-        $container.empty();
-
-        data.preguntas.forEach((q, index) => {
-            let optionsHTML = '';
-                
-            q.opciones.forEach(opcion => {
-                optionsHTML += `
-                    <div class="field">
-                        <div class="ui radio checkbox">
-                            <input type="radio" name="p_${q.id}" value="${opcion}" required>
-                            <label>${opcion}</label>
-                        </div>
-                    </div>
-                `;
-            });
-
-            const questionHTML = `
-                <div class="pregunta-item">
-                    <h3 class="ui header texto-pregunta">${index + 1}. ${q.texto}</h3>
-                    <div class="grouped fields">
-                        ${optionsHTML}
-                    </div>
-                </div>
-            `;
-            $container.append(questionHTML);
-        });
-
-        //Activar componentes de Semantic UI inyectados
-        $('.ui.radio.checkbox').checkbox();
-    }
-
-    //Ejecutar renderizado
-    renderSurvey(surveyMock);
-
-    //Manejo del formulario
-    $('#form-responder-encuesta').on('submit', function(e) {
-        e.preventDefault();
-        
-        //Obtenemos los datos seleccionados
-        const results = $(this).serializeArray();
-        console.log("Datos para el backend de Node.js:", results);
-
-        mostrarExito("¡Encuesta enviada! Sus respuestas han sido guardadas con éxito. Será redirigido al listado de encuestas...");
-    });
+function initSidebar() {
+    $('.ui.sidebar').sidebar({ context: $('.pusher'), transition: 'overlay' });
+    $('#sidebar-toggle').click(() => $('.ui.sidebar').sidebar('toggle'));
 }

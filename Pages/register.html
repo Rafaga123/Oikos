@@ -27,7 +27,7 @@
 
     <main class="centered-form-container">
 
-        <form class="ui form attached fluid segment" id="register-form">
+        <form class="ui form attached fluid segment horizontal-register-form" id="register-form">
             <h2 class="ui center aligned header" style="margin-bottom:1.5rem;">Registrarme</h2>
             <!-- Paso 1: Nombre y Apellido -->
             <div class="step" id="step-1">
@@ -54,7 +54,7 @@
                 <div class="ui fluid button primary next-btn">Siguiente</div>
             </div>
 
-            <!-- Paso 2: Cédula y Email (datos mínimos; el resto se pedirá en el primer ingreso) -->
+            <!-- Paso 2: Cédula, Email, Fecha de Nacimiento y Teléfono -->
             <div class="step" id="step-2" style="display: none;">
                 <div class="two fields">
                     <div class="field">
@@ -64,6 +64,35 @@
                     <div class="field">
                         <label>Correo Electrónico</label>
                         <input type="email" id="email" name="email" placeholder="Correo Electrónico" required>
+                    </div>
+                </div>
+                <div class="two fields">
+                    <div class="field">
+                        <label>Fecha de Nacimiento</label>
+                        <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                    </div>
+                    <div class="field">
+                        <label>Teléfono</label>
+                        <div class="two fields" style="margin: 0;">
+                            <div class="field" style="min-width: 160px; max-width: 200px;">
+                                <select id="pais-telefono" name="pais_telefono" class="ui dropdown" aria-label="Código de país">
+                                    <option value="VE" data-dial="+58" selected>Venezuela (+58)</option>
+                                    <option value="CO" data-dial="+57">Colombia (+57)</option>
+                                    <option value="MX" data-dial="+52">México (+52)</option>
+                                    <option value="AR" data-dial="+54">Argentina (+54)</option>
+                                    <option value="CL" data-dial="+56">Chile (+56)</option>
+                                    <option value="US" data-dial="+1">Estados Unidos (+1)</option>
+                                    <option value="ES" data-dial="+34">España (+34)</option>
+                                    <option value="BR" data-dial="+55">Brasil (+55)</option>
+                                    <option value="PE" data-dial="+51">Perú (+51)</option>
+                                    <option value="EC" data-dial="+593">Ecuador (+593)</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <input type="tel" id="telefono" name="telefono" placeholder="Ej: +584144601965" required>
+                            </div>
+                        </div>
+                        <small>Empieza con "+" y se detecta el país automáticamente.</small>
                     </div>
                 </div>
                 <div class="ui two buttons">
@@ -117,6 +146,7 @@
     </footer>
     <script src="../Scripts/jquery-3.7.1.min.js"></script>
     <script src="../Scripts/semantic.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../Scripts/register.js"></script>
     <script src="../Scripts/script.js"></script>
     <script>

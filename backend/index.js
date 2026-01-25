@@ -127,12 +127,22 @@ app.post('/api/registro', async (req, res) => {
     const { 
       cedula, email, password, 
       primer_nombre, segundo_nombre, 
-      primer_apellido, segundo_apellido
+      primer_apellido, segundo_apellido,
+      fecha_nacimiento, telefono
     } = req.body;
 
+    const telefonoNormalizado = typeof telefono === 'string' ? telefono.replace(/[\s-]/g, '') : '';
+    const fechaNacimientoDate = fecha_nacimiento ? new Date(fecha_nacimiento) : null;
+
     // 2. Validaciones
-    if (!cedula || !email || !password || !primer_nombre || !primer_apellido) {
+    if (!cedula || !email || !password || !primer_nombre || !primer_apellido || !fechaNacimientoDate || !telefonoNormalizado) {
       return res.status(400).json({ error: 'Faltan campos obligatorios' });
+    }
+    if (Number.isNaN(fechaNacimientoDate.getTime()) || fechaNacimientoDate > new Date()) {
+      return res.status(400).json({ error: 'Fecha de nacimiento no válida' });
+    }
+    if (!/^\+\d{8,15}$/.test(telefonoNormalizado)) {
+      return res.status(400).json({ error: 'Teléfono no válido. Debe iniciar con + y tener entre 8 y 15 dígitos.' });
     }
 
     // 3. Buscar rol
@@ -152,6 +162,8 @@ app.post('/api/registro', async (req, res) => {
         segundo_nombre: segundo_nombre || null,
         primer_apellido,
         segundo_apellido: segundo_apellido || null,
+        fecha_nacimiento: fechaNacimientoDate,
+        telefono: telefonoNormalizado,
         id_rol: rolHabitante.id,
         estado_solicitud: 'SIN_COMUNIDAD'
       }
@@ -477,7 +489,7 @@ app.get('/api/anuncios', verificarToken, async (req, res) => {
     // 2. Buscar anuncios de la comunidad actual
     const anuncios = await prisma.anuncio.findMany({
       where: { id_comunidad: usuario.id_comunidad },
-      orderBy: { fecha_public: 'desc' }, // Los más nuevos primero
+      orderBy: { fecha_publicacion: "desc", }, // Los más nuevos primero
       include: { autor: { select: { primer_nombre: true, primer_apellido: true } } } // Mostrar quién escribió
     });
 
@@ -1019,6 +1031,220 @@ app.get('/api/incidencias/mis-reportes', verificarToken, async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al cargar tus reportes' });
+    }
+});
+
+// --- GESTIÓN DE CONTENIDO (ANUNCIOS Y ENCUESTAS) ---
+
+/**
+ * 1. CREAR ANUNCIO
+ */
+app.post('/api/gestor/anuncios', verificarToken, async (req, res) => {
+    try {
+        const { titulo, contenido, categoria, fecha_expiracion, prioridad } = req.body;
+        const idGestor = req.usuario.id;
+
+        // Verificar comunidad
+        const gestor = await prisma.usuario.findUnique({ where: { id: idGestor } });
+        if (!gestor.id_comunidad) return res.status(403).json({ error: 'No tienes comunidad.' });
+
+        const nuevoAnuncio = await prisma.anuncio.create({
+            data: {
+                titulo,
+                contenido,
+                categoria,
+                prioridad: prioridad || false,
+                fecha_expiracion: fecha_expiracion ? new Date(fecha_expiracion) : null,
+                id_comunidad: gestor.id_comunidad,
+                id_autor: idGestor
+            }
+        });
+
+        res.status(201).json({ mensaje: 'Anuncio publicado', anuncio: nuevoAnuncio });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al crear anuncio' });
+    }
+});
+
+/**
+ * 2. CREAR ENCUESTA (CORREGIDO)
+ */
+app.post('/api/gestor/encuestas', verificarToken, async (req, res) => {
+    try {
+        const { titulo, descripcion, fecha_fin, tipo_voto, opciones } = req.body;
+        const idGestor = req.usuario.id;
+
+        const gestor = await prisma.usuario.findUnique({ where: { id: idGestor } });
+        if (!gestor.id_comunidad) return res.status(403).json({ error: 'No tienes comunidad.' });
+
+        // --- VALIDACIÓN DE FECHA (NUEVO) ---
+        if (!fecha_fin) {
+            return res.status(400).json({ error: 'Debes seleccionar una fecha de cierre.' });
+        }
+
+        const fechaCierre = new Date(fecha_fin);
+
+        // Verificar si la fecha es válida matemáticamente
+        if (isNaN(fechaCierre.getTime())) {
+            return res.status(400).json({ error: 'La fecha de cierre no es válida.' });
+        }
+        // -----------------------------------
+
+        // Crear encuesta
+        const nuevaEncuesta = await prisma.encuesta.create({
+            data: {
+                titulo,
+                descripcion,
+                fecha_fin: fechaCierre, // Usamos la fecha ya validada
+                tipo_voto,
+                id_comunidad: gestor.id_comunidad,
+                opciones: {
+                    create: opciones.map(txt => ({ texto: txt }))
+                }
+            }
+        });
+
+        res.status(201).json({ mensaje: 'Encuesta creada', encuesta: nuevaEncuesta });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al crear encuesta: ' + error.message });
+    }
+});
+
+/**
+ * OBTENER ANUNCIOS (Para el Habitante - Home Page)
+ */
+app.get('/api/anuncios', verificarToken, async (req, res) => {
+    try {
+        const idUsuario = req.usuario.id;
+
+        // 1. Obtener comunidad del usuario
+        const usuario = await prisma.usuario.findUnique({ where: { id: idUsuario } });
+        
+        if (!usuario.id_comunidad) {
+            return res.json([]); // Si no tiene comunidad, devuelve lista vacía
+        }
+
+        // 2. Buscar anuncios válidos
+        const anuncios = await prisma.anuncio.findMany({
+            where: {
+                id_comunidad: usuario.id_comunidad,
+                // Que no tenga fecha de expiración O que la fecha sea futura
+                OR: [
+                    { fecha_expiracion: null },
+                    { fecha_expiracion: { gte: new Date() } }
+                ]
+            },
+            orderBy: [
+                { prioridad: 'desc' },       // Primero los urgentes
+                { fecha_publicacion: 'desc' } // Luego los más nuevos
+            ],
+            take: 5 // Límite de 5 anuncios para el carrusel
+        });
+
+        res.json(anuncios);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al cargar anuncios' });
+    }
+});
+
+// --- ENCUESTAS PARA EL HABITANTE ---
+
+/**
+ * 1. LISTAR ENCUESTAS ACTIVAS
+ */
+app.get('/api/encuestas', verificarToken, async (req, res) => {
+    try {
+        const idUsuario = req.usuario.id;
+        const usuario = await prisma.usuario.findUnique({ where: { id: idUsuario } });
+
+        if (!usuario.id_comunidad) return res.json([]);
+
+        const encuestas = await prisma.encuesta.findMany({
+            where: {
+                id_comunidad: usuario.id_comunidad,
+                fecha_fin: { gte: new Date() } // Solo futuras
+            },
+            include: {
+                _count: { select: { votos: true } } // Contar cuántos han votado
+            }
+        });
+
+        // Marcar si el usuario YA votó en alguna
+        const misVotos = await prisma.votoEncuesta.findMany({
+            where: { 
+                id_usuario: idUsuario,
+                id_encuesta: { in: encuestas.map(e => e.id) }
+            }
+        });
+
+        const resultado = encuestas.map(e => ({
+            ...e,
+            yaVote: misVotos.some(v => v.id_encuesta === e.id),
+            totalVotos: e._count.votos
+        }));
+
+        res.json(resultado);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error cargando encuestas' });
+    }
+});
+
+/**
+ * 2. OBTENER DETALLE DE UNA ENCUESTA (Para responderla)
+ */
+app.get('/api/encuestas/:id', verificarToken, async (req, res) => {
+    try {
+        const idEncuesta = parseInt(req.params.id);
+        const encuesta = await prisma.encuesta.findUnique({
+            where: { id: idEncuesta },
+            include: { opciones: true }
+        });
+        res.json(encuesta);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error cargando encuesta' });
+    }
+});
+
+/**
+ * 3. VOTAR
+ */
+app.post('/api/encuestas/:id/votar', verificarToken, async (req, res) => {
+    try {
+        const idEncuesta = parseInt(req.params.id);
+        const idUsuario = req.usuario.id;
+        const { idOpcion } = req.body; // Recibimos el ID de la opción elegida
+
+        // Verificar si ya votó (doble seguridad)
+        const votoExistente = await prisma.votoEncuesta.findUnique({
+            where: {
+                id_usuario_id_encuesta: { id_usuario: idUsuario, id_encuesta: idEncuesta }
+            }
+        });
+
+        if (votoExistente) return res.status(400).json({ error: 'Ya votaste en esta encuesta.' });
+
+        await prisma.votoEncuesta.create({
+            data: {
+                id_usuario: idUsuario,
+                id_encuesta: idEncuesta,
+                id_opcion: parseInt(idOpcion)
+            }
+        });
+
+        res.json({ mensaje: 'Voto registrado' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al votar' });
     }
 });
 

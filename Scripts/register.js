@@ -13,6 +13,24 @@ document.addEventListener('DOMContentLoaded', () => {
   // Helpers de validación
   const nameRegex = /^[A-Za-zÁÉÍÓÚÜáéíóúüÑñ\s'-]{2,}$/;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const phoneRegex = /^\+\d{8,15}$/;
+
+  const countryDialCodes = [
+    { code: 'VE', dial: '+58' },
+    { code: 'CO', dial: '+57' },
+    { code: 'MX', dial: '+52' },
+    { code: 'AR', dial: '+54' },
+    { code: 'CL', dial: '+56' },
+    { code: 'US', dial: '+1' },
+    { code: 'ES', dial: '+34' },
+    { code: 'BR', dial: '+55' },
+    { code: 'PE', dial: '+51' },
+    { code: 'EC', dial: '+593' }
+  ];
+
+  const countrySelect = document.getElementById('pais-telefono');
+  const phoneInput = document.getElementById('telefono');
+  const birthInput = document.getElementById('fecha_nacimiento');
 
   const validators = {
     0: () => {
@@ -30,9 +48,18 @@ document.addEventListener('DOMContentLoaded', () => {
     1: () => {
       const cedula = document.getElementById('cedula').value.trim();
       const email = document.getElementById('email').value.trim();
+      const birth = birthInput?.value;
+      const telefonoRaw = phoneInput?.value || '';
+      const telefono = normalizePhone(telefonoRaw);
 
       if (!/^\d{6,12}$/.test(cedula)) return 'La cédula debe tener entre 6 y 12 dígitos';
       if (!emailRegex.test(email)) return 'Correo electrónico no válido';
+      if (!birth) return 'Ingrese su fecha de nacimiento';
+      const birthDate = new Date(birth);
+      if (Number.isNaN(birthDate.getTime()) || birthDate > new Date()) return 'Fecha de nacimiento no válida';
+      if (!phoneRegex.test(telefono)) return 'El teléfono debe iniciar con + y tener entre 8 y 15 dígitos';
+      const matchedDial = countryDialCodes.find(c => telefono.startsWith(c.dial));
+      if (!matchedDial) return 'Seleccione un país válido para el teléfono';
       return null;
     },
     2: () => {
@@ -125,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (el) el.addEventListener('input', () => updateStepState(0));
   });
 
-  ['cedula','email'].forEach(id => {
+  ['cedula','email','fecha_nacimiento','telefono'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('input', () => updateStepState(1));
   });
@@ -151,6 +178,8 @@ document.addEventListener('DOMContentLoaded', () => {
       segundo_apellido: document.getElementById('apellido2').value.trim() || null,
       cedula: document.getElementById('cedula').value.trim(),
       email: document.getElementById('email').value.trim(),
+      fecha_nacimiento: birthInput?.value,
+      telefono: normalizePhone(phoneInput?.value || ''),
       password: document.getElementById('password').value
     };
 
@@ -163,8 +192,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const data = await resp.json();
       if (!resp.ok) {
-        return setError(data?.error || 'No se pudo registrar. Intente nuevamente.');
-      } else {
+        const message = data?.error || 'No se pudo registrar. Intente nuevamente.';
+        setError(message);
+        if (window.Swal) {
+          Swal.fire({ icon: 'error', title: 'Registro no completado', text: message });
+        }
+        return;
+      }
+
+      if (window.Swal) {
         Swal.fire({
           icon: 'success',
           title: '¡Registro exitoso!',
@@ -172,17 +208,80 @@ document.addEventListener('DOMContentLoaded', () => {
         }).then(() => {
           window.location.href = 'login.html';
         });
+      } else {
+        window.location.href = 'login.html';
       }
-
-
 
     } catch (error) {
       console.error(error);
-      setError('Error de conexión con el servidor');
+      const message = 'Error de conexión con el servidor';
+      setError(message);
+      if (window.Swal) {
+        Swal.fire({ icon: 'error', title: 'Sin conexión', text: message });
+      }
     }
   });
 
   // Inicialización
   showStep(0);
   updateStepState(0);
+
+  function normalizePhone(value) {
+    return (value || '').replace(/[\s-]/g, '');
+  }
+
+  function getDialByCode(code) {
+    return countryDialCodes.find(c => c.code === code)?.dial || null;
+  }
+
+  function detectCountryFromPhone(value) {
+    const normalized = normalizePhone(value);
+    if (!normalized.startsWith('+')) return null;
+    // Buscar coincidencia más larga de prefijo
+    const match = countryDialCodes
+      .filter(c => normalized.startsWith(c.dial))
+      .sort((a, b) => b.dial.length - a.dial.length)[0];
+    return match ? match.code : null;
+  }
+
+  function applyDialToPhone(dial) {
+    if (!phoneInput || !dial) return;
+    const normalized = normalizePhone(phoneInput.value);
+    const existing = countryDialCodes.find(c => normalized.startsWith(c.dial));
+    const rest = existing ? normalized.slice(existing.dial.length) : normalized.replace(/^\+?/, '');
+    phoneInput.value = dial + rest;
+  }
+
+  if (countrySelect && phoneInput) {
+    // Ajustar número cuando cambia el país
+    countrySelect.addEventListener('change', () => {
+      const dial = getDialByCode(countrySelect.value);
+      if (dial) applyDialToPhone(dial);
+    });
+
+    // Detectar país automáticamente al escribir prefijo
+    phoneInput.addEventListener('input', () => {
+      const detected = detectCountryFromPhone(phoneInput.value);
+      if (detected && countrySelect.value !== detected) {
+        countrySelect.value = detected;
+      }
+      updateStepState(1);
+    });
+
+    // Al salir, si no tiene +, agregar prefijo seleccionado
+    phoneInput.addEventListener('blur', () => {
+      const dial = getDialByCode(countrySelect.value);
+      const normalized = normalizePhone(phoneInput.value);
+      if (dial && normalized && !normalized.startsWith('+')) {
+        phoneInput.value = dial + normalized.replace(/^0+/, '');
+      }
+      updateStepState(1);
+    });
+
+    // Inicializar con el prefijo seleccionado
+    const initialDial = getDialByCode(countrySelect.value);
+    if (initialDial && !phoneInput.value) {
+      phoneInput.value = initialDial;
+    }
+  }
 });
