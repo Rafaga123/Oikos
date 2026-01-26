@@ -29,6 +29,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+    // Aseguramos que el DOM esté cargado antes de ejecutar
+    $(document).ready(function() {
+    $('#mobile-btn').on('click', function(e) {
+        e.preventDefault();
+        // Alternamos la visibilidad del menú flotante
+        $('#mobile-menu-content').toggleClass('active');
+    });
+});
+
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault(); // Evita envío por querystring
     clearError();

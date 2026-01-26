@@ -145,7 +145,15 @@ document.addEventListener('DOMContentLoaded', () => {
       goBack();
     })
   );
-
+  
+    // Aseguramos que el DOM esté cargado antes de ejecutar
+    $(document).ready(function() {
+    $('#mobile-btn').on('click', function(e) {
+        e.preventDefault();
+        // Alternamos la visibilidad del menú flotante
+        $('#mobile-menu-content').toggleClass('active');
+    });
+});
   // Auto-validación y avance por campo
   ['nombre1','nombre2','apellido1','apellido2'].forEach(id => {
     const el = document.getElementById(id);
