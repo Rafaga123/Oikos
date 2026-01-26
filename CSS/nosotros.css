@@ -44,6 +44,11 @@ body {
     padding: 0;
 }
 
+.contenedor-centro{
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
 .justificar{
     text-align: justify;
 }
@@ -108,7 +113,7 @@ body {
     margin-top: 40px;
 }
 .image{
-    max-width: fit-content;
+    align-items: center;
 }
 
 /*Color específico para misión*/
@@ -121,3 +126,35 @@ body {
     background: linear-gradient(135deg, #ffffff, #a2dcee) !important;
 }
 
+#card-creador-1{
+    background-color: #A2DCEE;
+}
+
+#card-creador-1:hover{
+    /* Aumenta la sombra para simular elevación (efecto pop-up) */
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+    /* Ligeramente más grande y elevado*/
+    transform: translateY(-5px); 
+}
+
+#card-creador-2{
+    background-color: #A2B9EE;
+}
+
+#card-creador-2:hover{
+    /* Aumenta la sombra para simular elevación (efecto pop-up) */
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+    /* Ligeramente más grande y elevado*/
+    transform: translateY(-5px); 
+}
+
+#card-creador-3{
+    background-color: #ADEEE2;
+}
+
+#card-creador-3:hover{
+    /* Aumenta la sombra para simular elevación (efecto pop-up) */
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+    /* Ligeramente más grande y elevado*/
+    transform: translateY(-5px); 
+}

@@ -1,13 +1,24 @@
 body {
   font-family: "Segoe UI", Tahoma, sans-serif; 
   background-image: url('../Images/Fondopagina.png');
-  background-size: cover; /* cubre toda la pantalla*/ 
-  background-position: center center; /* centra la imagen */
-  background-repeat: no-repeat; /* no se repite */
-  background-attachment: fixed; /* queda fija al hacer scroll */
-  background-color: #f0f0f0; /* color de respaldo por si la imagen no carga */
-  margin:0;
-  padding:140px; 
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-color: #f0f0f0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ocupa el 100% de la altura de la ventana */
+  padding: 80px 0 0 0; /* Solo padding superior para el menú */
+}
+
+form {
+  flex: 1; /* Esto hace que el formulario ocupe todo el espacio disponible */
+  display: flex;
+  align-items: center; /* Centra el contenido verticalmente si quieres */
+  justify-content: center;
+  padding: 20px; /* Padding interno para que no toque los bordes en móvil */
 }
 
   .main-form-container { 
@@ -103,13 +114,13 @@ body {
   }
 
     .voucher-name { 
-      margin-top:8px; 
-      color:#24324a; 
-      font-size:13px; 
+    margin-top:8px; 
+    color:#24324a; 
+    font-size:13px; 
     }
     .actions-row { 
-      display:flex; 
-      justify-content:space-between; 
+    display:flex; 
+    justify-content:space-between; 
       gap:12px;
       margin-top:18px; 
     }
@@ -125,9 +136,14 @@ body {
       color:#333; 
       border-color:#e2e6ef; 
     }
+
     .btn.primary { 
       background:#a2dcee; 
       color:#fff; 
+    }
+
+    .btn.primary:hover { 
+      background:#9a9cea; 
     }
 
     /* Alerta global */
