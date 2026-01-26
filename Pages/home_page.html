@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
     <link rel="stylesheet" type="text/CSS" href="../CSS/home_page.css">
     <script src="../Scripts/seguridad.js"></script>
+    <script>window.rolesPermitidos = ['HABITANTE'];</script>
 </head>
 <body>
     <!-- Sidebar -->
@@ -97,49 +98,15 @@
         <br>
         <!--Muro de anuncios-->
         <div class="announcement-carousel">
-            <div class="carousel-nav">
-                <button class="carousel-btn prev-btn">
-                    <i class="chevron left icon"></i>
-                </button>
-                <button class="carousel-btn next-btn">
-                    <i class="chevron right icon"></i>
-                </button>
-            </div>
-            <div class="carousel-container">
-                <!--Aquí irían los anuncios dinámicos desde la base de datos-->
-                
-                <!--placeholders de ejemplo-->
-                <!-- Anuncio 1 -->
-                <div class="carousel-slide active">
-                    <h3 class="announcement-title">Mantenimiento de áreas comunes</h3>
-                    <div class="announcement-date">Publicado: 01 de Diciembre, 2025</div>
-                    <div class="announcement-content">
-                        <p>Estimados residentes, les informamos que el próximo lunes 8 de diciembre se realizará mantenimiento de las áreas verdes y limpieza profunda de la piscina. Agradecemos su comprensión.</p>
-                    </div>
-                </div>
+    <div class="carousel-nav">
+        <button class="carousel-btn prev-btn"><i class="chevron left icon"></i></button>
+        <button class="carousel-btn next-btn"><i class="chevron right icon"></i></button>
+    </div>
+    
+    <div class="carousel-container" id="carousel-container">
+        </div>
 
-                <!-- Anuncio 2 -->
-                <div class="carousel-slide">
-                    <h3 class="announcement-title">Reunión de Condominio</h3>
-                    <div class="announcement-date">Publicado: 30 de noviembre, 2025</div>
-                    <div class="announcement-content">
-                        <p>Convocamos a todos los residentes a la reunión ordinaria que se llevará a cabo el próximo sábado 6 de diciembre a las 10:00 AM en el salón comunal.</p>
-                        <p>Temas a tratar: Presupuesto 2026, mejoras en seguridad, y actividades navideñas.</p>                        
-                    </div>
-                </div>
-
-                <!-- Anuncio 3 -->
-                <div class="carousel-slide">
-                    <h3 class="announcement-title">Nuevo sistema de vigilancia</h3>
-                    <div class="announcement-date">Publicado: 28 de Noviembre, 2025</div>
-                    <div class="announcement-content">
-                        <p>Se han instalado nuevas cámaras de seguridad en los accesos principales y áreas comunes. El sistema estará operativo a partir del 5 de diciembre.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="carousel-indicators">
-                <!--Los indicadores se generarán dinámicamente con JS-->
-            </div>
+    <div class="carousel-indicators"></div>
         </div>
         <br>
         <!--Tarjetas de elección-->

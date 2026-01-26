@@ -1,136 +1,165 @@
 document.addEventListener('DOMContentLoaded', function() {
     initSidebar();
-    initAnnouncementCarousel();
-
-    //Inicializar dropdowns
     $('.ui.dropdown').dropdown();
+    
+    // Cargar anuncios reales antes de iniciar el carrusel
+    cargarAnuncios();
 });
 
+// --- API Y LÓGICA DE DATOS ---
 
-//SIDEBAR
-function initSidebar() {
+async function cargarAnuncios() {
+    const token = localStorage.getItem('token');
+    const container = document.getElementById('carousel-container');
+    
+    try {
+        const res = await fetch('http://localhost:3000/api/anuncios', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
 
-    //Botones de control
-    const allToggleSelectors = '#sidebar-toggle, .sidebar-toggle-btn';
+        if (!res.ok) throw new Error('Error al cargar');
 
-    //Inicializamos y controlamos el sidebar usando la API de Semantic UI
-    $('.ui.sidebar').sidebar({
-        context: $('.pusher'),
-        transition: 'overlay'
-    });
+        const anuncios = await res.json();
+        container.innerHTML = ''; // Limpiar
 
-    $(allToggleSelectors).click(function() {
-        //La función 'toggle' lo abrirá si está cerrado, y lo cerrará si está abierto.
-        $('.ui.sidebar').sidebar('toggle');
-    });
+        if (anuncios.length === 0) {
+            // Mostrar mensaje si no hay nada
+            container.innerHTML = `
+                <div class="carousel-slide active" style="text-align: center; padding: 40px;">
+                    <h3 class="announcement-title">Todo tranquilo por aquí</h3>
+                    <div class="announcement-content">
+                        <p>No hay anuncios recientes en tu comunidad.</p>
+                        <i class="coffee icon" style="font-size: 3em; margin-top: 20px; color: #ccc;"></i>
+                    </div>
+                </div>
+            `;
+            // Ocultar flechas si no hay anuncios o solo hay uno vacio
+            document.querySelector('.carousel-nav').style.display = 'none';
+            return;
+        }
+
+        // Generar HTML por cada anuncio
+        anuncios.forEach((anuncio, index) => {
+            const fecha = new Date(anuncio.fecha_publicacion).toLocaleDateString('es-ES', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+            
+            // Clase active solo para el primero
+            const activeClass = index === 0 ? 'active' : '';
+            
+            // Etiqueta de prioridad
+            const priorityBadge = anuncio.prioridad 
+                ? '<div class="ui red ribbon label">IMPORTANTE</div>' 
+                : '';
+
+            const slide = `
+                <div class="carousel-slide ${activeClass}">
+                    ${priorityBadge}
+                    <h3 class="announcement-title" style="${anuncio.prioridad ? 'margin-top:10px' : ''}">
+                        ${anuncio.titulo}
+                    </h3>
+                    <div class="announcement-date">Publicado: ${fecha}</div>
+                    <div class="announcement-content">
+                        <p>${anuncio.contenido.replace(/\n/g, '<br>')}</p>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', slide);
+        });
+
+        // Una vez inyectado el HTML, iniciamos la lógica visual del carrusel
+        initAnnouncementCarousel();
+
+    } catch (error) {
+        console.error(error);
+        container.innerHTML = '<div class="ui message red">No se pudieron cargar los anuncios.</div>';
+    }
 }
 
-//CARUSEL DE ANUNCIOS
+// --- LÓGICA VISUAL (Tu código original adaptado) ---
+
 function initAnnouncementCarousel() {
     const slides = document.querySelectorAll('.carousel-slide');
     const prevBtn = document.querySelector('.prev-btn');
     const nextBtn = document.querySelector('.next-btn');
     const indicatorsContainer = document.querySelector('.carousel-indicators');
     
-    //Si no hay carrusel en la página, sale
-    if (!slides.length || !indicatorsContainer) return;
+    // Si hay 0 o 1 slide, ocultamos controles de navegación
+    if (slides.length <= 1) {
+        if(prevBtn) prevBtn.style.display = 'none';
+        if(nextBtn) nextBtn.style.display = 'none';
+        return; 
+    } else {
+        // Asegurar que se vean si hay más de 1
+        if(prevBtn) prevBtn.style.display = 'block';
+        if(nextBtn) nextBtn.style.display = 'block';
+    }
     
     let currentSlide = 0;
     let slideInterval;
     
-    //Crear indicadores dinámicamente
     function createIndicators() {
         indicatorsContainer.innerHTML = '';
-        
-        slides.forEach((slide, index) => {
+        slides.forEach((_, index) => {
             const indicator = document.createElement('div');
             indicator.classList.add('indicator');
-            if (index === currentSlide) {
-                indicator.classList.add('active');
-            }
+            if (index === currentSlide) indicator.classList.add('active');
+            
             indicator.addEventListener('click', () => {
                 goToSlide(index);
+                resetAutoSlide(); // Reiniciar timer al interactuar
             });
             indicatorsContainer.appendChild(indicator);
         });
     }
     
-    //Función para ir a un slide específico
     function goToSlide(n) {
         slides[currentSlide].classList.remove('active');
-        
-        currentSlide = n;
-        
-        //Si el índice es mayor que el número de slides, volver al primero
-        if (currentSlide >= slides.length) {
-            currentSlide = 0;
-        }
-        
-        //Si el índice es menor que 0, ir al último slide
-        if (currentSlide < 0) {
-            currentSlide = slides.length - 1;
-        }
-        
+        currentSlide = (n + slides.length) % slides.length; // Ciclo infinito matemático
         slides[currentSlide].classList.add('active');
         updateIndicators();
     }
     
-    //Función para actualizar los indicadores
     function updateIndicators() {
         const indicators = document.querySelectorAll('.indicator');
-        indicators.forEach((indicator, index) => {
-            indicator.classList.toggle('active', index === currentSlide);
+        indicators.forEach((ind, index) => {
+            ind.classList.toggle('active', index === currentSlide);
         });
     }
     
-    //Función para ir al siguiente slide
-    function nextSlide() {
-        goToSlide(currentSlide + 1);
-    }
+    function nextSlide() { goToSlide(currentSlide + 1); }
+    function prevSlide() { goToSlide(currentSlide - 1); }
     
-    //Función para ir al slide anterior
-    function prevSlide() {
-        goToSlide(currentSlide - 1);
-    }
-    
-    //Iniciar auto-avance
     function startAutoSlide() {
-        slideInterval = setInterval(nextSlide, 5000);
+        slideInterval = setInterval(nextSlide, 6000); // 6 segundos
     }
     
-    //Pausar auto-avance
-    function stopAutoSlide() {
+    function resetAutoSlide() {
         clearInterval(slideInterval);
-    }
-    
-    //Inicializar el carrusel
-    function initCarousel() {
-        //Crear indicadores
-        createIndicators();
-        
-        //Inicializar primer slide
-        slides[currentSlide].classList.add('active');
-        
-        //Event listeners para los botones
-        if (nextBtn) {
-            nextBtn.addEventListener('click', nextSlide);
-        }
-        
-        if (prevBtn) {
-            prevBtn.addEventListener('click', prevSlide);
-        }
-        
-        //Iniciar auto-avance
         startAutoSlide();
-        
-        //Pausar el auto-avance cuando el mouse está sobre el carrusel
-        const carousel = document.querySelector('.carousel-container');
-        if (carousel) {
-            carousel.addEventListener('mouseenter', stopAutoSlide);
-            carousel.addEventListener('mouseleave', startAutoSlide);
-        }
     }
     
-    //Inicializar carrusel
-    initCarousel();
+    // Inicialización
+    createIndicators();
+    
+    if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); resetAutoSlide(); });
+    if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); resetAutoSlide(); });
+    
+    startAutoSlide();
+    
+    // Pausar con el mouse
+    const carousel = document.querySelector('.announcement-carousel'); // Selector corregido al contenedor padre
+    if (carousel) {
+        carousel.addEventListener('mouseenter', () => clearInterval(slideInterval));
+        carousel.addEventListener('mouseleave', startAutoSlide);
+    }
+}
+
+// SIDEBAR
+function initSidebar() {
+    const allToggleSelectors = '#sidebar-toggle, .sidebar-toggle-btn';
+    $('.ui.sidebar').sidebar({ context: $('.pusher'), transition: 'overlay' });
+    $(allToggleSelectors).click(function() {
+        $('.ui.sidebar').sidebar('toggle');
+    });
 }
