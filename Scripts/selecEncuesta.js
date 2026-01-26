@@ -18,9 +18,23 @@ async function cargarEncuestas() {
         const encuestas = await res.json();
         contenedor.innerHTML = ''; // Limpiar
 
+
         if (encuestas.length === 0) {
-            contenedor.innerHTML = '<div class="ui message info">No hay encuestas disponibles.</div>';
+            // Quitamos la clase grid/cards temporalmente para que el mensaje ocupe todo el ancho
+            contenedor.className = ''; 
+            contenedor.innerHTML = `
+                <div class="ui placeholder segment">
+                    <div class="ui icon header">
+                        <i class="clipboard check icon"></i>
+                        Todo al día
+                    </div>
+                    <div class="inline">No hay encuestas activas en este momento.</div>
+                </div>
+            `;
             return;
+        } else {
+            // Aseguramos que la clase vuelva a ser grid si hay datos
+            contenedor.className = 'ui four cards';
         }
 
         encuestas.forEach(enc => {

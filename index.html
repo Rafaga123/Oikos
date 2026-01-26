@@ -12,20 +12,43 @@
 </head>
 
 <body>
-    <header class="ui menu">
-        <div class="ui container">
-            <a href="index.html">
-                <img src="./Images/logoproyecto.png" alt="Oiko Logo" width="40" height="35"/>
-            </a>
-            <a class="item" href="index.html">Inicio</a>
-            <a class="item" href="./Pages/Acerca_nuestro.html">¿Quiénes somos?</a>
-            <a class="item" href="./Pages/mision_vision.html">Misión y Visión</a>
+    <header class="ui menu navbar-responsive">
+    <div class="ui container">
+        
+        <a href="index.html" class="header item logo-item">
+            <img src="Images/logoproyecto.png" alt="Logo" width="40" height="35"/>
+        </a>
+
+        <div class="desktop-menu">
+            <div class="desktop-links">
+                <a class="item" href="index.html">Inicio</a>
+                <a class="item" href="Pages/Acerca_nuestro.html">¿Quiénes somos?</a>
+                <a class="item" href="Pages/mision_vision.html">Misión y Visión</a>
+            </div>
             <div class="right menu">
-                <a class="ui button" href="./Pages/login.html">Iniciar sesión</a>
-                <a class="ui button" href="./Pages/register.html">Registrarme</a>
+                <a class="ui button" href="Pages/login.html">Iniciar sesión</a>
+                <a class="ui button" href="Pages/register.html">Registrarme</a>
             </div>
         </div>
-    </header>
+
+        <a href="#" class="item mobile-toggle" id="mobile-btn">
+            <i class="bars icon large"></i>
+        </a>
+
+    </div>
+
+    <div class="mobile-menu-overlay" id="mobile-menu-content">
+        <div class="nav-links-vertical">
+            <a class="item" href="index.html">Inicio</a>
+            <a class="item" href="Pages/nosotros.html">¿Quiénes somos?</a>
+            <a class="item" href="Pages/mision_vision.html">Misión y Visión</a>
+        </div>
+        <div class="nav-buttons-vertical">
+            <a class="ui button fluid primary" href="Pages/login.html" style="margin-bottom: 10px;">Iniciar sesión</a>
+            <a class="ui button fluid" href="Pages/register.html">Registrarme</a>
+        </div>
+    </div>
+</header>
         <!--Introducción-->
         <div class="header-content-wrapper">
             <div class="name-pag">
@@ -116,8 +139,22 @@
         <p>Hecho con <i class="heart icon"></i></p>
     </div>
     </footer>
-    <script src="Scripts/jquery.min.js"></script>
+    <script src="Scripts/jquery-3.7.1.min.js"></script>
+    
     <script src="Scripts/semantic.min.js"></script>
-    <script src="Scripts/index.js"></script>
+
+    <script src="Scripts/index.js"></script> 
+    
+    <script>
+        $(document).ready(function() {
+            
+            $('#mobile-btn').on('click', function(e) {
+                e.preventDefault();
+                console.log("Botón presionado");
+                $('#mobile-menu-content').toggleClass('active');
+            });
+        });
+    </script>
+</body>
 </body>
 </html>

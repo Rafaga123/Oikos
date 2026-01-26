@@ -52,6 +52,19 @@ async function cargarPosts() {
         const posts = await res.json();
         contenedor.innerHTML = ''; // Quitar loader
 
+        if (posts.length === 0) {
+            contenedor.innerHTML = `
+                <div class="ui placeholder segment" style="width: 100%; margin-top: 20px;">
+                    <div class="ui icon header">
+                        <i class="comments outline icon"></i>
+                        El foro está muy tranquilo hoy
+                    </div>
+                    <div class="inline">Aún no hay publicaciones en tu comunidad. ¡Sé el primero en escribir algo!</div>
+                </div>
+            `;
+            return;
+        }
+
         // 1. LLENAR LA PILA
         // El servidor los manda por fecha ascendente (viejos primero).
         // Al hacer push, el más nuevo queda en el tope (ultimo index).

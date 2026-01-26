@@ -322,3 +322,19 @@ h3{
     width: 100%;
     align-items: flex-end;
 }
+
+/* Corrección de centrado de tarjetas en móvil */
+@media only screen and (max-width: 768px) {
+    /* Forzar que las columnas sean flexibles y centren su contenido */
+    .ui.stackable.grid .column {
+        display: flex !important;
+        justify-content: center !important;
+        width: 100% !important; /* Asegurar ancho completo para centrar */
+        margin-bottom: 20px;    /* Espacio entre tarjetas */
+    }
+
+    /* Asegurar que la tarjeta no tenga márgenes raros */
+    .ui.card {
+        margin: 0 auto !important;
+    }
+}

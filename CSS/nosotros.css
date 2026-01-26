@@ -1,4 +1,4 @@
-/* Estilos personalizados para Acerca_nuestro, Misión y Visión */
+/* Estilos personalizados para nosotros, Misión y Visión */
 /* Header blanco igual que login/register */
 body{
     background-image: url('../Images/Fondopagina.png');
@@ -157,4 +157,127 @@ body {
     box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
     /* Ligeramente más grande y elevado*/
     transform: translateY(-5px); 
+}
+
+/* =========================================
+   ESTILOS BASE DEL HEADER
+   ========================================= */
+:root {
+    --color-primario: #9A9CEA;
+    --color-secundario: #A2B9EE;
+    --color-terciario: #A2DCEE;
+    --color-cuaternario: #ADEEE2;
+    --color-texto: #213547;
+}
+
+/* Evitar scroll horizontal indeseado */
+body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* Estilos básicos de botones para este CSS */
+.ui.button {
+    background-color: var(--color-terciario) !important;
+    color: #6066d8 !important;
+}
+.ui.button.primary {
+    background-color: var(--color-primario) !important;
+    color: white !important;
+}
+
+/* Header General */
+.ui.menu.navbar-responsive {
+    background: white !important;
+    color: var(--color-texto) !important;
+    border: none !important; 
+    box-shadow: 0 4px 24px rgba(154,156,234,0.12);
+    border-radius: 0px;
+    padding: 5px;
+    margin: 0 !important;
+    width: 100%;
+    position: relative;
+    z-index: 1000;
+}
+
+.navbar-responsive .ui.container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+/* Menú Escritorio */
+.desktop-menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-left: 1rem;
+}
+.desktop-links { display: flex; }
+
+/* Ocultar elementos móviles por defecto */
+.mobile-toggle, .mobile-menu-overlay { display: none !important; }
+
+/* =========================================
+   MEDIA QUERIES (MÓVIL)
+   ========================================= */
+
+@media only screen and (max-width: 768px) {
+    
+    /* Ocultar menú escritorio */
+    .desktop-menu { display: none !important; }
+
+    /* Ajustar contenedor */
+    .navbar-responsive .ui.container {
+        justify-content: space-between !important;
+        padding: 0 15px !important;
+    }
+
+    /* Mostrar botón hamburguesa */
+    .mobile-toggle {
+        display: block !important;
+        margin: 0 !important;
+        padding: 15px 0 !important;
+        cursor: pointer;
+        color: var(--color-primario);
+    }
+
+    /* Menú Overlay */
+    .mobile-menu-overlay {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: white;
+        border-bottom: 3px solid var(--color-primario);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        z-index: 9999;
+    }
+
+    .mobile-menu-overlay.active {
+        display: block !important;
+        animation: slideDown 0.3s ease-out;
+    }
+
+    .nav-links-vertical .item {
+        display: block;
+        padding: 15px 20px;
+        color: var(--color-texto);
+        text-align: center;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 1.1em;
+        text-decoration: none;
+    }
+    
+    .nav-buttons-vertical {
+        padding: 20px;
+        background: #f9f9f9;
+    }
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
