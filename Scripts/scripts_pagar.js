@@ -134,4 +134,164 @@ function mostrarAlertaTemporal(tipo, mensaje) {
   }, 4000);
 }
 
+// Funcionalidad del botón flotante de Pago Móvil
+$(document).ready(function() {
+    // Elementos del DOM
+    const floatingBtn = $('#floatingPmButton');
+    const pmModal = $('#pmModal');
+    const pmCloseBtn = $('#pmCloseBtn');
+    const copyNotification = $('#copyNotification');
+    const copyMessage = $('#copyMessage');
+    
+    // Abrir modal al hacer clic en el botón flotante
+    floatingBtn.click(function(e) {
+        e.preventDefault();
+        pmModal.addClass('active');
+        // Prevenir scroll del body cuando el modal está abierto
+        $('body').css('overflow', 'hidden');
+    });
+    
+    // Cerrar modal
+    pmCloseBtn.click(function() {
+        pmModal.removeClass('active');
+        $('body').css('overflow', 'auto');
+    });
+    
+    // Cerrar modal al hacer clic fuera del contenido
+    pmModal.click(function(e) {
+        if (e.target === this) {
+            pmModal.removeClass('active');
+            $('body').css('overflow', 'auto');
+        }
+    });
+    
+    // Cerrar modal con la tecla ESC
+    $(document).keydown(function(e) {
+        if (e.key === 'Escape' && pmModal.hasClass('active')) {
+            pmModal.removeClass('active');
+            $('body').css('overflow', 'auto');
+        }
+    });
+    
+    // Función para copiar texto al portapapeles
+    function copyToClipboard(text) {
+        // Crear un elemento textarea temporal
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        
+        // Seleccionar y copiar
+        textarea.select();
+        textarea.setSelectionRange(0, 99999); // Para dispositivos móviles
+        
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                showCopyNotification('Número copiado al portapapeles');
+            } else {
+                showCopyNotification('No se pudo copiar, intenta manualmente', 'error');
+            }
+        } catch (err) {
+            console.error('Error al copiar: ', err);
+            showCopyNotification('Error al copiar', 'error');
+        }
+        
+        // Limpiar
+        document.body.removeChild(textarea);
+    }
+    
+    // Mostrar notificación de copiado
+    function showCopyNotification(message, type = 'success') {
+        copyMessage.text(message);
+        
+        // Cambiar color según el tipo
+        if (type === 'error') {
+            copyNotification.css('background-color', '#db2828');
+        } else {
+            copyNotification.css('background-color', '#21ba45');
+        }
+        
+        copyNotification.addClass('show');
+        
+        // Ocultar después de 3 segundos
+        setTimeout(function() {
+            copyNotification.removeClass('show');
+        }, 3000);
+    }
+    
+    // Manejar clics en botones de copiar
+    $(document).on('click', '.copy-btn', function() {
+        const textToCopy = $(this).data('copy');
+        const button = $(this);
+        
+        // Copiar al portapapeles
+        copyToClipboard(textToCopy);
+        
+        // Cambiar texto del botón temporalmente
+        const originalText = button.html();
+        button.html('<i class="check icon"></i> ¡Copiado!');
+        button.addClass('copied');
+        
+        // Restaurar después de 2 segundos
+        setTimeout(function() {
+            button.html(originalText);
+            button.removeClass('copied');
+        }, 2000);
+    });
+    
+    // Animación sutil del botón flotante
+    function animateFloatingButton() {
+        floatingBtn.animate({
+            bottom: '35px'
+        }, 800, function() {
+            floatingBtn.animate({
+                bottom: '30px'
+            }, 800);
+        });
+    }
+    
+    // Animar cada 4 segundos
+    setInterval(animateFloatingButton, 4000);
+    
+    // También animar cuando el mouse entra/sale
+    floatingBtn.hover(
+        function() {
+            // Cancelar animación automática al hover
+            floatingBtn.stop();
+        },
+        function() {
+            // Continuar animación después de 1 segundo
+            setTimeout(animateFloatingButton, 1000);
+        }
+    );
+    
+    // Hacer que el botón flotante sea más visible cuando se selecciona pago móvil
+    const pmButtons = $('.pm-btn');
+    
+    pmButtons.click(function() {
+        const method = $(this).data('method');
+        
+        if (method === 'mobile') {
+            // Hacer el botón más visible cuando se selecciona pago móvil
+            floatingBtn.css({
+                'background-color': '#2185d0',
+                'box-shadow': '0 4px 15px rgba(33, 133, 208, 0.4)'
+            });
+            
+            // Mostrar un tooltip temporal
+            const originalTitle = floatingBtn.attr('title');
+            floatingBtn.attr('title', '¡Haz clic para ver los datos de Pago Móvil!');
+            
+            // Restaurar después de 3 segundos
+            setTimeout(function() {
+                floatingBtn.attr('title', originalTitle);
+            }, 3000);
+        }
+    });
+    
+    console.log('Botón flotante de Pago Móvil cargado correctamente');
+});
+
 });

@@ -122,5 +122,146 @@
           </div>
   </footer>
 
+  <!-- Botón flotante de Pago Móvil -->
+<button class="floating-pm-button" id="floatingPmButton" title="Ver datos de Pago Móvil">
+    <i class="mobile alternate icon"></i>
+</button>
+
+<!-- Modal de Pago Móvil -->
+<div class="pm-modal" id="pmModal">
+    <div class="pm-modal-content">
+        <div class="pm-modal-header">
+            <h3>
+                <i class="mobile alternate icon"></i>
+                Datos de Pago Móvil
+            </h3>
+            <button class="pm-close-btn" id="pmCloseBtn">&times;</button>
+        </div>
+        
+        <div class="pm-modal-body">
+            <!-- Información de Banesco -->
+            <div class="bank-info-card">
+                <div class="bank-info-header">
+                    <div class="bank-logo" style="background: linear-gradient(135deg, #f2f2f2 0%, #ffffff 100%); color: #e30613;">
+                        <i class="university icon"></i>
+                    </div>
+                    <h4 class="bank-name">Banesco</h4>
+                </div>
+                
+                <div class="bank-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Número de Teléfono:</span>
+                        <span class="detail-value">0414-555-1234</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Cédula:</span>
+                        <span class="detail-value">V-26.789.456</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Banco Receptor:</span>
+                        <span class="detail-value">Banesco</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Nombre del Beneficiario:</span>
+                        <span class="detail-value">OIKOS</span>
+                    </div>
+                    <button class="copy-btn" data-copy="0414-555-1234">
+                        <i class="copy icon"></i>
+                        Copiar Teléfono
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Información de Banco de Venezuela -->
+            <div class="bank-info-card">
+                <div class="bank-info-header">
+                    <div class="bank-logo" style="background: linear-gradient(135deg, #f2f2f2 0%, #ffffff 100%); color: #ff0000;">
+                        <i class="building icon"></i>
+                    </div>
+                    <h4 class="bank-name">Banco de Venezuela</h4>
+                </div>
+                
+                <div class="bank-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Número de Teléfono:</span>
+                        <span class="detail-value">0412-987-6543</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Cédula:</span>
+                        <span class="detail-value">V-26.789.456</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Banco Receptor:</span>
+                        <span class="detail-value">Banco de Venezuela</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Nombre del Beneficiario:</span>
+                        <span class="detail-value">OIKOS</span>
+                    </div>
+                    <button class="copy-btn" data-copy="0412-987-6543">
+                        <i class="copy icon"></i>
+                        Copiar Teléfono
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Información de Banco Provincial -->
+            <div class="bank-info-card">
+                <div class="bank-info-header">
+                    <div class="bank-logo" style="background: linear-gradient(135deg, #f2f2f2 0%, #ffffff 100%); color: #0033a0;">
+                        <i class="landmark icon"></i>
+                    </div>
+                    <h4 class="bank-name">Banco Provincial</h4>
+                </div>
+                
+                <div class="bank-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Número de Teléfono:</span>
+                        <span class="detail-value">0416-789-0123</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Cédula:</span>
+                        <span class="detail-value">V-26.789.456</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Banco Receptor:</span>
+                        <span class="detail-value">Banco Provincial</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Nombre del Beneficiario:</span>
+                        <span class="detail-value">OIKOS</span>
+                    </div>
+                    <button class="copy-btn" data-copy="0416-789-0123">
+                        <i class="copy icon"></i>
+                        Copiar Teléfono
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Instrucciones -->
+            <div class="pm-instructions">
+                <h4>
+                    <i class="info circle icon"></i>
+                    Instrucciones para Pagar
+                </h4>
+                <ul class="instructions-list">
+                    <li>Selecciona "Pago Móvil" en tu aplicación bancaria</li>
+                    <li>Ingresa el número de teléfono del banco correspondiente</li>
+                    <li>Verifica que el nombre del beneficiario sea correcto</li>
+                    <li>Ingresa el monto a pagar en Bolívares</li>
+                    <li>Guarda el comprobante de la transacción</li>
+                    <li>Regresa a esta página para reportar tu pago</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notificación de copiado -->
+<div class="copy-notification" id="copyNotification">
+    <i class="check icon"></i>
+    <span id="copyMessage">Texto copiado al portapapeles</span>
+</div>
+
 </body>
 </html>
