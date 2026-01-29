@@ -118,28 +118,41 @@ document.addEventListener('DOMContentLoaded', function() {
         // Recoger valores
         const bancoDestinoId = selectBancoDestino.value;
         const bancoEmisor = document.getElementById('bancoEmisor').value; 
+        
+        // --- NUEVO: CAPTURAR CONCEPTO ---
+        const concepto = document.getElementById('conceptoPago').value.trim();
+        // --------------------------------
+
         const referencia = document.getElementById('codigoRef').value;
         const monto = document.getElementById('monto').value;
         const fecha = document.getElementById('fechaPago').value;
         const archivo = voucherFile.files[0];
 
-        if (!bancoDestinoId || !referencia || !monto || !fecha) {
-            mostrarAlerta('danger', 'Completa los campos obligatorios');
+        // --- VALIDACIÓN ACTUALIZADA ---
+        if (!bancoDestinoId || !referencia || !monto || !fecha || !concepto) {
+            mostrarAlerta('danger', 'Por favor completa todos los campos, incluyendo el concepto.');
             return;
         }
+        // ------------------------------
 
         const formData = new FormData();
         formData.append('banco_destino_id', bancoDestinoId);
         formData.append('banco_origen', bancoEmisor); 
+        
+        // --- NUEVO: AGREGAR AL ENVÍO ---
+        formData.append('concepto', concepto); 
+        // -------------------------------
+
         formData.append('referencia', referencia);
         formData.append('monto', monto);
         formData.append('fecha', fecha);
         formData.append('metodo', metodoPago === 'mobile' ? 'Pago Móvil' : 'Transferencia');
+        
         if (archivo) {
             formData.append('comprobante', archivo);
         }
 
-        // UI Loading
+        // ... El resto del código de envío (fetch) sigue exactamente igual ...
         btn.disabled = true;
         btn.textContent = 'Enviando...';
 

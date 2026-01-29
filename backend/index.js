@@ -347,7 +347,7 @@ app.post('/api/comunidades', verificarToken, async (req, res) => {
 
     if (!nombre) return res.status(400).json({ error: 'El nombre es obligatorio' });
 
-    // Generar código único simple (ej: "RES-8821")
+    // Generar código único simple (ej: "8821")
     const aleatorio = Math.floor(1000 + Math.random() * 9000); 
     const codigo_unico = `${aleatorio}`;
 
@@ -1268,14 +1268,15 @@ app.get('/api/cuentas-bancarias', verificarToken, async (req, res) => {
 });
 
 /**
- * 2. REPORTAR PAGO (Con foto)
+ * 2. REPORTAR PAGO
  */
 app.post('/api/pagos/reportar', verificarToken, upload.single('comprobante'), async (req, res) => {
     try {
-        const { monto, fecha, referencia, banco_origen, banco_destino_id, metodo } = req.body;
+        // 1. Agregamos 'concepto' a la desestructuración
+        const { monto, fecha, referencia, banco_origen, banco_destino_id, metodo, concepto } = req.body;
+        
         const idUsuario = req.usuario.id;
         
-        // Obtener nombre del banco destino para guardarlo histórico
         const cuentaDestino = await prisma.cuentaBancaria.findUnique({ 
             where: { id: parseInt(banco_destino_id) } 
         });
@@ -1286,7 +1287,10 @@ app.post('/api/pagos/reportar', verificarToken, upload.single('comprobante'), as
                 monto: parseFloat(monto),
                 fecha_pago: new Date(fecha),
                 referencia,
-                concepto: "Pago de Condominio", // Se podria pedir en el formulario, solamente no tenemos el diseño de eso
+                
+                // 2. USAMOS LA VARIABLE REAL (Si llega vacía por error, ponemos un default)
+                concepto: concepto || "Pago de Condominio", 
+                
                 metodo_pago: metodo,
                 banco_origen: banco_origen,
                 banco_destino: cuentaDestino ? cuentaDestino.banco : "Desconocido",
@@ -1300,6 +1304,72 @@ app.post('/api/pagos/reportar', verificarToken, upload.single('comprobante'), as
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al reportar pago' });
+    }
+});
+
+// --- GESTIÓN DE PAGOS (GESTOR) ---
+
+/**
+ * 1. LISTAR PAGOS DE LA COMUNIDAD
+ */
+app.get('/api/gestor/pagos', verificarToken, async (req, res) => {
+    try {
+        const idGestor = req.usuario.id;
+        const gestor = await prisma.usuario.findUnique({ where: { id: idGestor } });
+
+        if (!gestor.id_comunidad) return res.status(400).json({ error: 'No tienes comunidad' });
+
+        const pagos = await prisma.pago.findMany({
+            where: {
+                usuario: { id_comunidad: gestor.id_comunidad }
+            },
+            include: {
+                usuario: {
+                    select: {
+                        primer_nombre: true,
+                        primer_apellido: true,
+                        numero_casa: true,
+                        cedula: true
+                    }
+                }
+            },
+            orderBy: { fecha_pago: 'desc' } // Los más recientes primero
+        });
+
+        res.json(pagos);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al cargar pagos' });
+    }
+});
+
+/**
+ * 2. CAMBIAR ESTADO DE PAGO (Aprobar o Rechazar)
+ */
+app.put('/api/gestor/pagos/:id/estado', verificarToken, async (req, res) => {
+    try {
+        const idPago = parseInt(req.params.id);
+        const { estado, nota } = req.body; // estado: 'APROBADO' o 'RECHAZADO'
+
+        // Validar que el estado sea válido según tu Enum de Prisma
+        if (!['APROBADO', 'RECHAZADO', 'PENDIENTE'].includes(estado)) {
+            return res.status(400).json({ error: 'Estado inválido' });
+        }
+
+        const pagoActualizado = await prisma.pago.update({
+            where: { id: idPago },
+            data: {
+                estado: estado,
+                nota_admin: nota || null 
+            }
+        });
+
+        res.json({ mensaje: 'Estado actualizado', pago: pagoActualizado });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al actualizar pago' });
     }
 });
 

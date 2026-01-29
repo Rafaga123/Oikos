@@ -3,439 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Pagos - Sistema de Condominio</title>
-    
-    <!-- jQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <link rel="stylesheet" href="../CSS/pagos_gestor.css">
+    <title>Gestión de Pagos - OIKOS</title>
     <link rel="shortcut icon" href="../Images/logo.ico" />
+    <script src="../Scripts/jquery-3.7.1.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
-    
-    
-
+    <link rel="stylesheet" href="../CSS/pagos_gestor.css">
+    <script src="../Scripts/seguridad.js"></script>
+    <script>window.rolesPermitidos = ['ENCARGADO_COMUNIDAD'];</script>
 </head>
 <body>
-    <!-- Sidebar -->
+    
     <div class="ui vertical inverted sidebar menu sidebar-menu" style="background-color: #9A9CEA;">
-        <div class="item">
-            <div class="header">
-                <h2 class="ui inverted header">
-                    <i class="cog icon"></i>
-                    <div class="content">
-                        Panel Gestor
-                        <div class="sub header">Gestión de Habitantes</div>
-                    </div>
-                </h2>
-            </div>
-        </div>
-        <div class="item">
-            <div class="menu">
-                <a class="active item" href="./gestor.html">
-                    <i class="home icon"></i>
-                    Panel de Control
-                </a>
-                <a class="item" href="./gestion_habitantes.html">
-                    <i class="users icon"></i>
-                    Habitantes
-                </a>
-                <a class="item" href="./solicitudes.html">
-                    <i class="chart bar icon"></i>
-                    Incidencias
-                </a>
-                <a class="item" href="./solicitudes_nuevas.html">
-                    <i class="user icon"></i>
-                    Solicitudes nuevas
-                </a>
-                <a class="item" href="./pagos_gestor.html">
-                    <i class="money bill alternate icon"></i>
-                    Pagos
-                </a>
-                
-            </div>
-        </div>
-        <div class="item" >
-            <div class="ui divider"></div>
-            <a class="item" onclick="cerrarSesion()">
-                <i class="sign out icon"></i>
-                Cerrar Sesión
-            </a>
-        </div>
-        <div class="sidebar-footer-image">
-            <img src="../Images/logopng.png" alt="Decoración de Sidebar">
-        </div>
+        <a class="item" href="./gestor.html"><i class="home icon"></i> Panel</a>
+        <a class="item" href="./gestion_habitantes.html"><i class="users icon"></i> Habitantes</a>
+        <a class="item active"><i class="money bill alternate icon"></i> Pagos</a>
+        <a class="item" onclick="cerrarSesion()"><i class="sign out icon"></i> Salir</a>
     </div>
 
-    <!-- Contenido Principal -->
     <div class="pusher">
-        <!--Menú Superior-->
         <div class="ui top fixed menu" style="background-color: #9A9CEA;">
             <div class="ui container">
-                <div class="item">
-                    <img src="../Images/logopng.png" alt="Logo"> <!--logo de la pagina-->
-                </div>
-                <a class="item" id="sidebar-toggle"><!--activador del sidebar-->
-                    <i class="sidebar icon" style="color: white;"></i><!--Icono del sidebar-->
-                </a>
-                <div class="header item" style="color: white;"><!--color y titulo del menu superior-->
-                    Gestión de Habitantes
-                </div>
-                <div class="right menu">
-                    <div class="ui dropdown item" style="color: white;">
-                        <i class="user icon" style="color: white;"></i> Gestor
-                        <i class="dropdown icon"></i>
-                        <div class="menu">
-                            <a class="item"><i class="user icon"></i> Mi Perfil</a>
-                            
-                            <div class="divider"></div>
-                            <a class="item" onclick="cerrarSesion()"><i class="sign out icon"></i> Cerrar Sesión</a>
-                        </div>
-                    </div>
-                </div>
+                <a class="item" id="sidebar-toggle"><i class="sidebar icon" style="color: white;"></i></a>
+                <div class="header item" style="color: white;">Auditoría de Pagos</div>
             </div>
         </div>
 
-        <!-- Contenido Principal -->
-        <div class="main-content">
+        <div class="main-content" style="margin-top: 60px; padding: 20px;">
             <div class="ui container">
-                <!-- Header -->
-                <div class="ui header">
-                    <h1>
-                        <i class="money bill alternate icon"></i>
-                        Gestión de Pagos del Condominio
-                        <div class="sub header">Administra los pagos de mantenimiento, cuotas y servicios</div>
-                    </h1>
-                </div>
+                <h2 class="ui header">
+                    <i class="money check icon"></i>
+                    <div class="content">
+                        Revisión de Pagos
+                        <div class="sub header">Aprueba o rechaza los reportes de pago de los habitantes</div>
+                    </div>
+                </h2>
                 
                 <div class="ui divider"></div>
-                
-                <!-- Dashboard de Estadísticas -->
-                <div class="stats-dashboard">
-                    <div class="stat-card total">
-                        <div class="stat-number" id="total-recaudado">Bs. 0</div>
-                        <div class="stat-label">
-                            <i class="money bill wave icon"></i>
-                            Total Recaudado
-                        </div>
+
+                <div class="ui three statistics">
+                    <div class="statistic">
+                        <div class="value" id="stat-pendientes">0</div>
+                        <div class="label">Por Revisar</div>
                     </div>
-                    
-                    <div class="stat-card pagado">
-                        <div class="stat-number" id="total-pagado">0</div>
-                        <div class="stat-label">
-                            <i class="check circle icon"></i>
-                            Pagos Realizados
-                        </div>
+                    <div class="statistic">
+                        <div class="value" id="stat-aprobados">0</div>
+                        <div class="label">Aprobados</div>
                     </div>
-                    
-                    <div class="stat-card pendiente">
-                        <div class="stat-number" id="total-pendiente">Bs. 0</div>
-                        <div class="stat-label">
-                            <i class="clock icon"></i>
-                            Pagos Pendientes
-                        </div>
+                    <div class="statistic">
+                        <div class="value" id="stat-rechazados">0</div>
+                        <div class="label">Rechazados</div>
                     </div>
+                </div>
+
+                <div class="ui secondary menu">
+                    <a class="item active filter-btn" data-filter="todos">Todos</a>
+                    <a class="item filter-btn" data-filter="PENDIENTE">Pendientes</a>
+                    <a class="item filter-btn" data-filter="APROBADO">Aprobados</a>
+                    <a class="item filter-btn" data-filter="RECHAZADO">Rechazados</a>
                     
-                    <div class="stat-card vencido">
-                        <div class="stat-number" id="total-vencido">Bs. 0</div>
-                        <div class="stat-label">
-                            <i class="exclamation triangle icon"></i>
-                            Pagos Vencidos
+                    <div class="right menu">
+                        <div class="item">
+                            <div class="ui icon input">
+                                <input type="text" id="busqueda" placeholder="Buscar residente...">
+                                <i class="search icon"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Barra de Herramientas -->
-                <div class="tools-bar">
-                    <button class="ui primary button" id="nuevo-pago-btn">
-                        <i class="plus icon"></i>
-                        Nuevo Pago
-                    </button>
-                    
-                    <div class="filter-btn active" data-filter="todos">
-                        <i class="list icon"></i> Todos
-                    </div>
-                    <div class="filter-btn" data-filter="pagado">
-                        <i class="check icon"></i> Pagados
-                    </div>
-                    <div class="filter-btn" data-filter="pendiente">
-                        <i class="clock icon"></i> Pendientes
-                    </div>
-                    <div class="filter-btn" data-filter="vencido">
-                        <i class="exclamation icon"></i> Vencidos
-                    </div>
-                    
-                    <div class="ui search search-input">
-                        <div class="ui icon input">
-                            <input class="prompt" type="text" placeholder="Buscar por residente, concepto...">
-                            <i class="search icon"></i>
-                        </div>
-                        <div class="results"></div>
-                    </div>
-                    
-                    <button class="ui icon button" id="filtros-avanzados-btn">
-                        <i class="filter icon"></i>
-                        Filtros Avanzados
-                    </button>
-                    
-                    <button class="ui green button" id="exportar-btn">
-                        <i class="file excel icon"></i>
-                        Exportar
-                    </button>
-                </div>
-                
-                <!-- Filtros Avanzados -->
-                <div class="filtros-avanzados" id="filtros-avanzados">
-                    <h4 class="ui header">Filtros Avanzados</h4>
-                    <div class="ui form">
-                        <div class="fields">
-                            <div class="field">
-                                <label>Fecha Desde</label>
-                                <input type="date" id="filtro-fecha-desde">
-                            </div>
-                            <div class="field">
-                                <label>Fecha Hasta</label>
-                                <input type="date" id="filtro-fecha-hasta">
-                            </div>
-                            <div class="field">
-                                <label>Monto Mínimo</label>
-                                <input type="number" id="filtro-monto-min" placeholder="Bs.">
-                            </div>
-                            <div class="field">
-                                <label>Monto Máximo</label>
-                                <input type="number" id="filtro-monto-max" placeholder="Bs.">
-                            </div>
-                        </div>
-                        <div class="fields">
-                            <div class="field">
-                                <label>Concepto</label>
-                                <select class="ui dropdown" id="filtro-concepto">
-                                    <option value="">Todos los conceptos</option>
-                                    <option value="mantenimiento">Mantenimiento</option>
-                                    <option value="cuota">Cuota Mensual</option>
-                                    <option value="agua">Agua</option>
-                                    <option value="luz">Luz</option>
-                                    <option value="gas">Gas</option>
-                                    <option value="extraordinario">Extraordinario</option>
-                                </select>
-                            </div>
-                            <div class="field">
-                                <label>Apartamento</label>
-                                <input type="text" id="filtro-apartamento" placeholder="Ej: A-101">
-                            </div>
-                            <div class="field">
-                                <label>Método de Pago</label>
-                                <select class="ui dropdown" id="filtro-metodo">
-                                    <option value="">Todos los métodos</option>
-                                    <option value="transferencia">Transferencia</option>
-                                    <option value="efectivo">Efectivo</option>
-                                    <option value="tarjeta">Tarjeta</option>
-                                    <option value="cheque">Cheque</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="field" style="text-align: right;">
-                            <button class="ui button" id="limpiar-filtros-btn">
-                                Limpiar Filtros
-                            </button>
-                            <button class="ui primary button" id="aplicar-filtros-btn">
-                                Aplicar Filtros
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Tabla de Pagos -->
-                <div class="pagos-container">
-                    <div class="pagos-table-container">
-                        <table class="pagos-table" id="tabla-pagos">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Residente</th>
-                                    <th>Apartamento</th>
-                                    <th>Concepto</th>
-                                    <th>Fecha Vencimiento</th>
-                                    <th>Fecha Pago</th>
-                                    <th>Monto</th>
-                                    <th>Estado</th>
-                                    <th>Método</th>
-                                    <th>Comprobante</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pagos-body">
-                                <!-- Los pagos se cargarán aquí dinámicamente -->
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <!-- Empty State -->
-                    <div class="empty-state" id="empty-state" style="display: none;">
-                        <i class="money bill alternate outline icon"></i>
-                        <h3>No hay pagos registrados</h3>
-                        <p>Comienza agregando un nuevo pago</p>
-                        <button class="ui primary button" id="nuevo-pago-empty">
-                            <i class="plus icon"></i>
-                            Agregar Primer Pago
-                        </button>
-                    </div>
-                </div>
+
+                <table class="ui celled table selectable">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Residente</th>
+                            <th>Apto</th>
+                            <th>Concepto</th>
+                            <th>Monto</th>
+                            <th>Método</th>
+                            <th>Ref</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pagos-body">
+                        </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <!-- Modal para Nuevo/Editar Pago -->
-    <div class="ui modal" id="pago-modal">
+    <div class="ui modal" id="modal-comprobante">
         <i class="close icon"></i>
-        <div class="header" id="modal-pago-header">
-            <i class="plus icon"></i>
-            Nuevo Pago
+        <div class="header">Comprobante de Pago</div>
+        <div class="image content">
+            <div class="ui medium image" style="margin: 0 auto;">
+                <img id="img-comprobante" src="" alt="Sin imagen">
+            </div>
+            <div class="description" style="margin-left: 20px;">
+                <p>Si es un PDF, haz clic en el botón para descargarlo.</p>
+                <a id="btn-descargar-comprobante" href="#" target="_blank" class="ui primary button">
+                    <i class="download icon"></i> Abrir Original
+                </a>
+            </div>
         </div>
-        <div class="scrolling content">
-            <form class="ui form" id="form-pago">
-                <input type="hidden" id="pago-id" value="">
-                
-                <div class="two fields">
-                    <div class="field">
-                        <label>Residente *</label>
-                        <select class="ui search dropdown" id="residente-id" required>
-                            <option value="">Seleccionar residente</option>
-                            <!-- Opciones se cargarán dinámicamente -->
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label>Apartamento</label>
-                        <input type="text" id="apartamento" readonly>
-                    </div>
-                </div>
-                
-                <div class="two fields">
-                    <div class="field">
-                        <label>Concepto *</label>
-                        <select class="ui dropdown" id="concepto" required>
-                            <option value="">Seleccionar concepto</option>
-                            <option value="mantenimiento">Mantenimiento</option>
-                            <option value="cuota">Cuota Mensual</option>
-                            <option value="agua">Agua</option>
-                            <option value="luz">Luz</option>
-                            <option value="gas">Gas</option>
-                            <option value="extraordinario">Extraordinario</option>
-                            <option value="otros">Otros</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label>Monto *</label>
-                        <div class="ui right labeled input">
-                            <label for="monto" class="ui label">Bs.</label>
-                            <input type="number" id="monto" step="0.01" min="0" placeholder="0.00" required>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="two fields">
-                    <div class="field">
-                        <label>Fecha de Emisión</label>
-                        <input type="date" id="fecha-emision" required>
-                    </div>
-                    <div class="field">
-                        <label>Fecha de Vencimiento *</label>
-                        <input type="date" id="fecha-vencimiento" required>
-                    </div>
-                </div>
-                
-                <div class="two fields">
-                    <div class="field">
-                        <label>Método de Pago</label>
-                        <select class="ui dropdown" id="metodo-pago">
-                            <option value="">Seleccionar método</option>
-                            <option value="transferencia">Transferencia</option>
-                            <option value="efectivo">Efectivo</option>
-                            <option value="tarjeta">Tarjeta</option>
-                            <option value="cheque">Cheque</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label>Estado</label>
-                        <select class="ui dropdown" id="estado">
-                            <option value="pendiente">Pendiente</option>
-                            <option value="pagado">Pagado</option>
-                            <option value="vencido">Vencido</option>
-                        </select>
-                    </div>
-                </div>
-                
+    </div>
+
+    <div class="ui small modal" id="modal-rechazar">
+        <div class="header">Rechazar Pago</div>
+        <div class="content">
+            <div class="ui form">
                 <div class="field">
-                    <label>Fecha de Pago (si aplica)</label>
-                    <input type="date" id="fecha-pago">
+                    <label>Motivo del rechazo (Visible para el habitante)</label>
+                    <textarea id="txt-motivo-rechazo" placeholder="Ej: Referencia no encontrada, monto incompleto..."></textarea>
                 </div>
-                
-                <div class="field">
-                    <label>Descripción/Notas</label>
-                    <textarea id="descripcion" rows="3" placeholder="Notas adicionales sobre este pago..."></textarea>
-                </div>
-                
-                <div class="field" id="comprobante-field">
-                    <label>Comprobante de Pago</label>
-                    <div class="ui action input">
-                        <input type="text" id="comprobante-text" placeholder="Seleccionar archivo..." readonly>
-                        <input type="file" id="comprobante-file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
-                        <button type="button" class="ui button" id="seleccionar-comprobante">
-                            <i class="file icon"></i> Seleccionar
-                        </button>
-                    </div>
-                    <div class="ui tiny message" style="margin-top: 5px;">
-                        <i class="info circle icon"></i>
-                        Formatos aceptados: PDF, JPG, PNG (máx. 5MB)
-                    </div>
-                </div>
-                
-                <div class="ui error message"></div>
-            </form>
+            </div>
         </div>
         <div class="actions">
-            <div class="ui button cancel-pago">Cancelar</div>
-            <div class="ui primary button submit-pago">
-                <i class="save icon"></i>
-                Guardar Pago
-            </div>
+            <div class="ui cancel button">Cancelar</div>
+            <div class="ui negative button" id="btn-confirmar-rechazo">Rechazar Pago</div>
         </div>
     </div>
 
-    <!-- Modal de Detalle de Pago -->
-    <div class="ui modal modal-pago-detalle" id="detalle-modal">
-        <i class="close icon"></i>
-        <div class="header" id="detalle-header">
-            <i class="info circle icon"></i>
-            Detalle de Pago
-        </div>
-        <div class="scrolling content">
-            <div id="detalle-content">
-                <!-- Contenido dinámico -->
-            </div>
-        </div>
-        <div class="actions" id="detalle-actions">
-            <!-- Acciones dinámicas -->
-        </div>
-    </div>
-
-    <!-- Modal de Confirmación -->
-    <div class="ui small modal" id="confirm-modal">
-        <div class="header" id="confirm-header">Confirmar Acción</div>
-        <div class="content" id="confirm-content">
-            <p id="confirm-message"></p>
-        </div>
-        <div class="actions">
-            <div class="ui button cancel-confirm">Cancelar</div>
-            <div class="ui red button confirm-delete">
-                <i class="trash icon"></i> Eliminar
-            </div>
-            <div class="ui green button confirm-marcar-pagado">
-                <i class="check icon"></i> Marcar como Pagado
-            </div>
-        </div>
-    </div>
-
-    <!-- JavaScript -->
     <script src="../Scripts/pagos_gestor.js"></script>
 </body>
 </html>
