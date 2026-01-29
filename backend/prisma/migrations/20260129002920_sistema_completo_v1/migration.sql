@@ -54,6 +54,9 @@ CREATE TABLE `Pago` (
     `comprobante_url` VARCHAR(191) NULL,
     `estado` ENUM('PENDIENTE', 'EN_REVISION', 'APROBADO', 'RECHAZADO') NOT NULL DEFAULT 'PENDIENTE',
     `nota_admin` VARCHAR(191) NULL,
+    `metodo_pago` VARCHAR(191) NULL,
+    `banco_origen` VARCHAR(191) NULL,
+    `banco_destino` VARCHAR(191) NULL,
     `id_usuario` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -178,6 +181,21 @@ CREATE TABLE `Like` (
     PRIMARY KEY (`id_usuario`, `id_post`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `CuentaBancaria` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `banco` VARCHAR(191) NOT NULL,
+    `numero_cuenta` VARCHAR(191) NOT NULL,
+    `titular` VARCHAR(191) NOT NULL,
+    `cedula_rif` VARCHAR(191) NOT NULL,
+    `tipo_cuenta` VARCHAR(191) NOT NULL,
+    `telefono` VARCHAR(191) NULL,
+    `logo_url` VARCHAR(191) NULL,
+    `id_comunidad` INTEGER NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `Usuario` ADD CONSTRAINT `Usuario_id_rol_fkey` FOREIGN KEY (`id_rol`) REFERENCES `Rol`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -237,3 +255,6 @@ ALTER TABLE `Like` ADD CONSTRAINT `Like_id_usuario_fkey` FOREIGN KEY (`id_usuari
 
 -- AddForeignKey
 ALTER TABLE `Like` ADD CONSTRAINT `Like_id_post_fkey` FOREIGN KEY (`id_post`) REFERENCES `Post`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `CuentaBancaria` ADD CONSTRAINT `CuentaBancaria_id_comunidad_fkey` FOREIGN KEY (`id_comunidad`) REFERENCES `Comunidad`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

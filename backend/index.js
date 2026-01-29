@@ -1248,6 +1248,61 @@ app.post('/api/encuestas/:id/votar', verificarToken, async (req, res) => {
     }
 });
 
+// --- PAGOS ---
+
+/**
+ * 1. LISTAR CUENTAS BANCARIAS (Para el select del habitante)
+ */
+app.get('/api/cuentas-bancarias', verificarToken, async (req, res) => {
+    try {
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+        if (!usuario.id_comunidad) return res.json([]);
+
+        const cuentas = await prisma.cuentaBancaria.findMany({
+            where: { id_comunidad: usuario.id_comunidad }
+        });
+        res.json(cuentas);
+    } catch (error) {
+        res.status(500).json({ error: 'Error cargando bancos' });
+    }
+});
+
+/**
+ * 2. REPORTAR PAGO (Con foto)
+ */
+app.post('/api/pagos/reportar', verificarToken, upload.single('comprobante'), async (req, res) => {
+    try {
+        const { monto, fecha, referencia, banco_origen, banco_destino_id, metodo } = req.body;
+        const idUsuario = req.usuario.id;
+        
+        // Obtener nombre del banco destino para guardarlo histórico
+        const cuentaDestino = await prisma.cuentaBancaria.findUnique({ 
+            where: { id: parseInt(banco_destino_id) } 
+        });
+
+        const nuevoPago = await prisma.pago.create({
+            data: {
+                id_usuario: idUsuario,
+                monto: parseFloat(monto),
+                fecha_pago: new Date(fecha),
+                referencia,
+                concepto: "Pago de Condominio", // Se podria pedir en el formulario, solamente no tenemos el diseño de eso
+                metodo_pago: metodo,
+                banco_origen: banco_origen,
+                banco_destino: cuentaDestino ? cuentaDestino.banco : "Desconocido",
+                comprobante_url: req.file ? `/uploads/${req.file.filename}` : null,
+                estado: 'PENDIENTE'
+            }
+        });
+
+        res.status(201).json({ mensaje: 'Pago reportado', pago: nuevoPago });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al reportar pago' });
+    }
+});
+
 // Iniciar servidor
 app.listen(port, async () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);

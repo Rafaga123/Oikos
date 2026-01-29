@@ -66,6 +66,7 @@
     areas_comunes AreaComun[]
     logs          LogAuditoria[]
     Post          Post[]
+    cuentas_bancarias CuentaBancaria[]
   }
 
   model Usuario {
@@ -112,18 +113,23 @@
   // --- TABLAS FUNCIONALES (Normalizadas) ---
 
   model Pago {
-    id              Int        @id @default(autoincrement())
-    monto           Decimal    @db.Decimal(10, 2)
-    fecha_pago      DateTime   @default(now())
-    concepto        String // Ej: "Alicuota Enero"
-    referencia      String?
-    comprobante_url String?
-    estado          EstadoPago @default(PENDIENTE)
-    nota_admin      String? // Feedback si se rechaza
+  id              Int      @id @default(autoincrement())
+  monto           Decimal  @db.Decimal(10, 2)
+  fecha_pago      DateTime @default(now())
+  concepto        String 
+  referencia      String?
+  comprobante_url String?  // URL de la foto subida
+  estado          EstadoPago @default(PENDIENTE)
+  nota_admin      String?
+  
+  // Datos del reporte
+  metodo_pago     String?  // "Transferencia", "Pago Movil"
+  banco_origen    String?  // Desde qué banco pagó el usuario
+  banco_destino   String?  // A qué banco del condominio pagó
 
-    usuario    Usuario @relation(fields: [id_usuario], references: [id])
-    id_usuario Int
-  }
+  usuario         Usuario @relation(fields: [id_usuario], references: [id])
+  id_usuario      Int
+}
 
   model Anuncio {
     id            Int      @id @default(autoincrement())
@@ -256,3 +262,17 @@
 
     @@id([id_usuario, id_post]) // Llave compuesta: un usuario solo da 1 like por post
   }
+  
+  model CuentaBancaria {
+  id            Int      @id @default(autoincrement())
+  banco         String
+  numero_cuenta String
+  titular       String
+  cedula_rif    String
+  tipo_cuenta   String
+  telefono      String?  
+  logo_url      String?
+  
+  id_comunidad  Int
+  comunidad     Comunidad @relation(fields: [id_comunidad], references: [id])
+}
