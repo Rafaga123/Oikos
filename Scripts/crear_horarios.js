@@ -1,13 +1,6 @@
- $(document).ready(function() {
+$(document).ready(function() {
             // Inicializar componentes
             $('.ui.dropdown').dropdown();
-            $('.ui.search').search({
-                source: [],
-                searchFields: ['nombre', 'area', 'tipo'],
-                onSelect: function(result) {
-                    filtrarHorarios();
-                }
-            });
             
             // Inicializar modales
             $('#horario-modal').modal({
@@ -17,10 +10,39 @@
             $('#confirm-modal').modal();
             $('#excepciones-modal').modal();
             
-            // Sidebar toggle
-            $('#sidebar-toggle').click(function() {
-                $('.ui.sidebar').sidebar('toggle');
-            });
+           // Inicializar sidebar de Semantic UI
+    $('.ui.sidebar').sidebar({
+        transition: 'overlay',
+        mobileTransition: 'overlay',
+        closable: true,
+        onShow: function() {
+            $('.pusher').addClass('dimmed');
+        },
+        onHide: function() {
+            $('.pusher').removeClass('dimmed');
+        }
+    });
+    
+    // Controlar sidebar en móviles
+    $('#sidebar-toggle').click(function(e) {
+        e.preventDefault();
+        $('.ui.sidebar').sidebar('toggle');
+    });
+
+            // Para pantallas grandes, forzar sidebar visible
+    function adjustSidebarForScreenSize() {
+        if ($(window).width() > 768) {
+            // En desktop, mostrar sidebar siempre
+            $('.ui.sidebar').sidebar('hide');
+            $('.ui.sidebar').addClass('hide');
+            $('.pusher').addClass('desktop-sidebar-visible');
+        } else {
+            // En mobile, ocultar sidebar
+            $('.ui.sidebar').sidebar('hide');
+            $('.ui.sidebar').removeClass('visible');
+            $('.pusher').removeClass('desktop-sidebar-visible');
+        }
+    }
             
             // Datos de ejemplo
             let horarios = [
@@ -103,26 +125,6 @@
                     creadoPor: "Admin",
                     fechaCreacion: "2025-01-20T14:00:00",
                     ultimaModificacion: "2025-02-28T10:45:00"
-                },
-                {
-                    id: 5,
-                    area: "parque",
-                    areaNombre: "Parque Infantil",
-                    tipo: "temporal",
-                    nombre: "Parque cerrado por mantenimiento",
-                    dias: ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"],
-                    horaInicio: "00:00",
-                    horaFin: "23:59",
-                    estado: "inactivo",
-                    capacidad: 0,
-                    grupo: "ninos",
-                    fechaInicio: "2025-03-10",
-                    fechaFin: "2025-03-20",
-                    descripcion: "Parque infantil cerrado por trabajos de mantenimiento",
-                    restricciones: ["Prohibido el acceso durante las obras"],
-                    creadoPor: "Admin",
-                    fechaCreacion: "2025-03-05T08:30:00",
-                    ultimaModificacion: "2025-03-05T08:30:00"
                 }
             ];
             
@@ -142,14 +144,6 @@
                     tipo: "horario-especial",
                     descripcion: "Clase especial de yoga",
                     horarioEspecial: "18:00 - 20:00"
-                },
-                {
-                    id: 3,
-                    horarioId: 4,
-                    fecha: "2025-03-15",
-                    tipo: "cerrado",
-                    descripcion: "Reservado para evento privado",
-                    horarioEspecial: null
                 }
             ];
             
@@ -159,21 +153,30 @@
             // Cargar datos iniciales
             cargarHorarios();
             
-            // Eventos de botones
+            // ===== EVENTOS DE BOTONES PRINCIPALES =====
+            
+            // Nuevo horario
             $('#nuevo-horario-btn, #nuevo-horario-empty').click(function() {
+                console.log('Nuevo horario clickeado');
                 nuevoHorario();
             });
             
+            // Publicar horarios
             $('#publicar-horarios-btn').click(function() {
+                console.log('Publicar horarios clickeado');
                 publicarHorarios();
             });
             
+            // Vista semanal
             $('#horario-semanal-btn').click(function() {
+                console.log('Vista semanal clickeada');
                 verVistaSemanal();
             });
             
+            // Editar área desde dashboard
             $('.editar-area').click(function() {
                 const area = $(this).data('area');
+                console.log('Editar área clickeado:', area);
                 editarHorarioArea(area);
             });
             
@@ -182,8 +185,11 @@
                 filtrarHorarios();
             });
             
+            // ===== EVENTOS DE MODALES =====
+            
             // Restricciones dinámicas
             $('#agregar-restriccion').click(function() {
+                console.log('Agregar restricción clickeado');
                 restriccionCount++;
                 const nuevaRestriccion = `
                     <div class="restriccion-item">
@@ -197,6 +203,7 @@
             });
             
             $(document).on('click', '.eliminar-restriccion', function() {
+                console.log('Eliminar restricción clickeado');
                 if ($('.restriccion-item').length > 1) {
                     $(this).closest('.restriccion-item').remove();
                 }
@@ -204,6 +211,7 @@
             
             // Excepciones
             $('#agregar-excepcion').click(function() {
+                console.log('Agregar excepción clickeado');
                 const fecha = $('#excepcion-fecha').val();
                 const tipo = $('#excepcion-tipo').val();
                 
@@ -234,33 +242,46 @@
             
             // Guardar horario
             $('.submit-horario').click(function() {
+                console.log('Guardar horario clickeado');
                 guardarHorario();
             });
             
             $('.cancel-horario').click(function() {
+                console.log('Cancelar horario clickeado');
                 $('#horario-modal').modal('hide');
                 limpiarFormulario();
             });
             
+            // Cerrar excepciones
+            $('.cerrar-excepciones').click(function() {
+                $('#excepciones-modal').modal('hide');
+            });
+            
             // Confirmaciones
             $('.cancel-confirm').click(function() {
+                console.log('Cancelar confirmación clickeado');
                 $('#confirm-modal').modal('hide');
             });
             
             $('.confirm-delete').click(function() {
+                console.log('Confirmar eliminar clickeado');
                 eliminarHorario(currentHorarioId);
             });
             
             $('.confirm-activar').click(function() {
+                console.log('Confirmar activar clickeado');
                 cambiarEstadoHorario(currentHorarioId, 'activo');
             });
             
             $('.confirm-desactivar').click(function() {
+                console.log('Confirmar desactivar clickeado');
                 cambiarEstadoHorario(currentHorarioId, 'inactivo');
             });
             
-            // Funciones principales
+            // ===== FUNCIONES PRINCIPALES =====
+            
             function cargarHorarios() {
+                console.log('Cargando horarios...');
                 const body = $('#horarios-body');
                 body.empty();
                 
@@ -270,6 +291,17 @@
                 } else {
                     $('#empty-state').hide();
                     body.show();
+                    
+                    // Mapa de días para mostrar
+                    const diasMap = {
+                        'lunes': 'L',
+                        'martes': 'M',
+                        'miercoles': 'X',
+                        'jueves': 'J',
+                        'viernes': 'V',
+                        'sabado': 'S',
+                        'domingo': 'D'
+                    };
                     
                     horarios.forEach(horario => {
                         const estadoClase = `estado-${horario.estado}`;
@@ -287,15 +319,6 @@
                         }[horario.tipo];
                         
                         const diasTexto = horario.dias.map(dia => {
-                            const diasMap = {
-                                'lunes': 'Lun',
-                                'martes': 'Mar',
-                                'miercoles': 'Mié',
-                                'jueves': 'Jue',
-                                'viernes': 'Vie',
-                                'sabado': 'Sáb',
-                                'domingo': 'Dom'
-                            };
                             return diasMap[dia] || dia;
                         }).join(', ');
                         
@@ -387,40 +410,48 @@
                         body.append(row);
                     });
                     
-                    // Agregar eventos a los botones
-                    $('.ver-detalle-horario').click(function() {
+                    // Agregar eventos a los botones DINÁMICAMENTE
+                    $(document).off('click', '.ver-detalle-horario').on('click', '.ver-detalle-horario', function() {
                         const id = $(this).data('id');
+                        console.log('Ver detalle horario clickeado:', id);
                         verDetalleHorario(id);
                     });
                     
-                    $('.editar-horario').click(function() {
+                    $(document).off('click', '.editar-horario').on('click', '.editar-horario', function() {
                         const id = $(this).data('id');
+                        console.log('Editar horario clickeado:', id);
                         editarHorario(id);
                     });
                     
-                    $('.activar-horario').click(function() {
+                    $(document).off('click', '.activar-horario').on('click', '.activar-horario', function() {
                         const id = $(this).data('id');
+                        console.log('Activar horario clickeado:', id);
                         confirmarCambiarEstado(id, 'activar');
                     });
                     
-                    $('.desactivar-horario').click(function() {
+                    $(document).off('click', '.desactivar-horario').on('click', '.desactivar-horario', function() {
                         const id = $(this).data('id');
+                        console.log('Desactivar horario clickeado:', id);
                         confirmarCambiarEstado(id, 'desactivar');
                     });
                     
-                    $('.eliminar-horario').click(function() {
+                    $(document).off('click', '.eliminar-horario').on('click', '.eliminar-horario', function() {
                         const id = $(this).data('id');
+                        console.log('Eliminar horario clickeado:', id);
                         confirmarEliminarHorario(id);
                     });
                     
-                    $('.excepciones-horario').click(function() {
+                    $(document).off('click', '.excepciones-horario').on('click', '.excepciones-horario', function() {
                         const id = $(this).data('id');
+                        console.log('Excepciones horario clickeado:', id);
                         mostrarExcepciones(id);
                     });
                 }
+                console.log('Horarios cargados:', horarios.length);
             }
             
             function filtrarHorarios() {
+                console.log('Filtrando horarios...');
                 const busqueda = $('.search-input input').val().toLowerCase();
                 if (!busqueda) {
                     $('tr[data-id]').show();
@@ -438,6 +469,7 @@
             }
             
             function nuevoHorario() {
+                console.log('Abriendo modal nuevo horario');
                 $('#modal-horario-header').html('<i class="plus icon"></i> Nuevo Horario');
                 $('#horario-id').val('');
                 limpiarFormulario();
@@ -445,6 +477,7 @@
             }
             
             function editarHorarioArea(area) {
+                console.log('Editando área:', area);
                 // Buscar horario principal del área
                 const horarioPrincipal = horarios.find(h => h.area === area && h.tipo === 'regular');
                 if (horarioPrincipal) {
@@ -460,6 +493,7 @@
             }
             
             function editarHorario(id) {
+                console.log('Editando horario ID:', id);
                 const horario = horarios.find(h => h.id === id);
                 if (!horario) return;
                 
@@ -479,7 +513,7 @@
                 $('#hora-fin').val(horario.horaFin);
                 $('#estado').val(horario.estado);
                 $('#capacidad').val(horario.capacidad);
-                $('#grupo').val(horario.grupo);
+                $('#grupo').val(horario.grupo || '');
                 $('#fecha-inicio').val(horario.fechaInicio);
                 $('#fecha-fin').val(horario.fechaFin);
                 $('#descripcion').val(horario.descripcion);
@@ -517,9 +551,19 @@
             }
             
             function guardarHorario() {
+                console.log('Guardando horario...');
                 const form = $('#form-horario');
-                if (!form.form('is valid')) {
-                    form.form('validate form');
+                
+                // Validación manual
+                const area = $('#area').val();
+                const tipo = $('#tipo').val();
+                const nombre = $('#nombre').val();
+                const horaInicio = $('#hora-inicio').val();
+                const horaFin = $('#hora-fin').val();
+                const estado = $('#estado').val();
+                
+                if (!area || !tipo || !nombre || !horaInicio || !horaFin || !estado) {
+                    mostrarNotificacion('Por favor completa todos los campos requeridos', 'error');
                     return;
                 }
                 
@@ -547,14 +591,14 @@
                 const fechaActual = new Date().toISOString();
                 
                 const nuevoHorario = {
-                    area: $('#area').val(),
+                    area: area,
                     areaNombre: $('#area option:selected').text(),
-                    tipo: $('#tipo').val(),
-                    nombre: $('#nombre').val(),
+                    tipo: tipo,
+                    nombre: nombre,
                     dias: diasSeleccionados,
-                    horaInicio: $('#hora-inicio').val(),
-                    horaFin: $('#hora-fin').val(),
-                    estado: $('#estado').val(),
+                    horaInicio: horaInicio,
+                    horaFin: horaFin,
+                    estado: estado,
                     capacidad: $('#capacidad').val() ? parseInt($('#capacidad').val()) : null,
                     grupo: $('#grupo').val(),
                     fechaInicio: $('#fecha-inicio').val(),
@@ -591,6 +635,7 @@
             }
             
             function limpiarFormulario() {
+                console.log('Limpiando formulario');
                 $('#form-horario')[0].reset();
                 $('#horario-id').val('');
                 $('input[name="dias"]').prop('checked', false);
@@ -604,10 +649,10 @@
                 `);
                 restriccionCount = 1;
                 $('.ui.dropdown').dropdown('clear');
-                $('.ui.form').form('clear');
             }
             
             function verDetalleHorario(id) {
+                console.log('Viendo detalle horario ID:', id);
                 const horario = horarios.find(h => h.id === id);
                 if (!horario) return;
                 
@@ -774,36 +819,36 @@
                     </button>
                 `);
                 
-                // Eventos de los botones del modal
-                $('.cancel-detalle').click(function() {
+                // Eventos de los botones del modal - DELEGACIÓN DE EVENTOS
+                $(document).off('click', '.cancel-detalle').on('click', '.cancel-detalle', function() {
                     $('#detalle-modal').modal('hide');
                 });
                 
-                $('.editar-desde-detalle').click(function() {
+                $(document).off('click', '.editar-desde-detalle').on('click', '.editar-desde-detalle', function() {
                     const id = $(this).data('id');
                     $('#detalle-modal').modal('hide');
                     setTimeout(() => editarHorario(id), 300);
                 });
                 
-                $('.activar-desde-detalle').click(function() {
+                $(document).off('click', '.activar-desde-detalle').on('click', '.activar-desde-detalle', function() {
                     const id = $(this).data('id');
                     $('#detalle-modal').modal('hide');
                     setTimeout(() => confirmarCambiarEstado(id, 'activar'), 300);
                 });
                 
-                $('.desactivar-desde-detalle').click(function() {
+                $(document).off('click', '.desactivar-desde-detalle').on('click', '.desactivar-desde-detalle', function() {
                     const id = $(this).data('id');
                     $('#detalle-modal').modal('hide');
                     setTimeout(() => confirmarCambiarEstado(id, 'desactivar'), 300);
                 });
                 
-                $('.eliminar-desde-detalle').click(function() {
+                $(document).off('click', '.eliminar-desde-detalle').on('click', '.eliminar-desde-detalle', function() {
                     const id = $(this).data('id');
                     $('#detalle-modal').modal('hide');
                     setTimeout(() => confirmarEliminarHorario(id), 300);
                 });
                 
-                $('.excepciones-desde-detalle').click(function() {
+                $(document).off('click', '.excepciones-desde-detalle').on('click', '.excepciones-desde-detalle', function() {
                     const id = $(this).data('id');
                     $('#detalle-modal').modal('hide');
                     setTimeout(() => mostrarExcepciones(id), 300);
@@ -813,6 +858,7 @@
             }
             
             function mostrarExcepciones(id) {
+                console.log('Mostrando excepciones para horario ID:', id);
                 currentHorarioId = id;
                 const horario = horarios.find(h => h.id === id);
                 
@@ -828,6 +874,7 @@
             }
             
             function cargarExcepcionesHorario(id) {
+                console.log('Cargando excepciones para horario ID:', id);
                 const lista = $('#lista-excepciones');
                 lista.empty();
                 
@@ -877,14 +924,15 @@
                     });
                 }
                 
-                // Evento para eliminar excepciones
-                $('.eliminar-excepcion').click(function() {
+                // Evento para eliminar excepciones - DELEGACIÓN DE EVENTOS
+                $(document).off('click', '.eliminar-excepcion').on('click', '.eliminar-excepcion', function() {
                     const excepcionId = $(this).data('id');
                     eliminarExcepcion(excepcionId);
                 });
             }
             
             function eliminarExcepcion(id) {
+                console.log('Eliminando excepción ID:', id);
                 const index = excepciones.findIndex(e => e.id === id);
                 if (index !== -1) {
                     excepciones.splice(index, 1);
@@ -894,6 +942,7 @@
             }
             
             function confirmarEliminarHorario(id) {
+                console.log('Confirmando eliminación horario ID:', id);
                 currentHorarioId = id;
                 const horario = horarios.find(h => h.id === id);
                 
@@ -908,6 +957,7 @@
             }
             
             function eliminarHorario(id) {
+                console.log('Eliminando horario ID:', id);
                 const index = horarios.findIndex(h => h.id === id);
                 if (index !== -1) {
                     horarios.splice(index, 1);
@@ -920,6 +970,7 @@
             }
             
             function confirmarCambiarEstado(id, accion) {
+                console.log('Confirmando cambio estado horario ID:', id, 'Acción:', accion);
                 currentHorarioId = id;
                 const horario = horarios.find(h => h.id === id);
                 
@@ -943,6 +994,7 @@
             }
             
             function cambiarEstadoHorario(id, estado) {
+                console.log('Cambiando estado horario ID:', id, 'Estado:', estado);
                 const horario = horarios.find(h => h.id === id);
                 if (horario) {
                     horario.estado = estado;
@@ -957,6 +1009,7 @@
             }
             
             function actualizarDashboard() {
+                console.log('Actualizando dashboard');
                 // Actualizar estado de áreas en el dashboard
                 const areas = ['piscina', 'gimnasio', 'salon', 'parque'];
                 
@@ -975,16 +1028,56 @@
             }
             
             function publicarHorarios() {
+                console.log('Publicando horarios');
                 // Aquí iría la lógica para publicar los horarios (notificar a residentes, etc.)
                 mostrarNotificacion('Horarios publicados exitosamente. Todos los residentes han sido notificados.', 'success');
             }
             
             function verVistaSemanal() {
+                console.log('Mostrando vista semanal');
                 // Aquí iría la lógica para mostrar vista semanal
                 mostrarNotificacion('Mostrando vista semanal de horarios', 'info');
+                
+                // Ejemplo de cómo se vería
+                const vistaHtml = `
+                    <div class="ui segment">
+                        <h3 class="ui header">
+                            <i class="calendar alternate icon"></i>
+                            Vista Semanal de Horarios
+                        </h3>
+                        <div class="ui message">
+                            <p>Esta funcionalidad mostraría una vista semanal completa con todos los horarios organizados por día.</p>
+                            <p>Próximamente disponible...</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Crear un modal temporal para mostrar la vista
+                $('body').append(`
+                    <div class="ui modal" id="vista-semanal-modal">
+                        <i class="close icon"></i>
+                        <div class="header">
+                            <i class="calendar alternate icon"></i>
+                            Vista Semanal
+                        </div>
+                        <div class="scrolling content">
+                            ${vistaHtml}
+                        </div>
+                        <div class="actions">
+                            <div class="ui button">Cerrar</div>
+                        </div>
+                    </div>
+                `);
+                
+                $('#vista-semanal-modal').modal('show').modal({
+                    onHide: function() {
+                        $('#vista-semanal-modal').remove();
+                    }
+                });
             }
             
             function mostrarNotificacion(mensaje, tipo) {
+                console.log('Mostrando notificación:', mensaje, 'Tipo:', tipo);
                 let icono = 'info circle';
                 let color = 'blue';
                 
@@ -999,39 +1092,41 @@
                     color = 'yellow';
                 }
                 
-                $('body').toast({
-                    class: color,
-                    title: tipo === 'success' ? 'Éxito' : tipo === 'error' ? 'Error' : 'Información',
-                    message: mensaje,
-                    showIcon: icono,
-                    position: 'top right',
-                    displayTime: 4000
+                // Crear notificación
+                const notification = $(`
+                    <div class="ui ${color} message" style="position: fixed; top: 80px; right: 20px; z-index: 9999; min-width: 300px; max-width: 400px;">
+                        <i class="close icon"></i>
+                        <div class="header">
+                            ${tipo === 'success' ? 'Éxito' : tipo === 'error' ? 'Error' : 'Información'}
+                        </div>
+                        <p>${mensaje}</p>
+                    </div>
+                `);
+                
+                $('body').append(notification);
+                
+                // Animación de entrada
+                notification.hide().slideDown(300);
+                
+                // Cerrar al hacer clic en la X
+                notification.find('.close.icon').click(function() {
+                    notification.slideUp(300, function() {
+                        $(this).remove();
+                    });
                 });
+                
+                // Auto-eliminar después de 4 segundos
+                setTimeout(function() {
+                    if (notification.is(':visible')) {
+                        notification.slideUp(300, function() {
+                            $(this).remove();
+                        });
+                    }
+                }, 4000);
             }
-            
-            // Inicializar validación del formulario
-            $('#form-horario').form({
-                fields: {
-                    area: 'empty',
-                    tipo: 'empty',
-                    nombre: 'empty',
-                    horaInicio: 'empty',
-                    horaFin: 'empty',
-                    estado: 'empty'
-                }
-            });
-            
-            // Mapa de días para mostrar
-            window.diasMap = {
-                'lunes': 'L',
-                'martes': 'M',
-                'miercoles': 'X',
-                'jueves': 'J',
-                'viernes': 'V',
-                'sabado': 'S',
-                'domingo': 'D'
-            };
             
             // Inicializar dashboard
             actualizarDashboard();
+            
+            console.log('JavaScript cargado correctamente');
         });

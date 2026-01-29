@@ -1,4 +1,4 @@
-       :root {
+        :root {
             --primary-color: #9A9CEA;
             --success-color: #21ba45;
             --warning-color: #f2711c;
@@ -7,9 +7,65 @@
         }
         
         body {
-            background-color: #f8f9fa;
+            background-image: url(/Images/Fondopagina.png);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
             min-height: 100vh;
         }
+
+                .sidebar-menu {
+    width: 260px;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 1001;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+.sidebar-menu .item {
+    /*Aumenta la fuente de todo el texto del item*/
+    font-size: 1.15em; 
+
+    /*Añade más espacio vertical entre los items para que se vean mejor*/
+    padding-top: 18px !important;
+    padding-bottom: 18px !important;
+}
+
+/* Aumentar el tamaño de los iconos dentro de los elementos del menú */
+.sidebar-menu .item i.icon {
+    /*Aumenta el tamaño de la fuente del icono*/
+    font-size: 1.5em !important;
+
+    /*Asegura que haya más espacio entre el icono y el texto*/
+    margin-right: 15px !important; 
+}
+
+.sidebar-footer-image {
+    flex-grow: 1; /*Ocupa el espacio restante del sidebar */
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Alinea la imagen a la parte inferior del espacio */
+    padding: 20px; /* Espacio de relleno para que no se pegue al borde */
+}
+
+/*Estilos de la Imagen*/
+.sidebar-footer-image img {
+    /* Asegura que la imagen no exceda el ancho del sidebar */
+    max-width: 100%; 
+    /* Define una altura máxima para que no empuje el menú */
+    max-height: 150px; 
+    /* Mantiene la proporción de la imagen */
+    height: auto; 
+
+}
+
+.sidebar-menu.visible {
+    transform: translateX(0);
+}
         
         .main-content {
             padding: 100px 30px 50px;

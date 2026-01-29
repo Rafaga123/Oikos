@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Horarios - Sistema de Condominio</title>
+    <title>Horarios</title>
     
     <!-- jQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -11,12 +11,11 @@
     <!-- Semantic UI -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
-    
     <link rel="stylesheet" href="../CSS/crear_horario.css">
 </head>
 <body>
     <!-- Sidebar -->
-<div class="ui vertical inverted sidebar menu sidebar-menu" style="background-color: #9A9CEA;">
+    <div class="ui vertical inverted sidebar menu sidebar-menu" style="background-color: #9A9CEA;">
         <div class="item">
             <div class="header">
                 <h2 class="ui inverted header">
@@ -50,6 +49,10 @@
                     <i class="money bill alternate icon"></i>
                     Pagos
                 </a>
+                <a class="item" href="./crear_horario.html">
+                    <i class="clock icon"></i>
+                    Modificar Horarios
+                </a>
                 
             </div>
         </div>
@@ -77,7 +80,7 @@
                     <i class="sidebar icon" style="color: white;"></i><!--Icono del sidebar-->
                 </a>
                 <div class="header item" style="color: white;"><!--color y titulo del menu superior-->
-                    Gestión de Habitantes
+                    Gestión de Horarios
                 </div>
                 <div class="right menu">
                     <div class="ui dropdown item" style="color: white;">
@@ -503,7 +506,7 @@
             </div>
         </div>
         <div class="actions">
-            <div class="ui button">Cerrar</div>
+            <div class="ui button cerrar-excepciones">Cerrar</div>
         </div>
     </div>
 
@@ -527,7 +530,6 @@
         </div>
     </div>
 
-    <!-- JavaScript -->
     <script src="../Scripts/crear_horarios.js"></script>
 </body>
 </html>
