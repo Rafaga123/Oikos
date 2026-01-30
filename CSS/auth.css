@@ -16,26 +16,32 @@ html, body {
 }
 
 body {
-    /* CAMBIO REALIZADO:
-       1. Se eliminó la capa de 'logopng.png'.
-       2. Se colocó 'Fondopagina.png' PRIMERO para que esté "sobre" el gradiente.
-       3. El gradiente queda en segundo lugar como fondo base.
-    */
-    background: 
-        url('../Images/Fondopaginapng.png'),
-        linear-gradient(135deg, var(--color-primario) 0%, var(--color-terciario) 100%);
+    /* Eliminamos las imágenes y gradientes anteriores */
+    background: transparent; 
+    background-color: #7375da; /* Color base de la config para evitar pantallazos blancos */
     
-    /* Configuración para que la imagen cubra todo y quede fija como en index.html */
-    background-position: center center, center center;
-    background-repeat: no-repeat, no-repeat;
-    background-size: cover, cover;
-    background-attachment: fixed, fixed;
-
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     overflow-x: hidden; 
     width: 100%;
+    position: relative;
+}
+
+
+body::before {
+    display: none;
+}
+
+/* Estilo para el contenedor del fondo animado */
+.finisher-header {
+    position: fixed;   /* Fijo para que no se mueva */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;     /* Ocupa toda la altura de la ventana */
+    z-index: -1;       /* Se coloca detrás de todo el contenido */
+    pointer-events: none; /* Permite hacer clic a través de él */
 }
 
 .ui.menu {

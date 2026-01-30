@@ -10,6 +10,7 @@
     <title>Registro</title>
 </head>
 <body>
+    <div class="header finisher-header" style="width: 100%; height: 100vh;"></div>
 <header class="ui menu navbar-responsive">
     <div class="ui container">
         
@@ -186,5 +187,44 @@
         button.setAttribute('aria-label', showing ? 'Mostrar contraseña' : 'Ocultar contraseña');
     }
     </script>
+    <script src="../Scripts/finisher-header.es5.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+new FinisherHeader({
+  "count": 6,
+  "size": {
+    "min": 1100,
+    "max": 1300,
+    "pulse": 0
+  },
+  "speed": {
+    "x": {
+      "min": 0.1,
+      "max": 0.3
+    },
+    "y": {
+      "min": 0.1,
+      "max": 0.3
+    }
+  },
+  "colors": {
+    "background": "#9a9cea",
+    "particles": [
+      "#a2b9ee",
+      "#a2dcee",
+      "#a544a5",
+      "#524ff2"
+    ]
+  },
+  "blending": "overlay",
+  "opacity": {
+    "center": 1,
+    "edge": 0.1
+  },
+  "skew": -2,
+  "shapes": [
+    "c"
+  ]
+});
+</script>
 </body>
 </html>

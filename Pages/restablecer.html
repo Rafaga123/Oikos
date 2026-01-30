@@ -4,12 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="../Images/logo.ico" />
-    <link rel="stylesheet" href="CSS/semantic.css" />
+    <link rel="stylesheet" href="../CSS/semantic.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"/>
     <link rel="stylesheet" href="../CSS/auth.css" />
     <title>Restablecer contraseña</title>
 </head>
 <body>
+    
+    <div class="header finisher-header" style="width: 100%; height: 100vh;"></div>
     <header class="ui menu">
         <div class="ui container">
             <a href="../index.html">
@@ -54,7 +56,6 @@
     <script src="../Scripts/semantic.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../Scripts/reset_password.js"></script>
-    <script src="../Scripts/script.js"></script>
     <script>
     function togglePassword(inputId, button) {
         const input = document.getElementById(inputId);
@@ -69,5 +70,44 @@
         button.setAttribute('aria-label', showing ? 'Mostrar contraseña' : 'Ocultar contraseña');
     }
     </script>
+    <script src="../Scripts/finisher-header.es5.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+new FinisherHeader({
+  "count": 6,
+  "size": {
+    "min": 1100,
+    "max": 1300,
+    "pulse": 0
+  },
+  "speed": {
+    "x": {
+      "min": 0.1,
+      "max": 0.3
+    },
+    "y": {
+      "min": 0.1,
+      "max": 0.3
+    }
+  },
+  "colors": {
+    "background": "#9a9cea",
+    "particles": [
+      "#a2b9ee",
+      "#a2dcee",
+      "#a544a5",
+      "#524ff2"
+    ]
+  },
+  "blending": "overlay",
+  "opacity": {
+    "center": 1,
+    "edge": 0.1
+  },
+  "skew": -2,
+  "shapes": [
+    "c"
+  ]
+});
+</script>
 </body>
 </html>
