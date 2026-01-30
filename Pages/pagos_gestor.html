@@ -15,12 +15,59 @@
 <body>
     
     <div class="ui vertical inverted sidebar menu sidebar-menu" style="background-color: #9A9CEA;">
-        <a class="item" href="./gestor.html"><i class="home icon"></i> Panel</a>
-        <a class="item" href="./gestion_habitantes.html"><i class="users icon"></i> Habitantes</a>
-        <a class="item active"><i class="money bill alternate icon"></i> Pagos</a>
-        <a class="item" onclick="cerrarSesion()"><i class="sign out icon"></i> Salir</a>
+        <div class="item">
+            <div class="header">
+                <h2 class="ui inverted header">
+                    <i class="cog icon"></i>
+                    <div class="content">
+                        Panel Gestor
+                        <div class="sub header">Gestión de Habitantes</div>
+                    </div>
+                </h2>
+            </div>
+        </div>
+        <div class="item">
+            <div class="menu">
+                <a class="active item" href="./gestor.html">
+                    <i class="home icon"></i>
+                    Panel de Control
+                </a>
+                <a class="item" href="./gestion_habitantes.html">
+                    <i class="users icon"></i>
+                    Habitantes
+                </a>
+                <a class="item" href="./solicitudes.html">
+                    <i class="chart bar icon"></i>
+                    Incidencias
+                </a>
+                <a class="item" href="./solicitudes_nuevas.html">
+                    <i class="user icon"></i>
+                    Solicitudes nuevas
+                </a>
+                <a class="item" href="./pagos_gestor.html">
+                    <i class="money bill alternate icon"></i>
+                    Pagos
+                </a>
+                <a class="item" href="./crear_horario.html">
+                    <i class="clock icon"></i>
+                    Modificar Horarios
+                </a>
+                
+            </div>
+        </div>
+        <div class="item" >
+            <div class="ui divider"></div>
+            <a class="item" onclick="cerrarSesion()">
+                <i class="sign out icon"></i>
+                Cerrar Sesión
+            </a>
+        </div>
+        <div class="sidebar-footer-image">
+            <img src="../Images/logopng.png" alt="Decoración de Sidebar">
+        </div>
     </div>
 
+    <!-- Contenido superior -->
     <div class="pusher">
         <div class="ui top fixed menu" style="background-color: #9A9CEA;">
             <div class="ui container">

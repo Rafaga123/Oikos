@@ -14,7 +14,7 @@ $(document).ready(function() {
     // 2. CARGAR DATOS REALES DEL BACKEND
     loadSolicitudes();
 
-    // Eventos de botones (Igual que tenías, pero adaptado)
+    // Eventos de botones 
     $('.filter-btn').click(function() {
         $('.filter-btn').removeClass('active');
         $(this).addClass('active');
