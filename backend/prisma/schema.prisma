@@ -67,6 +67,7 @@
     logs          LogAuditoria[]
     Post          Post[]
     cuentas_bancarias CuentaBancaria[]
+    reglas            Regla[]
   }
 
   model Usuario {
@@ -275,4 +276,16 @@
   
   id_comunidad  Int
   comunidad     Comunidad @relation(fields: [id_comunidad], references: [id])
+}
+
+model Regla {
+  id                  Int      @id @default(autoincrement())
+  titulo              String
+  contenido           String   @db.Text
+  categoria           String   // convivencia, seguridad, etc.
+  fecha_creacion      DateTime @default(now())
+  ultima_modificacion DateTime @updatedAt
+
+  id_comunidad        Int
+  comunidad           Comunidad @relation(fields: [id_comunidad], references: [id])
 }

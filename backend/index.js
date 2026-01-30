@@ -1373,6 +1373,81 @@ app.put('/api/gestor/pagos/:id/estado', verificarToken, async (req, res) => {
     }
 });
 
+// --- GESTIÓN DE REGLAMENTO ---
+
+/**
+ * 1. OBTENER REGLAS (Para Gestor y Habitante)
+ */
+app.get('/api/reglas', verificarToken, async (req, res) => {
+    try {
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+        if (!usuario.id_comunidad) return res.json([]);
+
+        const reglas = await prisma.regla.findMany({
+            where: { id_comunidad: usuario.id_comunidad },
+            orderBy: { fecha_creacion: 'desc' }
+        });
+        res.json(reglas);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al cargar reglas' });
+    }
+});
+
+/**
+ * 2. CREAR REGLA (Gestor)
+ */
+app.post('/api/gestor/reglas', verificarToken, async (req, res) => {
+    try {
+        const { titulo, contenido, categoria } = req.body;
+        const gestor = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        if (!gestor.id_comunidad) return res.status(403).json({ error: 'Sin comunidad' });
+
+        const nuevaRegla = await prisma.regla.create({
+            data: {
+                titulo,
+                contenido,
+                categoria,
+                id_comunidad: gestor.id_comunidad
+            }
+        });
+        res.status(201).json(nuevaRegla);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al crear regla' });
+    }
+});
+
+/**
+ * 3. EDITAR REGLA (Gestor)
+ */
+app.put('/api/gestor/reglas/:id', verificarToken, async (req, res) => {
+    try {
+        const { titulo, contenido, categoria } = req.body;
+        const idRegla = parseInt(req.params.id);
+
+        await prisma.regla.update({
+            where: { id: idRegla },
+            data: { titulo, contenido, categoria }
+        });
+        res.json({ mensaje: 'Regla actualizada' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al editar regla' });
+    }
+});
+
+/**
+ * 4. ELIMINAR REGLA (Gestor)
+ */
+app.delete('/api/gestor/reglas/:id', verificarToken, async (req, res) => {
+    try {
+        const idRegla = parseInt(req.params.id);
+        await prisma.regla.delete({ where: { id: idRegla } });
+        res.json({ mensaje: 'Regla eliminada' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar regla' });
+    }
+});
+
 // Iniciar servidor
 app.listen(port, async () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
