@@ -16,11 +16,24 @@ html, body {
 }
 
 body {
-    background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-terciario) 100%);
+    /* CAMBIO REALIZADO:
+       1. Se eliminó la capa de 'logopng.png'.
+       2. Se colocó 'Fondopagina.png' PRIMERO para que esté "sobre" el gradiente.
+       3. El gradiente queda en segundo lugar como fondo base.
+    */
+    background: 
+        url('../Images/Fondopaginapng.png'),
+        linear-gradient(135deg, var(--color-primario) 0%, var(--color-terciario) 100%);
+    
+    /* Configuración para que la imagen cubra todo y quede fija como en index.html */
+    background-position: center center, center center;
+    background-repeat: no-repeat, no-repeat;
+    background-size: cover, cover;
+    background-attachment: fixed, fixed;
+
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    /* CORRECCIÓN PRINCIPAL: Evita que la página se anchee más de la cuenta */
     overflow-x: hidden; 
     width: 100%;
 }

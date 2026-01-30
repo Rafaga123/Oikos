@@ -289,3 +289,38 @@ model Regla {
   id_comunidad        Int
   comunidad           Comunidad @relation(fields: [id_comunidad], references: [id])
 }
+
+model Horario {
+  id                 Int      @id @default(autoincrement())
+  nombre             String
+  area               String   // piscina, gimnasio, salon, etc.
+  tipo               String   // regular, especial, reserva
+  dias               String   // Guardaremos JSON string: '["lunes", "martes"]'
+  hora_inicio        String
+  hora_fin           String
+  estado             String   // activo, inactivo
+  capacidad          Int?
+  grupo              String?  // adultos, ninos, etc.
+  fecha_inicio       DateTime?
+  fecha_fin          DateTime?
+  descripcion        String?  @db.Text
+  restricciones      String?  @db.Text // Guardaremos JSON string: '["Gorro", "Ducha"]'
+  fecha_creacion     DateTime @default(now())
+  ultima_modificacion DateTime @updatedAt
+
+  id_comunidad       Int
+  comunidad          Comunidad @relation(fields: [id_comunidad], references: [id])
+  
+  excepciones        ExcepcionHorario[]
+}
+
+model ExcepcionHorario {
+  id               Int      @id @default(autoincrement())
+  fecha            DateTime
+  tipo             String   // cerrado, mantenimiento, horario-especial
+  descripcion      String?
+  horario_especial String?  // "09:00 - 12:00"
+  
+  id_horario       Int
+  horario          Horario  @relation(fields: [id_horario], references: [id], onDelete: Cascade)
+}

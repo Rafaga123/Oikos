@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OIKOS - Pagina Inicio</title>
+    <title>OIKOS - Horarios</title>
     <link rel="shortcut icon" href="../Images/logo.ico" />
+    
     <script src="../Scripts/jquery-3.7.1.min.js"></script>
     <script src="../Scripts/semantic.min.js"></script>
-    <script src="../Scripts/horario.js"></script>
-    <link rel="stylesheet" type="text/CSS" href="../CSS/semantic.css">       
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <link rel="stylesheet" type="text/CSS" href="../CSS/semantic.css">       
     <link rel="stylesheet" type="text/CSS" href="../CSS/horario.css">
+    
     <script src="../Scripts/seguridad.js"></script>
-</head>
+    <script src="../Scripts/horario.js"></script> </head>
 <body>
-    <!-- Sidebar -->
     <div class="ui vertical inverted sidebar menu sidebar-menu" style="background-color: #9A9CEA;">
         <div class="item">
             <div class="header">
@@ -35,15 +37,15 @@
                     Cerrar menú
                     <br>
                 </a>
-                <a class="active item">
+                <a class="item" href="./reglamento.html">
                     <i class="book icon"></i>
                     Reglamento del Condominio
                 </a>
-                <a class="item">
+                <a class="active item" href="./horario.html">
                     <i class="clock icon"></i>
                     Horarios
                 </a>
-                <a class="item">
+                <a class="item" href="./pagar.html">
                     <i class="credit card icon"></i>
                     Cuentas para Pagos
                 </a>
@@ -54,7 +56,7 @@
             </div>
         </div>
         <div class="item">
-            <div class="ui divider" ></div>
+            <div class="ui divider"></div>
             <a class="item" onclick="cerrarSesion()">
                 <i class="sign out icon"></i>
                 Cerrar Sesión
@@ -66,16 +68,15 @@
     </div>
 
     <div class="pusher">
-        <!--Menú Superior-->
         <div class="ui top fixed menu" style="background-color: #9A9CEA;">
             <div class="ui container">
                 <div class="item">
-                    <img src="../Images/logopng.png" alt="Logo"> <!--logo de la pagina-->
+                    <img src="../Images/logopng.png" alt="Logo">
                 </div>
-                <a class="item" id="sidebar-toggle"><!--activador del sidebar-->
-                    <i class="sidebar icon" style="color: white;"></i><!--Icono del sidebar-->
+                <a class="item" id="sidebar-toggle">
+                    <i class="sidebar icon" style="color: white;"></i>
                 </a>
-                <div class="header item" style="color: white;"><!--color y titulo del menu superior-->
+                <div class="header item" style="color: white;">
                     Gestión de Vivienda
                 </div>
                 <div class="right menu">
@@ -93,92 +94,31 @@
             </div>
         </div>
         
-        <div class="main-content-container">
+        <div class="main-content-container" style="margin-top: 80px; margin-bottom: 50px;">
             <div class="ui container">
-                <div class="ui centered grid">
-                    <div class="fourteen wide computer sixteen wide tablet column">
-                        <div class="ui fluid raised card custom-rules-card">
-                            <div class="content">
-                                <h1 class="ui center aligned header custom-card-title">
-                                    <i class="clock icon"></i>
-                                    Horarios de Áreas y Servicios
-                                </h1>
-                                <div class="ui divider"></div>
-                                <div class="description">
-                                    <h3 class="ui dividing header"><i class="universal access icon"></i> Áreas Recreativas</h3>
-                                    <table class="ui celled table">
-                                        <thead style="background-color: #f9f9f9;">
-                                            <tr>
-                                                <th>Espacio</th>
-                                                <th>Lunes a Viernes</th>
-                                                <th>Sábados y Domingos</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><div class="ui ribbon label">Piscina</div></td>
-                                                <td>08:00 AM - 07:00 PM</td>
-                                                <td>09:00 AM - 08:00 PM</td>
-                                            </tr>
-                                            <tr>
-                                                <td><div class="ui ribbon label">Cancha</div></td>
-                                                <td>07:00 AM - 10:00 PM</td>
-                                                <td>07:00 AM - 11:00 PM</td>
-                                            </tr>
-                                            <tr>
-                                                <td><div class="ui ribbon label">Parque</div></td>
-                                                <td>06:00 AM - 10:00 PM</td>
-                                                <td>08:00 AM - 12:00 AM</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-
-                                    <h3 class="ui dividing header"><i class="tools icon"></i> Servicios y Mantenimiento</h3>
-                                    <div class="ui stackable grid">
-                                        <div class="eight wide column">
-                                            <div class="ui segment">
-                                                <h5><i class="wrench icon"></i> Reparaciones Privadas</h5>
-                                                <p>Para evitar molestias, los trabajos de construcción dentro de los apartamentos se limitan a:</p>
-                                                <div class="ui bulleted list">
-                                                    <div class="item"><b>Lun - Vie:</b> 08:30 AM - 05:00 PM</div>
-                                                    <div class="item"><b>Sábados:</b> 09:00 AM - 01:00 PM (Solo ruidos leves)</div>
-                                                    <div class="item" style="color: #db2828;"><b>Dom/Feriados:</b> No permitido</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="eight wide column">
-                                            <div class="ui segment">
-                                                <h5><i class="trash alternate icon"></i> Recolección de Basura</h5>
-                                                <p>Deposite las bolsas en los bajantes o contenedores en los siguientes bloques horarios:</p>
-                                                <div class="ui basic label"><i class="clock icon"></i> Mañana: 07:00 AM - 09:00 AM</div>
-                                                <div class="ui basic label"><i class="clock icon"></i> Noche: 07:00 PM - 09:00 PM</div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="ui warning message">
-                                        <div class="header">Aviso de Mantenimiento</div>
-                                        <ul class="list">
-                                            <li>La piscina se somete a limpieza profunda todos los <b>lunes</b> (Cerrada todo el día).</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                    </div>
-                    <div class="extra content center aligned">
-                        <span class="date">Horarios vigentes para el periodo 2026</span>
-                    </div>
+                
+                <div class="ui header">
+                    <h1>
+                        <i class="clock icon"></i>
+                        Horarios de Áreas y Servicios
+                        <div class="sub header">Consulta la disponibilidad de las áreas comunes</div>
+                    </h1>
                 </div>
-                        </div>
-                    </div>
+                
+                <div class="ui divider"></div>
+                
+                <div class="horarios-dashboard">
+                    <div class="ui active centered inline loader" style="margin-top: 50px;"></div>
+                    <p style="text-align: center; color: #777; margin-top: 10px;">Cargando horarios...</p>
                 </div>
+
             </div>
         </div>
         
-
         <footer class="ui inverted vertical footer segment">
-        <div class="ui container">
-            <p>Hecho con <i class="heart icon"></i></p>
-        </div>
+            <div class="ui container">
+                <p>Hecho con <i class="heart icon"></i></p>
+            </div>
         </footer>
     </div>
 </body>

@@ -7,6 +7,7 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const _ = require('lodash');
 
 // Importar Mailjet
 const Mailjet = require('node-mailjet');
@@ -1445,6 +1446,128 @@ app.delete('/api/gestor/reglas/:id', verificarToken, async (req, res) => {
         res.json({ mensaje: 'Regla eliminada' });
     } catch (error) {
         res.status(500).json({ error: 'Error al eliminar regla' });
+    }
+});
+
+// --- GESTIÓN DE HORARIOS ---
+
+// 1. OBTENER HORARIOS (Gestor y Habitante)
+app.get('/api/horarios', verificarToken, async (req, res) => {
+    try {
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+        if (!usuario.id_comunidad) return res.json([]);
+
+        const horarios = await prisma.horario.findMany({
+            where: { id_comunidad: usuario.id_comunidad },
+            include: { excepciones: true },
+            orderBy: { area: 'asc' }
+        });
+
+        // Parsear los strings JSON de vuelta a Arrays
+        const horariosFormateados = horarios.map(h => ({
+            ...h,
+            dias: JSON.parse(h.dias || '[]'),
+            restricciones: JSON.parse(h.restricciones || '[]')
+        }));
+
+        res.json(horariosFormateados);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al cargar horarios' });
+    }
+});
+
+// 2. CREAR/EDITAR HORARIO (Gestor)
+app.post('/api/gestor/horarios', verificarToken, async (req, res) => {
+    try {
+        const { id, area, tipo, nombre, dias, horaInicio, horaFin, estado, capacidad, grupo, descripcion, restricciones, fechaInicio, fechaFin } = req.body;
+        const gestor = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        const dataPayload = {
+            area, tipo, nombre,
+            hora_inicio: horaInicio,
+            hora_fin: horaFin,
+            estado,
+            capacidad: capacidad ? parseInt(capacidad) : null,
+            grupo,
+            descripcion,
+            dias: JSON.stringify(dias), // Convertir Array a String para BD
+            restricciones: JSON.stringify(restricciones),
+            fecha_inicio: fechaInicio ? new Date(fechaInicio) : null,
+            fecha_fin: fechaFin ? new Date(fechaFin) : null,
+            id_comunidad: gestor.id_comunidad
+        };
+
+        let resultado;
+        if (id) {
+            // Editar
+            resultado = await prisma.horario.update({
+                where: { id: parseInt(id) },
+                data: _.omit(dataPayload, ['id_comunidad']) // No cambiamos comunidad al editar
+            });
+        } else {
+            // Crear
+            resultado = await prisma.horario.create({ data: dataPayload });
+        }
+
+        res.json(resultado);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al guardar horario' });
+    }
+});
+
+// 3. ELIMINAR HORARIO
+app.delete('/api/gestor/horarios/:id', verificarToken, async (req, res) => {
+    try {
+        await prisma.horario.delete({ where: { id: parseInt(req.params.id) } });
+        res.json({ message: 'Eliminado' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar' });
+    }
+});
+
+// 4. CAMBIAR ESTADO (Activar/Desactivar)
+app.put('/api/gestor/horarios/:id/estado', verificarToken, async (req, res) => {
+    try {
+        const { estado } = req.body;
+        await prisma.horario.update({
+            where: { id: parseInt(req.params.id) },
+            data: { estado }
+        });
+        res.json({ message: 'Estado actualizado' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar estado' });
+    }
+});
+
+// 5. AGREGAR EXCEPCIÓN
+app.post('/api/gestor/horarios/excepcion', verificarToken, async (req, res) => {
+    try {
+        const { horarioId, fecha, tipo, descripcion, horarioEspecial } = req.body;
+        const nuevaExcepcion = await prisma.excepcionHorario.create({
+            data: {
+                id_horario: parseInt(horarioId),
+                fecha: new Date(fecha),
+                tipo,
+                descripcion,
+                horario_especial: horarioEspecial
+            }
+        });
+        res.json(nuevaExcepcion);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al crear excepción' });
+    }
+});
+
+// 6. ELIMINAR EXCEPCIÓN
+app.delete('/api/gestor/excepciones/:id', verificarToken, async (req, res) => {
+    try {
+        await prisma.excepcionHorario.delete({ where: { id: parseInt(req.params.id) } });
+        res.json({ message: 'Excepción eliminada' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar excepción' });
     }
 });
 
