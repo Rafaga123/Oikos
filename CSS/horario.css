@@ -1,0 +1,139 @@
+body {
+    background-image: url('../Images/Fondopagina.png');
+    background-size: cover; /* cubre toda la pantalla */
+    background-position: center center; /* centra la imagen */
+    background-repeat: no-repeat; /* no se repite */
+    background-attachment: fixed; /* queda fija al hacer scroll */
+    background-color: #f0f0f0; /* color de respaldo por si la imagen no carga */;
+}
+
+.pusher {
+    margin-left: 0px;
+    transition: margin-left 0.3s ease;
+}
+
+.sidebar-menu {
+    width: 260px;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 1001;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+.sidebar-menu.visible {
+    transform: translateX(0);
+}
+
+/*Aumentar el tamaño de la letra de todos los elementos del menú */
+.sidebar-menu .item {
+    /*Aumenta la fuente de todo el texto del item*/
+    font-size: 1.15em; 
+    
+    /*Añade más espacio vertical entre los items para que se vean mejor*/
+    padding-top: 18px !important;
+    padding-bottom: 18px !important;
+}
+
+/*Aumentar el tamaño de los iconos dentro de los elementos del menú*/
+.sidebar-menu .item i.icon {
+    /*Aumenta el tamaño de la fuente del icono*/
+    font-size: 1.5em !important;
+    
+    /*Asegura que haya más espacio entre el icono y el texto */
+    margin-right: 15px !important; 
+}
+
+.main-content {
+    padding: 70px;
+    width:100%;
+}
+
+.ui.left.vertical.inverted.sidebar.labeled.icon.menu{
+    background-color: #9A9CEA;
+}
+
+.large.sidebar.icon {
+    color: white;
+    margin-top: 25px;
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+/*Habilita Flexbox en el Sidebar Contenedor */
+.ui.left.vertical.sidebar {
+    display: flex !important; 
+    /* Los elementos se apilan verticalmente */
+    flex-direction: column;
+}
+
+/* Hace que el contenedor de la imagen crezca */
+.sidebar-footer-image {
+    flex-grow: 1; /*Ocupa el espacio restante del sidebar */
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Alinea la imagen a la parte inferior del espacio */
+    padding: 20px; /* Espacio de relleno para que no se pegue al borde */
+}
+
+/*Estilos de la Imagen*/
+.sidebar-footer-image img {
+    /* Asegura que la imagen no exceda el ancho del sidebar */
+    max-width: 100%; 
+    /* Define una altura máxima para que no empuje el menú */
+    max-height: 150px; 
+    /* Mantiene la proporción de la imagen */
+    height: auto; 
+
+}
+
+.main-content-container {
+    min-height: calc(100vh - 120px); /* Resta altura aproximada de menú y footer */
+    display: flex;
+    align-items: center; /* Centrado vertical */
+    padding-top: 80px;   /* Espacio para no chocar con el menú fijo */
+    padding-bottom: 40px;
+}
+
+/* Personalización de la Tarjeta */
+.custom-rules-card {
+    background-color: #A2DCEE !important;
+    border-radius: 15px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important;
+}
+
+/* Título mucho más grande */
+.custom-card-title {
+    font-size: 2.5em !important;
+    padding: 20px 0 !important;
+    color: #444;
+}
+
+/* Cuerpo de la tarjeta con letra grande y legible */
+.custom-card-body {
+    font-size: 1.4em !important;
+    line-height: 1.6;
+    padding: 30px !important;
+    color: #333;
+}
+
+.ui.vertical.footer {
+    background-color: #A2B9EE;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    bottom: 0;
+    width: 100%;
+    align-items: flex-end;
+    margin-top: auto;
+}
+
+.universal.access.icon, .clock.icon, .trash.alternate.icon, .wrench.icon {
+    color: #9A9CEA;
+}
+
+.ui.ribbon.label{
+    background-color:#ADEEE2;
+}
