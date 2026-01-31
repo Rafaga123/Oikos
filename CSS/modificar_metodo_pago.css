@@ -1,13 +1,15 @@
-body {
+/* Estilos específicos para la página de administración */
+        body {
             background-image: url(../Images/Fondopagina.png);
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
             min-height: 100vh;
+        
         }
 
-         .sidebar-menu .item {
+        .sidebar-menu .item {
     /*Aumenta la fuente de todo el texto del item*/
     font-size: 1.15em; 
 
@@ -82,7 +84,7 @@ body {
             align-items: center;
             gap: 8px;
             background-color: white;
-            color: #9A9CEA;
+            color: #6a11cb;
             padding: 10px 20px;
             border-radius: 25px;
             text-decoration: none;
@@ -95,6 +97,51 @@ body {
             background-color: #f8f9fa;
             transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .tabs-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            background: none;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background-color: #9A9CEA;
+            color: white;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background-color: #f0f0f0;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px 0;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         .banks-grid {
@@ -144,6 +191,25 @@ body {
             margin: 0;
         }
 
+        .bank-type-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+
+        .badge-pagomovil {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge-transferencia {
+            background-color: #e3f2fd;
+            color: #1565c0;
+        }
+
         .form-group {
             margin-bottom: 20px;
         }
@@ -171,8 +237,14 @@ body {
             border-color: #6a11cb;
         }
 
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
         .save-btn {
-            background: linear-gradient(135deg, #6a11cb 0%, #9A9CEA 100%);
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             color: white;
             border: none;
             padding: 12px 30px;
@@ -324,6 +396,35 @@ body {
             font-size: 0.9rem;
         }
 
+        /* Tipos de cuenta */
+        .account-type-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .account-type-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .account-type-btn.active {
+            border-color: #6a11cb;
+            background-color: #f0e6ff;
+            color: #6a11cb;
+        }
+
+        .account-type-btn:hover:not(.active) {
+            background-color: #f5f5f5;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .banks-grid {
@@ -337,5 +438,13 @@ body {
             .admin-container {
                 margin-top: 100px;
                 padding: 15px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
             }
         }

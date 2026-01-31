@@ -1,10 +1,12 @@
- // Datos iniciales de los bancos
+// Datos iniciales de los bancos
         const bancosData = {
             "Banesco": {
                 telefono: "0414-555-1234",
                 cedula: "V-26.789.456",
                 bancoReceptor: "Banesco",
                 beneficiario: "OIKOS",
+                cuenta: "0134-1234-56-1234567890",
+                tipoCuenta: "corriente",
                 color: "#e30613",
                 icono: "university"
             },
@@ -13,6 +15,8 @@
                 cedula: "V-26.789.456",
                 bancoReceptor: "Banco de Venezuela",
                 beneficiario: "OIKOS",
+                cuenta: "0102-9876-54-3210987654",
+                tipoCuenta: "ahorro",
                 color: "#ff0000",
                 icono: "building"
             },
@@ -21,6 +25,8 @@
                 cedula: "V-26.789.456",
                 bancoReceptor: "Banco Provincial",
                 beneficiario: "OIKOS",
+                cuenta: "0108-5678-12-3456789012",
+                tipoCuenta: "corriente",
                 color: "#0033a0",
                 icono: "landmark"
             }
@@ -37,6 +43,19 @@
         ];
 
         $(document).ready(function() {
+            // Inicializar pestañas
+            $('.tab-btn').click(function() {
+                const tabId = $(this).data('tab');
+                
+                // Actualizar botones de pestaña
+                $('.tab-btn').removeClass('active');
+                $(this).addClass('active');
+                
+                // Mostrar contenido correspondiente
+                $('.tab-content').removeClass('active');
+                $(`#${tabId}`).addClass('active');
+            });
+
             // Cargar datos iniciales
             cargarDatosBancos();
             cargarInstrucciones();
@@ -70,17 +89,56 @@
                     $(this).removeClass('error');
                 }
             });
+
+            // Validar formato de cuenta bancaria
+            $('input[data-type="cuenta"]').on('blur', function() {
+                const valor = $(this).val();
+                // Validar formato básico de cuenta bancaria
+                if (valor && !/^[0-9-]{10,25}$/.test(valor)) {
+                    $(this).addClass('error');
+                    showNotification('Formato de cuenta inválido. Use solo números y guiones', 'error');
+                } else {
+                    $(this).removeClass('error');
+                }
+            });
+
+            // Manejar selector de tipo de cuenta
+            $('.account-type-btn').click(function() {
+                const bancoId = $(this).data('banco');
+                const tipo = $(this).data('type');
+                
+                // Actualizar botones
+                $(`[data-banco="${bancoId}"]`).removeClass('active');
+                $(this).addClass('active');
+                
+                // Actualizar campo oculto
+                $(`#tipoCuenta-${bancoId}`).val(tipo);
+                
+                // Marcar como modificado
+                const bancoNombre = $(this).closest('.bank-card-admin').find('.bank-name-admin').text();
+                const idBase = bancoNombre.replace(/\s+/g, '-');
+                $(`#status-${idBase}`).removeClass('status-saved').addClass('status-unsaved')
+                    .html('<i class="exclamation circle icon"></i> Cambios sin guardar');
+            });
         });
 
         function cargarDatosBancos() {
             for (const [nombre, datos] of Object.entries(bancosData)) {
-                $(`#telefono-${nombre.replace(/\s+/g, '-')}`).val(datos.telefono);
-                $(`#cedula-${nombre.replace(/\s+/g, '-')}`).val(datos.cedula);
-                $(`#banco-${nombre.replace(/\s+/g, '-')}`).val(datos.bancoReceptor);
-                $(`#beneficiario-${nombre.replace(/\s+/g, '-')}`).val(datos.beneficiario);
+                const idBase = nombre.replace(/\s+/g, '-');
+                
+                // Campos comunes
+                $(`#telefono-${idBase}`).val(datos.telefono);
+                $(`#cedula-${idBase}`).val(datos.cedula);
+                $(`#banco-${idBase}`).val(datos.bancoReceptor);
+                $(`#beneficiario-${idBase}`).val(datos.beneficiario);
+                $(`#cuenta-${idBase}`).val(datos.cuenta);
+                $(`#tipoCuenta-${idBase}`).val(datos.tipoCuenta);
+                
+                // Establecer tipo de cuenta activo
+                $(`.account-type-btn[data-banco="${idBase}"][data-type="${datos.tipoCuenta}"]`).addClass('active');
                 
                 // Establecer color del logo
-                $(`#logo-${nombre.replace(/\s+/g, '-')}`).css({
+                $(`#logo-${idBase}`).css({
                     'background': `linear-gradient(135deg, #f2f2f2 0%, #ffffff 100%)`,
                     'color': datos.color
                 });
@@ -164,12 +222,14 @@
                 telefono: $(`#telefono-${idBase}`).val(),
                 cedula: $(`#cedula-${idBase}`).val(),
                 bancoReceptor: $(`#banco-${idBase}`).val(),
-                beneficiario: $(`#beneficiario-${idBase}`).val()
+                beneficiario: $(`#beneficiario-${idBase}`).val(),
+                cuenta: $(`#cuenta-${idBase}`).val(),
+                tipoCuenta: $(`#tipoCuenta-${idBase}`).val()
             };
 
             // Validaciones
-            if (!nuevosDatos.telefono || !nuevosDatos.cedula || !nuevosDatos.beneficiario) {
-                showNotification('Por favor complete todos los campos', 'error');
+            if (!nuevosDatos.telefono || !nuevosDatos.cedula || !nuevosDatos.beneficiario || !nuevosDatos.cuenta) {
+                showNotification('Por favor complete todos los campos requeridos', 'error');
                 return;
             }
 
@@ -212,19 +272,25 @@
                         telefono: "0414-555-1234",
                         cedula: "V-26.789.456",
                         bancoReceptor: "Banesco",
-                        beneficiario: "OIKOS"
+                        beneficiario: "OIKOS",
+                        cuenta: "0134-1234-56-1234567890",
+                        tipoCuenta: "corriente"
                     },
                     "Banco de Venezuela": {
                         telefono: "0412-987-6543",
                         cedula: "V-26.789.456",
                         bancoReceptor: "Banco de Venezuela",
-                        beneficiario: "OIKOS"
+                        beneficiario: "OIKOS",
+                        cuenta: "0102-9876-54-3210987654",
+                        tipoCuenta: "ahorro"
                     },
                     "Banco Provincial": {
                         telefono: "0416-789-0123",
                         cedula: "V-26.789.456",
                         bancoReceptor: "Banco Provincial",
-                        beneficiario: "OIKOS"
+                        beneficiario: "OIKOS",
+                        cuenta: "0108-5678-12-3456789012",
+                        tipoCuenta: "corriente"
                     }
                 };
 
@@ -233,6 +299,12 @@
                 $(`#cedula-${idBase}`).val(defaults[nombre].cedula);
                 $(`#banco-${idBase}`).val(defaults[nombre].bancoReceptor);
                 $(`#beneficiario-${idBase}`).val(defaults[nombre].beneficiario);
+                $(`#cuenta-${idBase}`).val(defaults[nombre].cuenta);
+                $(`#tipoCuenta-${idBase}`).val(defaults[nombre].tipoCuenta);
+
+                // Actualizar botones de tipo de cuenta
+                $(`[data-banco="${idBase}"]`).removeClass('active');
+                $(`[data-banco="${idBase}"][data-type="${defaults[nombre].tipoCuenta}"]`).addClass('active');
 
                 // Actualizar datos en memoria
                 bancosData[nombre] = { ...bancosData[nombre], ...defaults[nombre] };
@@ -298,10 +370,13 @@
 
         // Detectar cambios en los inputs
         $(document).on('input', 'input, select', function() {
-            const banco = $(this).closest('.bank-card-admin').find('.bank-name-admin').text();
-            const idBase = banco.replace(/\s+/g, '-');
-            $(`#status-${idBase}`).removeClass('status-saved').addClass('status-unsaved')
-                .html('<i class="exclamation circle icon"></i> Cambios sin guardar');
+            const bancoCard = $(this).closest('.bank-card-admin');
+            if (bancoCard.length) {
+                const banco = bancoCard.find('.bank-name-admin').text();
+                const idBase = banco.replace(/\s+/g, '-');
+                $(`#status-${idBase}`).removeClass('status-saved').addClass('status-unsaved')
+                    .html('<i class="exclamation circle icon"></i> Cambios sin guardar');
+            }
         });
 
         $(document).ready(function() {
