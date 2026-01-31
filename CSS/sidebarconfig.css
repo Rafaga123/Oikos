@@ -1,0 +1,35 @@
+       /* --- CORRECCIONES DE DISEÑO PARA EL SIDEBAR --- */
+        .sidebar-menu {
+            width: 260px !important; /* Ancho fijo estándar */
+            font-size: 1.1em; /* Texto legible, no miniatura */
+        }
+        
+        .sidebar-menu .item {
+            padding: 15px 20px !important;
+        }
+
+        .sidebar-menu .header {
+            font-size: 1.2em !important;
+            margin-bottom: 10px;
+        }
+
+        /* Arreglo del Logo Gigante */
+        .sidebar-footer-image {
+            text-align: center;
+            margin-top: 20px;
+            padding-bottom: 20px;
+        }
+        
+        .sidebar-footer-image img {
+            max-width: 150px !important; /* Limitar ancho */
+            height: auto !important;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Ajuste del contenido principal para que no quede pegado */
+        .main-content {
+            max-width: 900px;
+            margin: 100px auto 50px auto; /* Centrado y bajado por el header */
+            padding: 20px;
+        }

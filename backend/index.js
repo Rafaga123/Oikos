@@ -1680,6 +1680,129 @@ app.get('/api/gestor/dashboard-stats', verificarToken, async (req, res) => {
         res.status(500).json({ error: 'Error al cargar estadísticas' });
     }
 });
+// ==========================================
+//  CONFIGURACIÓN Y PERFIL
+// ==========================================
+
+// 1. ACTUALIZAR INFO COMUNIDAD (Solo Gestor)
+app.put('/api/comunidad', verificarToken, async (req, res) => {
+    try {
+        const { nombre, direccion } = req.body;
+        const usuario = await prisma.usuario.findUnique({ 
+            where: { id: req.usuario.id },
+            include: { rol: true }
+        });
+
+        if (usuario.rol.nombre !== 'ENCARGADO_COMUNIDAD' && usuario.rol.nombre !== 'ADMINISTRADOR') {
+            return res.status(403).json({ error: 'No tienes permisos para editar la comunidad.' });
+        }
+
+        const comunidadActualizada = await prisma.comunidad.update({
+            where: { id: usuario.id_comunidad },
+            data: { nombre, direccion }
+        });
+
+        res.json({ message: 'Comunidad actualizada', comunidad: comunidadActualizada });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar comunidad' });
+    }
+});
+
+// 2. CAMBIAR CONTRASEÑA
+app.put('/api/auth/cambiar-password', verificarToken, async (req, res) => {
+    try {
+        const { passwordActual, passwordNuevo } = req.body;
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        // Verificar password anterior
+        const esValido = await bcrypt.compare(passwordActual, usuario.password_hash);
+        if (!esValido) {
+            return res.status(400).json({ error: 'La contraseña actual es incorrecta.' });
+        }
+
+        // Encriptar nueva
+        const hashedPassword = await bcrypt.hash(passwordNuevo, 10);
+        await prisma.usuario.update({
+            where: { id: usuario.id },
+            data: { password_hash: hashedPassword }
+        });
+
+        res.json({ message: 'Contraseña actualizada correctamente.' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al cambiar contraseña' });
+    }
+});
+
+// 3. ELIMINAR CUENTA (Zona Roja - PROTEGIDO CON CONTRASEÑA)
+app.delete('/api/auth/eliminar-cuenta', verificarToken, async (req, res) => {
+    try {
+        const { password } = req.body; // Recibimos la contraseña
+        
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        // VERIFICACIÓN DE SEGURIDAD
+        const esValido = await bcrypt.compare(password, usuario.password_hash);
+        if (!esValido) {
+            return res.status(401).json({ error: 'Contraseña incorrecta. No se pudo eliminar la cuenta.' });
+        }
+
+        await prisma.usuario.delete({ where: { id: req.usuario.id } });
+        res.json({ message: 'Cuenta eliminada permanentemente.' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al eliminar cuenta.' });
+    }
+});
+
+// 4. TRANSFERIR GESTORÍA (Zona Roja - PROTEGIDO CON CONTRASEÑA)
+app.post('/api/comunidad/transferir', verificarToken, async (req, res) => {
+    try {
+        const { cedulaNuevoGestor, password } = req.body; // Recibimos la contraseña
+        const gestorActual = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        // VERIFICACIÓN DE SEGURIDAD
+        const esValido = await bcrypt.compare(password, gestorActual.password_hash);
+        if (!esValido) {
+            return res.status(401).json({ error: 'Contraseña incorrecta. Transferencia cancelada.' });
+        }
+
+        // Buscar al sucesor
+        const sucesor = await prisma.usuario.findUnique({ where: { cedula: cedulaNuevoGestor } });
+
+        if (!sucesor) return res.status(404).json({ error: 'Usuario no encontrado.' });
+        if (sucesor.id_comunidad !== gestorActual.id_comunidad) return res.status(400).json({ error: 'El usuario no pertenece a esta comunidad.' });
+
+        // Transacción
+        await prisma.$transaction([
+            prisma.usuario.update({
+                where: { id: gestorActual.id },
+                data: { id_rol: 3 } 
+            }),
+            prisma.usuario.update({
+                where: { id: sucesor.id },
+                data: { id_rol: 2 } 
+            })
+        ]);
+
+        res.json({ message: 'Gestoría transferida exitosamente.' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al transferir gestoría.' });
+    }
+});
+
+// 5. OBTENER INFO COMUNIDAD (Público para los miembros)
+app.get('/api/comunidad/info', verificarToken, async (req, res) => {
+    try {
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+        const comunidad = await prisma.comunidad.findUnique({ where: { id: usuario.id_comunidad } });
+        res.json(comunidad);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al cargar datos' });
+    }
+});
 
 // Iniciar servidor
 app.listen(port, async () => {
