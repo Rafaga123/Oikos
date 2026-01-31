@@ -614,37 +614,52 @@ app.post('/api/perfil/foto', verificarToken, upload.single('foto'), async (req, 
 
 // --- ENDPOINTS DEL FORO ---
 
-/**
- * 1. OBTENER POSTS (Solo de mi comunidad)
- */
+// 1. OBTENER POSTS (Con verificación de Like del usuario actual)
 app.get('/api/foro', verificarToken, async (req, res) => {
     try {
-        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
-        
-        if (!usuario.id_comunidad) {
-            return res.status(403).json({ error: 'Debes pertenecer a una comunidad para ver el foro.' });
-        }
+        const idUsuarioActual = req.usuario.id;
+        const usuarioActual = await prisma.usuario.findUnique({ where: { id: idUsuarioActual } });
 
+        // Obtener posts de la comunidad
         const posts = await prisma.post.findMany({
-            where: { id_comunidad: usuario.id_comunidad },
-            include: {
-                usuario: { select: { primer_nombre: true, foto_perfil_url: true } }, // Datos del autor
-                likes: { where: { id_usuario: req.usuario.id } } // Para saber si YO le di like
+            where: { 
+                usuario: { id_comunidad: usuarioActual.id_comunidad } 
             },
-            orderBy: { fecha_creacion: 'asc' } // Traemos los viejos primero para meterlos a la Pila
+            include: {
+                usuario: {
+                    select: {
+                        id: true,
+                        primer_nombre: true,
+                        primer_apellido: true,
+                        foto_perfil_url: true,
+                        rol: { select: { nombre: true } }
+                    }
+                },
+                likes: true // Traemos los likes para calcular
+            },
+            orderBy: { fecha_creacion: 'asc' } // Orden cronológico para la Pila
         });
 
-        // Formateamos para el frontend
-        const postsFormateados = posts.map(p => ({
-            ...p,
-            dio_like: p.likes.length > 0 // True si le di like
-        }));
+        // Procesar los datos para el frontend
+        const postsProcesados = posts.map(post => {
+            return {
+                id: post.id,
+                titulo: post.titulo,
+                contenido: post.contenido,
+                fecha_creacion: post.fecha_creacion,
+                usuario: post.usuario,
+                // Calculamos la cantidad total
+                cantidad_likes: post.likes.length,
+                // Verificamos si EL USUARIO ACTUAL está en la lista de likes
+                dioLike: post.likes.some(like => like.id_usuario === idUsuarioActual)
+            };
+        });
 
-        res.json(postsFormateados);
+        res.json(postsProcesados);
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error obteniendo posts' });
+        res.status(500).json({ error: 'Error al obtener posts' });
     }
 });
 
@@ -680,44 +695,79 @@ app.post('/api/foro', verificarToken, async (req, res) => {
     }
 });
 
-/**
- * 3. DAR / QUITAR LIKE
- */
+// 2. DAR / QUITAR LIKE (Toggle)
 app.post('/api/foro/:id/like', verificarToken, async (req, res) => {
     try {
         const idPost = parseInt(req.params.id);
         const idUsuario = req.usuario.id;
 
         // Verificar si ya existe el like
-        const existeLike = await prisma.like.findUnique({
-            where: { id_usuario_id_post: { id_usuario: idUsuario, id_post: idPost } }
+        const likeExistente = await prisma.like.findUnique({
+            where: {
+                id_usuario_id_post: { // Nombre de la llave compuesta en Prisma
+                    id_usuario: idUsuario,
+                    id_post: idPost
+                }
+            }
         });
 
-        if (existeLike) {
-            // QUITAR LIKE (Dislike)
+        if (likeExistente) {
+            // SI YA EXISTE -> LO BORRAMOS (Dislike)
             await prisma.like.delete({
-                where: { id_usuario_id_post: { id_usuario: idUsuario, id_post: idPost } }
+                where: {
+                    id_usuario_id_post: {
+                        id_usuario: idUsuario,
+                        id_post: idPost
+                    }
+                }
             });
-            await prisma.post.update({
-                where: { id: idPost },
-                data: { cantidad_likes: { decrement: 1 } }
-            });
-            res.json({ dio_like: false });
         } else {
-            // DAR LIKE
+            // SI NO EXISTE -> LO CREAMOS (Like)
             await prisma.like.create({
-                data: { id_usuario: idUsuario, id_post: idPost }
+                data: {
+                    id_usuario: idUsuario,
+                    id_post: idPost
+                }
             });
-            await prisma.post.update({
-                where: { id: idPost },
-                data: { cantidad_likes: { increment: 1 } }
-            });
-            res.json({ dio_like: true });
         }
+
+        // Devolver el nuevo conteo y el estado actual
+        const totalLikes = await prisma.like.count({ where: { id_post: idPost } });
+        const dioLike = !likeExistente; // Si existía es false (se quitó), si no, true (se puso)
+
+        res.json({ totalLikes, dioLike });
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error en like' });
+        res.status(500).json({ error: 'Error al procesar like' });
+    }
+});
+
+/**
+ * ELIMINAR POST (Solo Gestor)
+ */
+app.delete('/api/gestor/foro/:id', verificarToken, async (req, res) => {
+    try {
+        const idPost = parseInt(req.params.id);
+        const idUsuario = req.usuario.id;
+
+        // Verificar que quien pide esto sea Gestor
+        const usuario = await prisma.usuario.findUnique({ where: { id: idUsuario }, include: { rol: true } });
+        
+        if (usuario.rol.nombre !== 'ENCARGADO_COMUNIDAD' && usuario.rol.nombre !== 'ADMINISTRADOR') {
+            return res.status(403).json({ error: 'No tienes permisos para eliminar publicaciones de otros.' });
+        }
+
+        // Eliminar el post (Prisma se encarga de los Likes en cascada si está configurado, 
+        // si no, habría que borrar los likes primero manualmente)
+        await prisma.like.deleteMany({ where: { id_post: idPost } }); // Limpiar likes primero por seguridad
+        await prisma.post.delete({ where: { id: idPost } });
+
+        res.json({ message: 'Publicación eliminada correctamente' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al eliminar el post' });
     }
 });
 
