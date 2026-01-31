@@ -338,3 +338,7 @@ h3{
         margin: 0 auto !important;
     }
 }
+
+.ui.container.main-content {
+    margin-bottom: 30px;
+}
