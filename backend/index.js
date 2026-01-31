@@ -298,6 +298,18 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ error: 'Credenciales incorrectas' });
     }
 
+    // --- VALIDACIÓN DE ESTADO ACTUALIZADA ---
+    // Si es ADMIN o GESTOR, suele tener pase libre, pero validamos igual por seguridad
+    
+    if (userFound.estado_solicitud === 'PENDIENTE') {
+        return res.status(403).json({ error: 'Tu cuenta está en revisión. Espera la aprobación del gestor.' });
+    }
+
+    // AQUI ESTA EL CAMBIO PARA EL PUNTO 1:
+    if (userFound.estado_solicitud === 'RECHAZADO') {
+        return res.status(403).json({ error: 'Tu cuenta está inactiva. Contacta al administrador.' });
+    }
+
     // 2. Verificar contraseña
     const esCorrecto = await bcrypt.compare(password, userFound.password_hash);
     if (!esCorrecto) {
@@ -904,21 +916,31 @@ app.get('/api/gestor/habitantes', verificarToken, async (req, res) => {
 app.put('/api/gestor/habitante/:id', verificarToken, async (req, res) => {
     try {
         const idHabitante = parseInt(req.params.id);
-        const { nombre, apellido, cedula, correo, estado_solicitud } = req.body; // 'estado' en el frontend es 'estado_solicitud' en BD?
-        
+        const { nombre, apellido, estado_solicitud } = req.body; // El frontend manda 'estado_solicitud' con valor 'activo' o 'inactivo'
+
+        // TRADUCCIÓN DE ESTADO (SOLUCIÓN PUNTO 2)
+        let estadoDB = undefined;
+        if (estado_solicitud === 'activo') estadoDB = 'ACEPTADO';
+        if (estado_solicitud === 'inactivo') estadoDB = 'RECHAZADO'; // Usamos RECHAZADO como estado inactivo/bloqueado
+
+        // Objeto de actualización dinámica
+        const dataToUpdate = {
+            primer_nombre: nombre,
+            primer_apellido: apellido
+        };
+
+        // Solo agregamos el estado si se envió uno válido
+        if (estadoDB) {
+            dataToUpdate.estado_solicitud = estadoDB;
+        }
+
         await prisma.usuario.update({
             where: { id: idHabitante },
-            data: {
-                primer_nombre: nombre,
-                primer_apellido: apellido,
-                // cedula: cedula,  <--- ELIMINADO (No se debe editar)
-                // email: correo,   <--- ELIMINADO (No se debe editar)
-                estado_solicitud: estado_solicitud === 'activo' ? 'ACEPTADO' : 'RECHAZADO'
-            }
+            data: dataToUpdate
         });
-// ...
 
-        res.json({ mensaje: 'Habitante actualizado' });
+        res.json({ message: 'Habitante actualizado correctamente' });
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al actualizar habitante' });
@@ -1801,6 +1823,45 @@ app.get('/api/comunidad/info', verificarToken, async (req, res) => {
         res.json(comunidad);
     } catch (error) {
         res.status(500).json({ error: 'Error al cargar datos' });
+    }
+});
+
+app.post('/api/gestor/habitante', verificarToken, async (req, res) => {
+    try {
+        const { nombre, apellido, cedula, correo, anio_registro, estado } = req.body;
+        const gestor = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        // Verificar si ya existe
+        const existe = await prisma.usuario.findFirst({
+            where: { OR: [{ cedula }, { email: correo }] }
+        });
+
+        if (existe) {
+            return res.status(400).json({ error: 'La cédula o el correo ya están registrados.' });
+        }
+
+        // Crear contraseña por defecto (Cédula) para que luego la cambien si quieren
+        const passwordHash = await bcrypt.hash(cedula, 10);
+
+        const nuevoUsuario = await prisma.usuario.create({
+            data: {
+                primer_nombre: nombre,
+                primer_apellido: apellido,
+                cedula: cedula,
+                email: correo,
+                password_hash: passwordHash,
+                id_rol: 3, // Habitante
+                id_comunidad: gestor.id_comunidad,
+                estado_solicitud: estado === 'activo' ? 'ACEPTADO' : 'PENDIENTE',
+                fecha_registro: new Date(`${anio_registro}-01-01`) // Fecha aproximada
+            }
+        });
+
+        res.json({ message: 'Habitante creado exitosamente', usuario: nuevoUsuario });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al crear habitante.' });
     }
 });
 

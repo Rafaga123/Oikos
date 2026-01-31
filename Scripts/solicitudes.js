@@ -129,7 +129,7 @@ function renderActionButtons(sol) {
     if (sol.estado !== 'resuelta' && sol.estado !== 'rechazada') {
         btns += `
             <button class="ui green basic button" onclick="changeStatus(${sol.id}, 'RESUELTO')">
-                <i class="check icon"></i> Resolver
+                <i class="check icon"></i> Marcar como resuelta
             </button>
             <button class="ui red basic button" onclick="changeStatus(${sol.id}, 'CERRADO')">
                 <i class="times icon"></i> Rechazar

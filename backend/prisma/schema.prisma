@@ -129,7 +129,7 @@ model Pago {
   banco_origen  String? // Desde qué banco pagó el usuario
   banco_destino String? // A qué banco del condominio pagó
 
-  usuario    Usuario @relation(fields: [id_usuario], references: [id])
+  usuario    Usuario @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
   id_usuario Int
 }
 
@@ -146,7 +146,7 @@ model Anuncio {
   comunidad    Comunidad @relation(fields: [id_comunidad], references: [id])
 
   id_autor Int
-  autor    Usuario @relation(fields: [id_autor], references: [id])
+  autor    Usuario @relation(fields: [id_autor], references: [id], onDelete: Cascade)
 }
 
 model Encuesta {
@@ -175,7 +175,7 @@ model OpcionEncuesta {
 model VotoEncuesta {
   id         Int     @id @default(autoincrement())
   id_usuario Int
-  usuario    Usuario @relation(fields: [id_usuario], references: [id])
+  usuario    Usuario @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
 
   id_encuesta Int
   encuesta    Encuesta @relation(fields: [id_encuesta], references: [id])
@@ -192,7 +192,7 @@ model LogAuditoria {
   detalle_tecnico String?  @db.Text
   fecha_hora      DateTime @default(now())
 
-  usuario    Usuario? @relation(fields: [id_usuario], references: [id])
+  usuario    Usuario? @relation(fields: [id_usuario], references: [id], onDelete: SetNull)
   id_usuario Int?
 
   comunidad    Comunidad? @relation(fields: [id_comunidad], references: [id])
@@ -209,7 +209,7 @@ model Incidencia {
   foto_url      String?
   estado        EstadoIncidencia @default(ABIERTO)
 
-  usuario    Usuario @relation(fields: [id_usuario], references: [id])
+  usuario    Usuario @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
   id_usuario Int
 }
 
@@ -231,7 +231,7 @@ model Reserva {
   hora_fin      DateTime
   estado        String   @default("PENDIENTE")
 
-  usuario    Usuario @relation(fields: [id_usuario], references: [id])
+  usuario    Usuario @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
   id_usuario Int
 
   area    AreaComun @relation(fields: [id_area], references: [id])
@@ -246,7 +246,7 @@ model Post {
 
   // Relaciones
   id_usuario Int
-  usuario    Usuario @relation(fields: [id_usuario], references: [id])
+  usuario    Usuario @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
 
   id_comunidad Int
   comunidad    Comunidad @relation(fields: [id_comunidad], references: [id])
@@ -259,7 +259,7 @@ model Like {
   id_usuario Int
   id_post    Int
 
-  usuario Usuario @relation(fields: [id_usuario], references: [id])
+  usuario Usuario @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
   post    Post    @relation(fields: [id_post], references: [id], onDelete: Cascade)
 
   @@id([id_usuario, id_post]) // Llave compuesta: un usuario solo da 1 like por post

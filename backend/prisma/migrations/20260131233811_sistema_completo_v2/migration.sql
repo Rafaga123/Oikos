@@ -196,6 +196,54 @@ CREATE TABLE `CuentaBancaria` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `Regla` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `titulo` VARCHAR(191) NOT NULL,
+    `contenido` TEXT NOT NULL,
+    `categoria` VARCHAR(191) NOT NULL,
+    `fecha_creacion` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `ultima_modificacion` DATETIME(3) NOT NULL,
+    `id_comunidad` INTEGER NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Horario` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(191) NOT NULL,
+    `area` VARCHAR(191) NOT NULL,
+    `tipo` VARCHAR(191) NOT NULL,
+    `dias` VARCHAR(191) NOT NULL,
+    `hora_inicio` VARCHAR(191) NOT NULL,
+    `hora_fin` VARCHAR(191) NOT NULL,
+    `estado` VARCHAR(191) NOT NULL,
+    `capacidad` INTEGER NULL,
+    `grupo` VARCHAR(191) NULL,
+    `fecha_inicio` DATETIME(3) NULL,
+    `fecha_fin` DATETIME(3) NULL,
+    `descripcion` TEXT NULL,
+    `restricciones` TEXT NULL,
+    `fecha_creacion` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `ultima_modificacion` DATETIME(3) NOT NULL,
+    `id_comunidad` INTEGER NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ExcepcionHorario` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `fecha` DATETIME(3) NOT NULL,
+    `tipo` VARCHAR(191) NOT NULL,
+    `descripcion` VARCHAR(191) NULL,
+    `horario_especial` VARCHAR(191) NULL,
+    `id_horario` INTEGER NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `Usuario` ADD CONSTRAINT `Usuario_id_rol_fkey` FOREIGN KEY (`id_rol`) REFERENCES `Rol`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -203,13 +251,13 @@ ALTER TABLE `Usuario` ADD CONSTRAINT `Usuario_id_rol_fkey` FOREIGN KEY (`id_rol`
 ALTER TABLE `Usuario` ADD CONSTRAINT `Usuario_id_comunidad_fkey` FOREIGN KEY (`id_comunidad`) REFERENCES `Comunidad`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Pago` ADD CONSTRAINT `Pago_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Pago` ADD CONSTRAINT `Pago_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Anuncio` ADD CONSTRAINT `Anuncio_id_comunidad_fkey` FOREIGN KEY (`id_comunidad`) REFERENCES `Comunidad`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Anuncio` ADD CONSTRAINT `Anuncio_id_autor_fkey` FOREIGN KEY (`id_autor`) REFERENCES `Usuario`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Anuncio` ADD CONSTRAINT `Anuncio_id_autor_fkey` FOREIGN KEY (`id_autor`) REFERENCES `Usuario`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Encuesta` ADD CONSTRAINT `Encuesta_id_comunidad_fkey` FOREIGN KEY (`id_comunidad`) REFERENCES `Comunidad`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -218,7 +266,7 @@ ALTER TABLE `Encuesta` ADD CONSTRAINT `Encuesta_id_comunidad_fkey` FOREIGN KEY (
 ALTER TABLE `OpcionEncuesta` ADD CONSTRAINT `OpcionEncuesta_id_encuesta_fkey` FOREIGN KEY (`id_encuesta`) REFERENCES `Encuesta`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `VotoEncuesta` ADD CONSTRAINT `VotoEncuesta_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `VotoEncuesta` ADD CONSTRAINT `VotoEncuesta_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `VotoEncuesta` ADD CONSTRAINT `VotoEncuesta_id_encuesta_fkey` FOREIGN KEY (`id_encuesta`) REFERENCES `Encuesta`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -233,28 +281,37 @@ ALTER TABLE `LogAuditoria` ADD CONSTRAINT `LogAuditoria_id_usuario_fkey` FOREIGN
 ALTER TABLE `LogAuditoria` ADD CONSTRAINT `LogAuditoria_id_comunidad_fkey` FOREIGN KEY (`id_comunidad`) REFERENCES `Comunidad`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Incidencia` ADD CONSTRAINT `Incidencia_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Incidencia` ADD CONSTRAINT `Incidencia_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `AreaComun` ADD CONSTRAINT `AreaComun_id_comunidad_fkey` FOREIGN KEY (`id_comunidad`) REFERENCES `Comunidad`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Reserva` ADD CONSTRAINT `Reserva_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Reserva` ADD CONSTRAINT `Reserva_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Reserva` ADD CONSTRAINT `Reserva_id_area_fkey` FOREIGN KEY (`id_area`) REFERENCES `AreaComun`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Post` ADD CONSTRAINT `Post_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Post` ADD CONSTRAINT `Post_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Post` ADD CONSTRAINT `Post_id_comunidad_fkey` FOREIGN KEY (`id_comunidad`) REFERENCES `Comunidad`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Like` ADD CONSTRAINT `Like_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Like` ADD CONSTRAINT `Like_id_usuario_fkey` FOREIGN KEY (`id_usuario`) REFERENCES `Usuario`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Like` ADD CONSTRAINT `Like_id_post_fkey` FOREIGN KEY (`id_post`) REFERENCES `Post`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `CuentaBancaria` ADD CONSTRAINT `CuentaBancaria_id_comunidad_fkey` FOREIGN KEY (`id_comunidad`) REFERENCES `Comunidad`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Regla` ADD CONSTRAINT `Regla_id_comunidad_fkey` FOREIGN KEY (`id_comunidad`) REFERENCES `Comunidad`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Horario` ADD CONSTRAINT `Horario_id_comunidad_fkey` FOREIGN KEY (`id_comunidad`) REFERENCES `Comunidad`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ExcepcionHorario` ADD CONSTRAINT `ExcepcionHorario_id_horario_fkey` FOREIGN KEY (`id_horario`) REFERENCES `Horario`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
