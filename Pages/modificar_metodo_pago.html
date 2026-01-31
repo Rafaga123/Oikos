@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Datos de Pago Móvil</title>
+    <link rel="shortcut icon" href="../Images/logo.ico" />
+    <script src="../Scripts/jquery-3.7.1.min.js"></script>
+    <script src="../Scripts/semantic.min.js"></script>
+    <link rel="stylesheet" type="text/CSS" href="../CSS/semantic.css">       
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <link rel="stylesheet" href="../CSS/modificar_metodo_pago.css">
+
+</head>
+<body>
+
+     <!-- Sidebar -->
+    <div class="ui vertical inverted sidebar menu sidebar-menu" style="background-color: #9A9CEA;">
+        <div class="item">
+            <div class="header">
+                <h2 class="ui inverted header">
+                    <i class="cog icon"></i>
+                    <div class="content">
+                        Panel Gestor
+                        <div class="sub header">Gestión de Habitantes</div>
+                    </div>
+                </h2>
+            </div>
+        </div>
+        <div class="item">
+            <div class="menu">
+                <a class="active item" href="./gestor.html">
+                    <i class="home icon"></i>
+                    Panel de Control
+                </a>
+                <a class="item" href="./gestion_habitantes.html">
+                    <i class="users icon"></i>
+                    Habitantes
+                </a>
+                <a class="item" href="./solicitudes.html">
+                    <i class="chart bar icon"></i>
+                    Incidencias
+                </a>
+                <a class="item" href="./solicitudes_nuevas.html">
+                    <i class="chart bar icon"></i>
+                    Solicitudes nuevas
+                </a>
+                <a class="item" href="./pagos_gestor.html">
+                    <i class="money bill alternate icon"></i>
+                    Pagos
+                </a>
+                <a class="item" href="./crear_horario.html">
+                    <i class="clock icon"></i>
+                    Modificar Horarios
+                </a>
+                <a class="item" href="./modificar_metodo_pago.html">
+                    <i class="clock icon"></i>
+                    Modificar Pagomovil
+                </a>
+                
+            </div>
+        </div>
+        <div class="item">
+            <div class="ui divider"></div>
+            <a class="item" onclick="cerrarSesion()">
+                <i class="sign out icon"></i>
+                Cerrar Sesión
+            </a>
+        </div>
+        <div class="sidebar-footer-image">
+            <img src="../Images/logopng.png" alt="Decoración de Sidebar">
+        </div>
+    </div>
+
+<!--contenido de la pagina del gestor-->
+    <div class="pusher">
+        <!--Menú Superior-->
+        <div class="ui top fixed menu" style="background-color: #9A9CEA;">
+            <div class="ui container">
+                <div class="item">
+                    <img src="../Images/logopng.png" alt="Logo"> <!--logo de la pagina-->
+                </div>
+                <a class="item" id="sidebar-toggle"><!--activador del sidebar-->
+                    <i class="sidebar icon" style="color: white;"></i><!--Icono del sidebar-->
+                </a>
+                <div class="header item" style="color: white;"><!--color y titulo del menu superior-->
+                    Modificar Datos del Pagomovil
+                </div>
+                <div class="right menu">
+                    <div class="ui dropdown item" style="color: white;">
+                        <i class="user icon" style="color: white;"></i> Gestor
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <a class="item"><i class="user icon"></i> Mi Perfil</a>
+                            <a class="item"><i class="cog icon"></i> Configuración</a>
+                            <div class="divider"></div>
+                            <a class="item" onclick="cerrarSesion()"><i class="sign out icon"></i> Cerrar Sesión</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Contenido principal -->
+    <div class="admin-container">
+        <!-- Header -->
+        <div class="admin-header">
+            <h1>
+                <i class="mobile alternate icon"></i>
+                Configuración de Pago Móvil
+            </h1>
+            <p>Administra los datos bancarios e instrucciones que los usuarios verán al realizar pagos</p>
+            <a href="./home_page.html" class="back-button">
+                <i class="arrow left icon"></i>
+                Volver al Inicio
+            </a>
+        </div>
+
+        <!-- Grid de Bancos -->
+        <div class="banks-grid">
+            <!-- Banco: Banesco -->
+            <div class="bank-card-admin">
+                <div class="bank-header-admin">
+                    <div class="bank-logo-admin" id="logo-Banesco">
+                        <i class="university icon"></i>
+                    </div>
+                    <h3 class="bank-name-admin">Banesco</h3>
+                </div>
+                
+                <div class="status-indicator status-saved" id="status-Banesco">
+                    <i class="check icon"></i> Datos actualizados
+                </div>
+                
+                <div class="form-group">
+                    <label for="telefono-Banesco">Número de Teléfono</label>
+                    <input type="tel" id="telefono-Banesco" 
+                           placeholder="Ej: 0414-555-1234"
+                           pattern="^0[0-9]{3}-[0-9]{3}-[0-9]{4}$">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cedula-Banesco">Cédula</label>
+                    <input type="text" id="cedula-Banesco" 
+                           placeholder="Ej: V-26.789.456">
+                </div>
+                
+                <div class="form-group">
+                    <label for="banco-Banesco">Banco Receptor</label>
+                    <select id="banco-Banesco">
+                        <option value="Banesco">Banesco</option>
+                        <option value="Banco de Venezuela">Banco de Venezuela</option>
+                        <option value="Banco Provincial">Banco Provincial</option>
+                        <option value="Mercantil">Mercantil</option>
+                        <option value="Bancaribe">Bancaribe</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="beneficiario-Banesco">Nombre del Beneficiario</label>
+                    <input type="text" id="beneficiario-Banesco" 
+                           placeholder="Ej: OIKOS">
+                </div>
+                
+                <button class="save-btn" data-banco="Banesco">
+                    <i class="save icon"></i> Guardar Cambios
+                </button>
+            </div>
+
+            <!-- Banco: Banco de Venezuela -->
+            <div class="bank-card-admin">
+                <div class="bank-header-admin">
+                    <div class="bank-logo-admin" id="logo-Banco-de-Venezuela">
+                        <i class="building icon"></i>
+                    </div>
+                    <h3 class="bank-name-admin">Banco de Venezuela</h3>
+                </div>
+                
+                <div class="status-indicator status-saved" id="status-Banco-de-Venezuela">
+                    <i class="check icon"></i> Datos actualizados
+                </div>
+                
+                <div class="form-group">
+                    <label for="telefono-Banco-de-Venezuela">Número de Teléfono</label>
+                    <input type="tel" id="telefono-Banco-de-Venezuela" 
+                           placeholder="Ej: 0412-987-6543"
+                           pattern="^0[0-9]{3}-[0-9]{3}-[0-9]{4}$">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cedula-Banco-de-Venezuela">Cédula</label>
+                    <input type="text" id="cedula-Banco-de-Venezuela" 
+                           placeholder="Ej: V-26.789.456">
+                </div>
+                
+                <div class="form-group">
+                    <label for="banco-Banco-de-Venezuela">Banco Receptor</label>
+                    <select id="banco-Banco-de-Venezuela">
+                        <option value="Banesco">Banesco</option>
+                        <option value="Banco de Venezuela">Banco de Venezuela</option>
+                        <option value="Banco Provincial">Banco Provincial</option>
+                        <option value="Mercantil">Mercantil</option>
+                        <option value="Bancaribe">Bancaribe</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="beneficiario-Banco-de-Venezuela">Nombre del Beneficiario</label>
+                    <input type="text" id="beneficiario-Banco-de-Venezuela" 
+                           placeholder="Ej: OIKOS">
+                </div>
+                
+                <button class="save-btn" data-banco="Banco de Venezuela">
+                    <i class="save icon"></i> Guardar Cambios
+                </button>
+            </div>
+
+            <!-- Banco: Banco Provincial -->
+            <div class="bank-card-admin">
+                <div class="bank-header-admin">
+                    <div class="bank-logo-admin" id="logo-Banco-Provincial">
+                        <i class="landmark icon"></i>
+                    </div>
+                    <h3 class="bank-name-admin">Banco Provincial</h3>
+                </div>
+                
+                <div class="status-indicator status-saved" id="status-Banco-Provincial">
+                    <i class="check icon"></i> Datos actualizados
+                </div>
+                
+                <div class="form-group">
+                    <label for="telefono-Banco-Provincial">Número de Teléfono</label>
+                    <input type="tel" id="telefono-Banco-Provincial" 
+                           placeholder="Ej: 0416-789-0123"
+                           pattern="^0[0-9]{3}-[0-9]{3}-[0-9]{4}$">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cedula-Banco-Provincial">Cédula</label>
+                    <input type="text" id="cedula-Banco-Provincial" 
+                           placeholder="Ej: V-26.789.456">
+                </div>
+                
+                <div class="form-group">
+                    <label for="banco-Banco-Provincial">Banco Receptor</label>
+                    <select id="banco-Banco-Provincial">
+                        <option value="Banesco">Banesco</option>
+                        <option value="Banco de Venezuela">Banco de Venezuela</option>
+                        <option value="Banco Provincial">Banco Provincial</option>
+                        <option value="Mercantil">Mercantil</option>
+                        <option value="Bancaribe">Bancaribe</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="beneficiario-Banco-Provincial">Nombre del Beneficiario</label>
+                    <input type="text" id="beneficiario-Banco-Provincial" 
+                           placeholder="Ej: OIKOS">
+                </div>
+                
+                <button class="save-btn" data-banco="Banco Provincial">
+                    <i class="save icon"></i> Guardar Cambios
+                </button>
+            </div>
+        </div>
+
+      
+</body>
+</html>
