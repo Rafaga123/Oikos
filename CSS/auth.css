@@ -47,7 +47,9 @@ body::before {
 .ui.menu {
     padding: 5px;
 }
-
+.center{
+    text-align: center;
+}
 .centered-form-container {
     flex: 1 0 auto;
     min-height: 80vh;

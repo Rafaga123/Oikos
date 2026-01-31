@@ -52,7 +52,7 @@
     <main class="centered-form-container">
 
         <form class="ui form attached fluid segment horizontal-register-form" id="register-form">
-            <h2 class="ui center aligned header" style="margin-bottom:1.5rem;">Registrarme</h2>
+            <h2 class="ui center aligned header" style="margin-bottom:1.5rem;">Registro de usuario</h2>
             <!-- Paso 1: Nombre y Apellido -->
             <div class="step" id="step-1">
                 <div class="two fields">
@@ -94,6 +94,7 @@
                     <div class="field">
                         <label>Fecha de Nacimiento</label>
                         <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                        
                     </div>
                     <div class="field">
                         <label>Teléfono</label>
@@ -113,10 +114,10 @@
                                 </select>
                             </div>
                             <div class="field">
-                                <input type="tel" id="telefono" name="telefono" placeholder="Ej: +584144601965" required>
+                                <input type="tel" id="telefono" name="telefono" placeholder="Ej: +58XXXXXXXXXX" required>
                             </div>
                         </div>
-                        <small>Empieza con "+" y se detecta el país automáticamente.</small>
+                        <small>Empieza con "+" y se detecta el país automáticamente. Ej: +58XXXXXXXXXX</small>
                     </div>
                 </div>
                 <div class="ui two buttons">
@@ -146,6 +147,7 @@
                         </button>
                     </div>
                 </div>
+                
                 <div class="ui two buttons">
                     <button class="ui button back-btn" type="button">Volver</button>
                     <div class="or" data-text="o"></div>
@@ -155,6 +157,7 @@
             </div>
             <!-- Mensaje de Error -->
             <div class="ui error message" id="error-message"></div>
+            <small>Podra continuar con a la siguiente pägina al completar todos los datos solicitados</small>
         </form>
     </main>
     <main class="container">
