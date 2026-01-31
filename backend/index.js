@@ -1571,6 +1571,66 @@ app.delete('/api/gestor/excepciones/:id', verificarToken, async (req, res) => {
     }
 });
 
+app.get('/api/gestor/dashboard-stats', verificarToken, async (req, res) => {
+    try {
+        const idGestor = req.usuario.id;
+        const gestor = await prisma.usuario.findUnique({ where: { id: idGestor } });
+        const idComunidad = gestor.id_comunidad;
+
+        if (!idComunidad) return res.status(400).json({ error: 'No tienes comunidad' });
+
+        // 1. Habitantes (Activos vs Total)
+        const totalHabitantes = await prisma.usuario.count({
+            where: { id_comunidad: idComunidad, id_rol: 3, estado_solicitud: { not: 'PENDIENTE' } }
+        });
+        const habitantesActivos = await prisma.usuario.count({
+            where: { id_comunidad: idComunidad, id_rol: 3, estado_solicitud: 'ACEPTADO' } // O activos según tu lógica
+        });
+
+        // 2. Pagos (Historial últimos 6 meses para la gráfica)
+        const fechaLimite = new Date();
+        fechaLimite.setMonth(fechaLimite.getMonth() - 6);
+        
+        const pagosHistorial = await prisma.pago.findMany({
+            where: { 
+                usuario: { id_comunidad: idComunidad },
+                fecha_pago: { gte: fechaLimite },
+                estado: 'APROBADO' // Solo contamos los aprobados/recibidos para la gráfica
+            },
+            select: { fecha_pago: true }
+        });
+
+        // Conteo de Pagos Pendientes (para el número grande)
+        const pagosPendientes = await prisma.pago.count({
+            where: { usuario: { id_comunidad: idComunidad }, estado: 'PENDIENTE' }
+        });
+
+        // 3. Incidentes Pendientes (Alertas)
+        const incidentesPendientes = await prisma.incidencia.count({
+            where: { 
+                usuario: { id_comunidad: idComunidad }, 
+                estado: { in: ['ABIERTO', 'EN_PROGRESO'] } 
+            }
+        });
+
+        // 4. Solicitudes Nuevas (Completado)
+        const solicitudesPendientes = await prisma.usuario.count({
+            where: { id_comunidad: idComunidad, estado_solicitud: 'PENDIENTE' }
+        });
+
+        res.json({
+            habitantes: { total: totalHabitantes, activos: habitantesActivos },
+            pagos: { pendientes: pagosPendientes, historial: pagosHistorial },
+            incidentes: incidentesPendientes,
+            solicitudes: solicitudesPendientes
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al cargar estadísticas' });
+    }
+});
+
 // Iniciar servidor
 app.listen(port, async () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);

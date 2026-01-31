@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Pagos - OIKOS</title>
+    
     <link rel="shortcut icon" href="../Images/logo.ico" />
-    <script src="../Scripts/jquery-3.7.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <link rel="stylesheet" href="../CSS/pagos_gestor.css">
     <script src="../Scripts/seguridad.js"></script>
     <script>window.rolesPermitidos = ['ENCARGADO_COMUNIDAD'];</script>
@@ -28,63 +31,56 @@
         </div>
         <div class="item">
             <div class="menu">
-                <a class="active item" href="./gestor.html">
-                    <i class="home icon"></i>
-                    Panel de Control
-                </a>
-                <a class="item" href="./gestion_habitantes.html">
-                    <i class="users icon"></i>
-                    Habitantes
-                </a>
-                <a class="item" href="./solicitudes.html">
-                    <i class="chart bar icon"></i>
-                    Incidencias
-                </a>
-                <a class="item" href="./solicitudes_nuevas.html">
-                    <i class="user icon"></i>
-                    Solicitudes nuevas
-                </a>
-                <a class="item" href="./pagos_gestor.html">
-                    <i class="money bill alternate icon"></i>
-                    Pagos
-                </a>
-                <a class="item" href="./crear_horario.html">
-                    <i class="clock icon"></i>
-                    Modificar Horarios
-                </a>
-                
+                <a class="item" href="./gestor.html"><i class="home icon"></i> Panel de Control</a>
+                <a class="item" href="./gestion_habitantes.html"><i class="users icon"></i> Habitantes</a>
+                <a class="item" href="./solicitudes.html"><i class="chart bar icon"></i> Incidencias</a>
+                <a class="item" href="./solicitudes_nuevas.html"><i class="user icon"></i> Solicitudes nuevas</a>
+                <a class="active item" href="./pagos_gestor.html"><i class="money bill alternate icon"></i> Pagos</a>
+                <a class="item" href="./crear_horario.html"><i class="clock icon"></i> Modificar Horarios</a>
             </div>
         </div>
-        <div class="item" >
+        <div class="item">
             <div class="ui divider"></div>
-            <a class="item" onclick="cerrarSesion()">
-                <i class="sign out icon"></i>
-                Cerrar Sesión
-            </a>
+            <a class="item" onclick="cerrarSesion()"><i class="sign out icon"></i> Cerrar Sesión</a>
         </div>
         <div class="sidebar-footer-image">
             <img src="../Images/logopng.png" alt="Decoración de Sidebar">
         </div>
     </div>
 
-    <!-- Contenido superior -->
     <div class="pusher">
+        
         <div class="ui top fixed menu" style="background-color: #9A9CEA;">
             <div class="ui container">
+                <div class="item"><img src="../Images/logopng.png" alt="Logo"></div>
                 <a class="item" id="sidebar-toggle"><i class="sidebar icon" style="color: white;"></i></a>
                 <div class="header item" style="color: white;">Auditoría de Pagos</div>
+                <div class="right menu">
+                    <div class="ui dropdown item" style="color: white;">
+                        <i class="user icon" style="color: white;"></i> Gestor
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <a class="item"><i class="user icon"></i> Mi Perfil</a>
+                            <div class="divider"></div>
+                            <a class="item" onclick="cerrarSesion()"><i class="sign out icon"></i> Cerrar Sesión</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="main-content" style="margin-top: 60px; padding: 20px;">
+        <div class="main-content" style="margin-top: 80px; padding: 20px;">
             <div class="ui container">
-                <h2 class="ui header">
-                    <i class="money check icon"></i>
-                    <div class="content">
-                        Revisión de Pagos
-                        <div class="sub header">Aprueba o rechaza los reportes de pago de los habitantes</div>
-                    </div>
-                </h2>
+                
+                <div class="ui header">
+                    <h2 class="ui header">
+                        <i class="money check icon"></i>
+                        <div class="content">
+                            Revisión de Pagos
+                            <div class="sub header">Aprueba o rechaza los reportes de pago de los habitantes</div>
+                        </div>
+                    </h2>
+                </div>
                 
                 <div class="ui divider"></div>
 
@@ -103,7 +99,7 @@
                     </div>
                 </div>
 
-                <div class="ui secondary menu">
+                <div class="ui secondary menu stackable">
                     <a class="item active filter-btn" data-filter="todos">Todos</a>
                     <a class="item filter-btn" data-filter="PENDIENTE">Pendientes</a>
                     <a class="item filter-btn" data-filter="APROBADO">Aprobados</a>
@@ -119,23 +115,25 @@
                     </div>
                 </div>
 
-                <table class="ui celled table selectable">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Residente</th>
-                            <th>Apto</th>
-                            <th>Concepto</th>
-                            <th>Monto</th>
-                            <th>Método</th>
-                            <th>Ref</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pagos-body">
-                        </tbody>
-                </table>
+                <div style="overflow-x: auto;">
+                    <table class="ui celled table selectable">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Residente</th>
+                                <th>Apto</th>
+                                <th>Concepto</th>
+                                <th>Monto</th>
+                                <th>Método</th>
+                                <th>Ref</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pagos-body">
+                            </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -145,12 +143,12 @@
         <div class="header">Comprobante de Pago</div>
         <div class="image content">
             <div class="ui medium image" style="margin: 0 auto;">
-                <img id="img-comprobante" src="" alt="Sin imagen">
+                <img id="img-comprobante" src="" alt="Sin imagen" style="max-height: 400px; object-fit: contain;">
             </div>
-            <div class="description" style="margin-left: 20px;">
-                <p>Si es un PDF, haz clic en el botón para descargarlo.</p>
-                <a id="btn-descargar-comprobante" href="#" target="_blank" class="ui primary button">
-                    <i class="download icon"></i> Abrir Original
+            <div class="description" style="margin-left: 20px; width: 100%;">
+                <p>Haz clic en el botón para descargar el archivo original.</p>
+                <a id="btn-descargar-comprobante" href="#" target="_blank" class="ui primary button fluid">
+                    <i class="download icon"></i> Descargar / Ver Original
                 </a>
             </div>
         </div>

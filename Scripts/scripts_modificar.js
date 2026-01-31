@@ -4,10 +4,13 @@ let currentCategoryFilter = 'all';
 let ruleToDelete = null;
 
 $(document).ready(function() {
+    // Inicialización UI
     $('.ui.dropdown').dropdown();
+    $('.ui.sidebar').sidebar({ context: $('.pusher'), transition: 'overlay' });
+    $('#sidebar-toggle').click(() => $('.ui.sidebar').sidebar('toggle'));
     $('#confirm-modal').modal();
     
-    // Cargar desde API
+    // Cargar Datos
     loadRules();
     
     // Eventos
@@ -15,14 +18,20 @@ $(document).ready(function() {
     $('#cancel-edit-btn').click(() => { hideRuleEditor(); resetForm(); });
     $('#rule-form').submit((e) => { e.preventDefault(); saveRule(); });
     $('#confirm-delete-btn').click(confirmDeleteAction);
+    
+    // Cancelar modal
+    $('.ui.button.cancel').click(() => $('#confirm-modal').modal('hide'));
 
+    // Filtros
     $('.category-filter-btn').click(function() {
         $('.category-filter-btn').removeClass('active');
         $(this).addClass('active');
         currentCategoryFilter = $(this).data('category');
-        renderRules(); // Renderizar localmente lo que ya bajamos
+        renderRules();
     });
 });
+
+// --- LÓGICA DE DATOS ---
 
 async function loadRules() {
     const token = localStorage.getItem('token');
@@ -30,13 +39,17 @@ async function loadRules() {
         const res = await fetch('http://localhost:3000/api/reglas', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
+        
         if(res.ok) {
             reglas = await res.json();
             renderRules();
+        } else {
+            console.error('Error API');
+            $('#rules-list').html('<div class="ui error message">No se pudieron cargar las reglas.</div>');
         }
     } catch (error) {
         console.error(error);
-        showAlert('Error al cargar reglas', 'error');
+        $('#rules-list').html('<div class="ui error message">Error de conexión.</div>');
     }
 }
 
@@ -61,25 +74,43 @@ function renderRules() {
     filteredRules.forEach((regla, index) => {
         const catInfo = getCategoryInfo(regla.categoria);
         const html = `
-            <div class="rule-item" style="border-left: 4px solid ${catInfo.color}">
-                <div class="rule-header">
-                    <div style="display: flex; align-items: center;">
-                        <div class="rule-number" style="background:${catInfo.bg}; color:${catInfo.color}">${index + 1}</div>
-                        <div class="rule-title">${regla.titulo}</div>
+            <div class="ui segment rule-item" style="border-left: 5px solid ${catInfo.color}">
+                <div class="content">
+                    <h3 class="ui header" style="margin-bottom: 5px;">
+                        <div class="ui circular label" style="background:${catInfo.bg}; color:${catInfo.color}; margin-right:10px;">${index + 1}</div>
+                        ${regla.titulo}
+                    </h3>
+                    
+                    <div class="ui label tiny" style="background:${catInfo.bg}; color:${catInfo.color}; margin-bottom:10px;">
+                        ${catInfo.name}
                     </div>
-                </div>
-                <div class="rule-category" style="background:${catInfo.bg}; color:${catInfo.color}">${catInfo.name}</div>
-                <div class="rule-content">${regla.contenido}</div>
-                <div class="rule-actions">
-                    <button class="ui primary basic tiny button edit-rule-btn" data-id="${regla.id}"><i class="edit icon"></i> Editar</button>
-                    <button class="ui red basic tiny button delete-rule-btn" data-id="${regla.id}"><i class="trash icon"></i> Eliminar</button>
+                    
+                    <div class="description" style="color:#555; font-size:1.1em; line-height:1.5;">
+                        ${regla.contenido}
+                    </div>
+                    
+                    <div class="extra content" style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="color:#999; font-size:0.9em;">
+                            <i class="calendar alternate outline icon"></i> 
+                            ${new Date(regla.ultima_modificacion || regla.fecha_creacion).toLocaleDateString()}
+                        </span>
+                        
+                        <div>
+                            <button class="ui primary basic tiny button edit-rule-btn" data-id="${regla.id}">
+                                <i class="edit icon"></i> Editar
+                            </button>
+                            <button class="ui red basic tiny button delete-rule-btn" data-id="${regla.id}">
+                                <i class="trash icon"></i> Eliminar
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
         rulesList.append(html);
     });
 
-    // Reasignar eventos a los nuevos botones
+    // Reasignar eventos
     $('.edit-rule-btn').click(function() { editRule($(this).data('id')); });
     $('.delete-rule-btn').click(function() { 
         ruleToDelete = $(this).data('id'); 
@@ -87,13 +118,15 @@ function renderRules() {
     });
 }
 
+// --- CRUD ---
+
 async function saveRule() {
     const titulo = $('#rule-title').val().trim();
     const categoria = $('#rule-category').val();
     const contenido = $('#rule-content').val().trim();
     const token = localStorage.getItem('token');
 
-    if (!titulo || !categoria || !contenido) return showAlert('Completa todos los campos', 'error');
+    if (!titulo || !categoria || !contenido) return showAlert('Completa todos los campos', 'warning');
 
     const method = editingRuleId ? 'PUT' : 'POST';
     const url = editingRuleId 
@@ -114,7 +147,7 @@ async function saveRule() {
             showAlert(`Regla ${editingRuleId ? 'actualizada' : 'creada'} con éxito`, 'success');
             hideRuleEditor();
             resetForm();
-            loadRules(); // Recargar todo
+            loadRules(); 
         } else {
             showAlert('Error al guardar', 'error');
         }
@@ -139,19 +172,22 @@ async function confirmDeleteAction() {
     } catch(e) { console.error(e); }
 }
 
-// Utilidades UI
+// --- UTILS ---
+
 function showRuleEditor() {
     $('#rule-editor').slideDown();
     $('html, body').animate({ scrollTop: $('#rule-editor').offset().top - 100 }, 500);
 }
 function hideRuleEditor() { $('#rule-editor').slideUp(); }
+
 function resetForm() {
     $('#rule-form')[0].reset();
     $('#rule-id').val('');
-    $('#editor-title').text('Nueva Regla');
+    $('#editor-title').html('<i class="edit icon"></i> Nueva Regla');
     editingRuleId = null;
-    $('.ui.dropdown').dropdown('clear');
+    $('#rule-category').dropdown('clear');
 }
+
 function editRule(id) {
     const regla = reglas.find(r => r.id === id);
     if(regla) {
@@ -159,10 +195,11 @@ function editRule(id) {
         $('#rule-title').val(regla.titulo);
         $('#rule-content').val(regla.contenido);
         $('#rule-category').dropdown('set selected', regla.categoria);
-        $('#editor-title').text('Editar Regla');
+        $('#editor-title').html('<i class="edit icon"></i> Editar Regla');
         showRuleEditor();
     }
 }
+
 function getCategoryInfo(cat) {
     const map = {
         'convivencia': { name: 'Convivencia', color: '#2e7d32', bg: '#e8f5e9' },
@@ -173,13 +210,25 @@ function getCategoryInfo(cat) {
     };
     return map[cat] || map['otros'];
 }
+
 function getEmptyStateHTML() {
-    return `<div class="empty-state"><i class="law icon"></i><h3>No hay reglas</h3></div>`;
+    return `
+        <div class="ui placeholder segment center aligned">
+            <div class="ui icon header">
+                <i class="file alternate outline icon"></i>
+                Sin reglas configuradas
+            </div>
+            <button class="ui primary button" id="first-rule-btn">
+                <i class="plus icon"></i> Crear Primera Regla
+            </button>
+        </div>
+    `;
 }
+
 function showAlert(msg, type) {
     Swal.fire({
         icon: type,
-        title: type === 'success' ? 'Éxito' : 'Error',
+        title: type === 'success' ? 'Éxito' : 'Atención',
         text: msg,
         timer: 2000,
         showConfirmButton: false

@@ -2,7 +2,11 @@ let listaPagos = [];
 let idPagoActual = null; // Para saber qué pago estamos rechazando
 
 $(document).ready(function() {
-    initSidebar();
+    // Inicializar UI
+    $('.ui.dropdown').dropdown();
+    $('#sidebar-toggle').click(() => $('.ui.sidebar').sidebar('toggle'));
+    
+    // Cargar Datos
     cargarPagos();
 
     // Filtros
@@ -24,20 +28,39 @@ $(document).ready(function() {
         $('#modal-rechazar').modal('show');
     });
 
-    // Confirmar Rechazo
+    // Confirmar Rechazo (Click en el botón del modal)
     $('#btn-confirmar-rechazo').click(function() {
         const motivo = $('#txt-motivo-rechazo').val();
-        if (!motivo) return alert("Debes escribir un motivo.");
+        if (!motivo) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Motivo requerido',
+                text: 'Debes escribir por qué rechazas el pago.',
+                timer: 2000
+            });
+            return;
+        }
         
         cambiarEstado(idPagoActual, 'RECHAZADO', motivo);
     });
 
-    // Acción Aprobar
+    // Acción Aprobar con SweetAlert
     $(document).on('click', '.btn-aprobar', function() {
         const id = $(this).data('id');
-        if(confirm('¿Confirmas que el dinero está en cuenta?')) {
-            cambiarEstado(id, 'APROBADO');
-        }
+        
+        Swal.fire({
+            title: '¿Aprobar Pago?',
+            text: "¿Confirmas que el dinero está efectivo en la cuenta?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#21ba45',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, Aprobar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                cambiarEstado(id, 'APROBADO');
+            }
+        });
     });
 
     // Ver Comprobante
@@ -45,9 +68,9 @@ $(document).ready(function() {
         const url = $(this).data('url');
         const urlCompleta = `http://localhost:3000${url}`;
         
-        // Si es imagen, la mostramos. Si es PDF, botón.
+        // Si es PDF, mostramos icono. Si es imagen, mostramos la imagen.
         if(url.toLowerCase().endsWith('.pdf')) {
-            $('#img-comprobante').attr('src', '../Images/pdf_icon.png'); // Pon un icono genérico
+            $('#img-comprobante').attr('src', '../Images/pdf_icon.png'); 
         } else {
             $('#img-comprobante').attr('src', urlCompleta);
         }
@@ -72,7 +95,7 @@ async function cargarPagos() {
 
     } catch (error) {
         console.error(error);
-        alert('Error cargando pagos');
+        Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudieron cargar los pagos.' });
     }
 }
 
@@ -83,13 +106,9 @@ function renderizarTabla(filtro) {
     const busqueda = $('#busqueda').val().toLowerCase();
 
     const filtrados = listaPagos.filter(p => {
-        // Filtro por Estado
         const pasaEstado = filtro === 'todos' || p.estado === filtro;
-        
-        // Filtro por Texto
         const texto = `${p.usuario.primer_nombre} ${p.usuario.primer_apellido} ${p.referencia}`.toLowerCase();
         const pasaBusqueda = texto.includes(busqueda);
-
         return pasaEstado && pasaBusqueda;
     });
 
@@ -108,7 +127,7 @@ function renderizarTabla(filtro) {
         if(p.estado === 'APROBADO') labelColor = 'green';
         if(p.estado === 'RECHAZADO') labelColor = 'red';
 
-        // Botones de acción (Solo si está pendiente)
+        // Botones de acción
         let botones = '';
         if(p.estado === 'PENDIENTE') {
             botones = `
@@ -120,7 +139,9 @@ function renderizarTabla(filtro) {
                 </button>
             `;
         } else if (p.estado === 'RECHAZADO') {
-            botones = `<span style="font-size:0.8em; color:red;">${p.nota_admin || ''}</span>`;
+            botones = `<span style="font-size:0.8em; color:#d9534f; cursor:help;" title="${p.nota_admin}">Rechazado</span>`;
+        } else {
+            botones = `<span style="font-size:0.8em; color:#5cb85c;">Aprobado</span>`;
         }
 
         // Botón comprobante
@@ -137,10 +158,12 @@ function renderizarTabla(filtro) {
                 <td style="font-weight:bold;">Bs. ${parseFloat(p.monto).toFixed(2)}</td>
                 <td>${p.metodo_pago || '-'}</td>
                 <td>${p.referencia || '-'}</td>
-                <td><div class="ui ${labelColor} label">${p.estado}</div></td>
+                <td><div class="ui ${labelColor} label tiny">${p.estado}</div></td>
                 <td>
-                    ${btnComprobante}
-                    ${botones}
+                    <div class="ui buttons">
+                        ${btnComprobante}
+                        ${botones}
+                    </div>
                 </td>
             </tr>
         `;
@@ -161,7 +184,7 @@ async function cambiarEstado(id, nuevoEstado, nota = '') {
         });
 
         if(res.ok) {
-            // Actualizar localmente para no recargar todo
+            // Actualizar localmente
             const pago = listaPagos.find(p => p.id === id);
             if(pago) {
                 pago.estado = nuevoEstado;
@@ -169,16 +192,28 @@ async function cambiarEstado(id, nuevoEstado, nota = '') {
             }
             $('#modal-rechazar').modal('hide');
             actualizarEstadisticas();
+            // Mantener el filtro actual visualmente
             renderizarTabla($('.filter-btn.active').data('filter'));
             
-            // Toast de éxito
-            $('body').toast({ class: 'success', message: `Pago ${nuevoEstado.toLowerCase()} correctamente` });
+            // Notificación bonita
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+            Toast.fire({
+                icon: 'success',
+                title: `Pago ${nuevoEstado.toLowerCase()} con éxito`
+            });
+
         } else {
-            alert('Error al actualizar');
+            Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo actualizar el estado.' });
         }
     } catch(e) {
         console.error(e);
-        alert('Error de conexión');
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Fallo de conexión.' });
     }
 }
 
@@ -190,8 +225,4 @@ function actualizarEstadisticas() {
     $('#stat-pendientes').text(pendientes);
     $('#stat-aprobados').text(aprobados);
     $('#stat-rechazados').text(rechazados);
-}
-
-function initSidebar() {
-    $('#sidebar-toggle').click(() => $('.ui.sidebar').sidebar('toggle'));
 }

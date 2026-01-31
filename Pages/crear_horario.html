@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Horarios</title>
-    
-    <!-- jQuery -->
+    <title>Horarios - Gestión OIKOS</title>
+    <link rel="shortcut icon" href="../Images/logo.ico" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    
-    <!-- Semantic UI -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
     <link rel="stylesheet" href="../CSS/crear_horario.css">
+    <script src="../Scripts/seguridad.js"></script>
+    <script>window.rolesPermitidos = ['ENCARGADO_COMUNIDAD'];</script>
 </head>
 <body>
-    <!-- Sidebar -->
+
     <div class="ui vertical inverted sidebar menu sidebar-menu" style="background-color: #9A9CEA;">
         <div class="item">
             <div class="header">
@@ -29,38 +30,30 @@
         </div>
         <div class="item">
             <div class="menu">
-                <a class="active item" href="./gestor.html">
-                    <i class="home icon"></i>
-                    Panel de Control
+                <a class="item" href="./gestor.html">
+                    <i class="home icon"></i> Panel de Control
                 </a>
                 <a class="item" href="./gestion_habitantes.html">
-                    <i class="users icon"></i>
-                    Habitantes
+                    <i class="users icon"></i> Habitantes
                 </a>
                 <a class="item" href="./solicitudes.html">
-                    <i class="chart bar icon"></i>
-                    Incidencias
+                    <i class="chart bar icon"></i> Incidencias
                 </a>
                 <a class="item" href="./solicitudes_nuevas.html">
-                    <i class="user icon"></i>
-                    Solicitudes nuevas
+                    <i class="user icon"></i> Solicitudes nuevas
                 </a>
                 <a class="item" href="./pagos_gestor.html">
-                    <i class="money bill alternate icon"></i>
-                    Pagos
+                    <i class="money bill alternate icon"></i> Pagos
                 </a>
-                <a class="item" href="./crear_horario.html">
-                    <i class="clock icon"></i>
-                    Modificar Horarios
+                <a class="active item" href="./crear_horario.html">
+                    <i class="clock icon"></i> Modificar Horarios
                 </a>
-                
             </div>
         </div>
-        <div class="item" >
+        <div class="item">
             <div class="ui divider"></div>
             <a class="item" onclick="cerrarSesion()">
-                <i class="sign out icon"></i>
-                Cerrar Sesión
+                <i class="sign out icon"></i> Cerrar Sesión
             </a>
         </div>
         <div class="sidebar-footer-image">
@@ -68,18 +61,17 @@
         </div>
     </div>
 
-    <!-- Contenido Principal -->
     <div class="pusher">
-        <!--Menú Superior-->
+        
         <div class="ui top fixed menu" style="background-color: #9A9CEA;">
             <div class="ui container">
                 <div class="item">
-                    <img src="../Images/logopng.png" alt="Logo"> <!--logo de la pagina-->
+                    <img src="../Images/logopng.png" alt="Logo">
                 </div>
-                <a class="item" id="sidebar-toggle"><!--activador del sidebar-->
-                    <i class="sidebar icon" style="color: white;"></i><!--Icono del sidebar-->
+                <a class="item" id="sidebar-toggle">
+                    <i class="sidebar icon" style="color: white;"></i>
                 </a>
-                <div class="header item" style="color: white;"><!--color y titulo del menu superior-->
+                <div class="header item" style="color: white;">
                     Gestión de Horarios
                 </div>
                 <div class="right menu">
@@ -88,7 +80,6 @@
                         <i class="dropdown icon"></i>
                         <div class="menu">
                             <a class="item"><i class="user icon"></i> Mi Perfil</a>
-                            
                             <div class="divider"></div>
                             <a class="item" onclick="cerrarSesion()"><i class="sign out icon"></i> Cerrar Sesión</a>
                         </div>
@@ -97,10 +88,9 @@
             </div>
         </div>
 
-        <!-- Main Content -->
         <div class="main-content">
             <div class="ui container">
-                <!-- Header -->
+                
                 <div class="ui header">
                     <h1>
                         <i class="clock icon"></i>
@@ -111,155 +101,23 @@
                 
                 <div class="ui divider"></div>
                 
-                <!-- Dashboard de Horarios -->
-                <div class="horarios-dashboard">
-                    <!-- Piscina -->
-                    <div class="area-card piscina">
-                        <div class="area-header">
-                            <div class="area-title">
-                                <div class="area-icon piscina">
-                                    <i class="swimming pool icon"></i>
-                                </div>
-                                Piscina
-                            </div>
-                            <div class="area-status status-abierto" id="status-piscina">
-                                Abierto
-                            </div>
-                        </div>
-                        <div class="horario-item">
-                            <div class="horario-dias">Lunes a Viernes</div>
-                            <div class="horario-horas">7:00 AM - 8:00 PM</div>
-                            <div class="horario-notas">Adultos: todo el día • Niños: 3:00 PM - 6:00 PM</div>
-                        </div>
-                        <div class="horario-item">
-                            <div class="horario-dias">Sábados y Domingos</div>
-                            <div class="horario-horas">8:00 AM - 9:00 PM</div>
-                            <div class="horario-notas">Capacidad máxima: 20 personas</div>
-                        </div>
-                        <button class="ui primary small button editar-area" data-area="piscina" style="margin-top: 15px;">
-                            <i class="edit icon"></i>
-                            Modificar Horario
-                        </button>
-                    </div>
-                    
-                    <!-- Gimnasio -->
-                    <div class="area-card gimnasio">
-                        <div class="area-header">
-                            <div class="area-title">
-                                <div class="area-icon gimnasio">
-                                    <i class="dumbbell icon"></i>
-                                </div>
-                                Gimnasio
-                            </div>
-                            <div class="area-status status-abierto" id="status-gimnasio">
-                                Abierto
-                            </div>
-                        </div>
-                        <div class="horario-item">
-                            <div class="horario-dias">Lunes a Domingo</div>
-                            <div class="horario-horas">5:00 AM - 10:00 PM</div>
-                            <div class="horario-notas">Uso para mayores de 16 años</div>
-                        </div>
-                        <div class="horario-item">
-                            <div class="horario-dias">Reservas Especiales</div>
-                            <div class="horario-horas">7:00 PM - 9:00 PM</div>
-                            <div class="horario-notas">Clases dirigidas (requiere reserva)</div>
-                        </div>
-                        <button class="ui primary small button editar-area" data-area="gimnasio" style="margin-top: 15px;">
-                            <i class="edit icon"></i>
-                            Modificar Horario
-                        </button>
-                    </div>
-                    
-                    <!-- Salón de Eventos -->
-                    <div class="area-card salon">
-                        <div class="area-header">
-                            <div class="area-title">
-                                <div class="area-icon salon">
-                                    <i class="birthday cake icon"></i>
-                                </div>
-                                Salón de Eventos
-                            </div>
-                            <div class="area-status status-proximamente" id="status-salon">
-                                Reservado
-                            </div>
-                        </div>
-                        <div class="horario-item">
-                            <div class="horario-dias">Horario General</div>
-                            <div class="horario-horas">8:00 AM - 11:00 PM</div>
-                            <div class="horario-notas">Reservas con 48h de anticipación</div>
-                        </div>
-                        <div class="horario-item">
-                            <div class="horario-dias">Próximo Evento</div>
-                            <div class="horario-horas">Sáb 15 Mar, 4:00 PM - 8:00 PM</div>
-                            <div class="horario-notas">Cumpleaños Familia González</div>
-                        </div>
-                        <button class="ui primary small button editar-area" data-area="salon" style="margin-top: 15px;">
-                            <i class="edit icon"></i>
-                            Modificar Horario
-                        </button>
-                    </div>
-                    
-                    <!-- Parque Infantil -->
-                    <div class="area-card parque">
-                        <div class="area-header">
-                            <div class="area-title">
-                                <div class="area-icon parque">
-                                    <i class="child icon"></i>
-                                </div>
-                                Parque Infantil
-                            </div>
-                            <div class="area-status status-cerrado" id="status-parque">
-                                Cerrado Temporal
-                            </div>
-                        </div>
-                        <div class="horario-item">
-                            <div class="horario-dias">Temporada Normal</div>
-                            <div class="horario-horas">8:00 AM - 7:00 PM</div>
-                            <div class="horario-notas">Supervisión adulta requerida</div>
-                        </div>
-                        <div class="horario-item">
-                            <div class="horario-dias">Nota Importante</div>
-                            <div class="horario-horas">Cerrado por Mantenimiento</div>
-                            <div class="horario-notas">Reapertura: 20 de marzo</div>
-                        </div>
-                        <button class="ui primary small button editar-area" data-area="parque" style="margin-top: 15px;">
-                            <i class="edit icon"></i>
-                            Modificar Horario
-                        </button>
-                    </div>
+                <div class="horarios-dashboard" id="dashboard-container">
+                    <div class="ui active centered inline loader" style="margin-top: 50px;"></div>
                 </div>
                 
-                <!-- Barra de Herramientas -->
-                <div class="tools-bar">
+                <div class="tools-bar" style="margin-top: 30px; margin-bottom: 20px;">
                     <button class="ui primary button" id="nuevo-horario-btn">
-                        <i class="plus icon"></i>
-                        Nuevo Horario
+                        <i class="plus icon"></i> Nuevo Horario
                     </button>
                     
                     <button class="ui green button" id="publicar-horarios-btn">
-                        <i class="bullhorn icon"></i>
-                        Publicar Cambios
+                        <i class="bullhorn icon"></i> Notificar Cambios
                     </button>
-                    
-                    <button class="ui teal button" id="horario-semanal-btn">
-                        <i class="calendar alternate icon"></i>
-                        Vista Semanal
-                    </button>
-                    
-                    <div class="ui search search-input">
-                        <div class="ui icon input">
-                            <input class="prompt" type="text" placeholder="Buscar área o actividad...">
-                            <i class="search icon"></i>
-                        </div>
-                        <div class="results"></div>
-                    </div>
                 </div>
                 
-                <!-- Tabla de Horarios -->
                 <div class="horarios-container">
                     <div class="horarios-table-container">
-                        <table class="horarios-table" id="tabla-horarios">
+                        <table class="ui celled table" id="tabla-horarios">
                             <thead>
                                 <tr>
                                     <th>Área/Actividad</th>
@@ -268,266 +126,129 @@
                                     <th>Horario</th>
                                     <th>Estado</th>
                                     <th>Capacidad</th>
-                                    <th>Última Modificación</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="horarios-body">
-                                <!-- Los horarios se cargarán aquí dinámicamente -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                     
-                    <!-- Empty State -->
-                    <div class="empty-state" id="empty-state" style="display: none;">
-                        <i class="clock outline icon"></i>
-                        <h3>No hay horarios configurados</h3>
-                        <p>Comienza agregando un nuevo horario o configurando las áreas comunes</p>
-                        <button class="ui primary button" id="nuevo-horario-empty">
-                            <i class="plus icon"></i>
-                            Configurar Primer Horario
-                        </button>
+                    <div class="empty-state" id="empty-state" style="display: none; text-align: center; padding: 40px;">
+                        <i class="clock outline icon" style="font-size: 3em; color: #ccc;"></i>
+                        <h3 style="color: #666;">No hay horarios configurados</h3>
+                        <p>Comienza agregando un nuevo horario para las áreas comunes.</p>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
 
-    <!-- Modal para Nuevo/Editar Horario -->
     <div class="ui modal" id="horario-modal">
         <i class="close icon"></i>
-        <div class="header" id="modal-horario-header">
-            <i class="plus icon"></i>
-            Nuevo Horario
-        </div>
+        <div class="header" id="modal-horario-header">Nuevo Horario</div>
         <div class="scrolling content">
             <form class="ui form" id="form-horario">
-                <input type="hidden" id="horario-id" value="">
+                <input type="hidden" id="horario-id">
                 
                 <div class="two fields">
-                    <div class="field">
-                        <label>Área/Actividad *</label>
-                        <select class="ui dropdown" id="area" required>
-                            <option value="">Seleccionar área</option>
+                    <div class="field required">
+                        <label>Área</label>
+                        <select class="ui dropdown" id="area">
+                            <option value="">Seleccionar</option>
                             <option value="piscina">Piscina</option>
                             <option value="gimnasio">Gimnasio</option>
                             <option value="salon">Salón de Eventos</option>
                             <option value="parque">Parque Infantil</option>
-                            <option value="bbq">Área de BBQ</option>
-                            <option value="lavanderia">Lavandería</option>
+                            <option value="bbq">Área BBQ</option>
                             <option value="estacionamiento">Estacionamiento</option>
                             <option value="otro">Otro</option>
                         </select>
                     </div>
-                    <div class="field">
-                        <label>Tipo de Horario *</label>
-                        <select class="ui dropdown" id="tipo" required>
-                            <option value="">Seleccionar tipo</option>
+                    <div class="field required">
+                        <label>Tipo</label>
+                        <select class="ui dropdown" id="tipo">
                             <option value="regular">Regular</option>
                             <option value="especial">Especial</option>
                             <option value="temporal">Temporal</option>
-                            <option value="reserva">Solo con Reserva</option>
+                            <option value="reserva">Solo Reserva</option>
                         </select>
                     </div>
                 </div>
                 
-                <div class="field">
-                    <label>Nombre del Horario *</label>
-                    <input type="text" id="nombre" placeholder="Ej: Horario de piscina para adultos" required>
+                <div class="field required">
+                    <label>Nombre del Horario</label>
+                    <input type="text" id="nombre" placeholder="Ej: Horario General Piscina" required>
                 </div>
                 
-                <div class="field">
-                    <label>Seleccionar Días *</label>
-                    <div class="dias-selector">
-                        <label class="dia-checkbox">
-                            <input type="checkbox" name="dias" value="lunes">
-                            <span class="dia-label">Lun</span>
-                        </label>
-                        <label class="dia-checkbox">
-                            <input type="checkbox" name="dias" value="martes">
-                            <span class="dia-label">Mar</span>
-                        </label>
-                        <label class="dia-checkbox">
-                            <input type="checkbox" name="dias" value="miercoles">
-                            <span class="dia-label">Mié</span>
-                        </label>
-                        <label class="dia-checkbox">
-                            <input type="checkbox" name="dias" value="jueves">
-                            <span class="dia-label">Jue</span>
-                        </label>
-                        <label class="dia-checkbox">
-                            <input type="checkbox" name="dias" value="viernes">
-                            <span class="dia-label">Vie</span>
-                        </label>
-                        <label class="dia-checkbox">
-                            <input type="checkbox" name="dias" value="sabado">
-                            <span class="dia-label">Sáb</span>
-                        </label>
-                        <label class="dia-checkbox">
-                            <input type="checkbox" name="dias" value="domingo">
-                            <span class="dia-label">Dom</span>
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="field">
-                    <label>Horario *</label>
-                    <div class="horas-selector">
-                        <input type="time" id="hora-inicio" class="hora-input" required>
-                        <span>a</span>
-                        <input type="time" id="hora-fin" class="hora-input" required>
+                <div class="field required">
+                    <label>Días</label>
+                    <div class="inline fields">
+                        <div class="field"><div class="ui checkbox"><input type="checkbox" name="dias" value="lunes"><label>L</label></div></div>
+                        <div class="field"><div class="ui checkbox"><input type="checkbox" name="dias" value="martes"><label>M</label></div></div>
+                        <div class="field"><div class="ui checkbox"><input type="checkbox" name="dias" value="miercoles"><label>X</label></div></div>
+                        <div class="field"><div class="ui checkbox"><input type="checkbox" name="dias" value="jueves"><label>J</label></div></div>
+                        <div class="field"><div class="ui checkbox"><input type="checkbox" name="dias" value="viernes"><label>V</label></div></div>
+                        <div class="field"><div class="ui checkbox"><input type="checkbox" name="dias" value="sabado"><label>S</label></div></div>
+                        <div class="field"><div class="ui checkbox"><input type="checkbox" name="dias" value="domingo"><label>D</label></div></div>
                     </div>
                 </div>
                 
                 <div class="two fields">
-                    <div class="field">
-                        <label>Estado *</label>
-                        <select class="ui dropdown" id="estado" required>
+                    <div class="field required"><label>Desde</label><input type="time" id="hora-inicio" required></div>
+                    <div class="field required"><label>Hasta</label><input type="time" id="hora-fin" required></div>
+                </div>
+                
+                <div class="two fields">
+                    <div class="field required">
+                        <label>Estado</label>
+                        <select class="ui dropdown" id="estado">
                             <option value="activo">Activo</option>
                             <option value="inactivo">Inactivo</option>
-                            <option value="temporal">Temporal</option>
                         </select>
                     </div>
-                    <div class="field">
-                        <label>Capacidad Máxima</label>
-                        <input type="number" id="capacidad" min="0" placeholder="Número de personas">
-                    </div>
+                    <div class="field"><label>Capacidad (Opcional)</label><input type="number" id="capacidad"></div>
                 </div>
                 
-                <div class="field">
-                    <label>Grupo/Edad</label>
-                    <select class="ui dropdown" id="grupo">
-                        <option value="">Todos</option>
-                        <option value="adultos">Adultos</option>
-                        <option value="ninos">Niños</option>
-                        <option value="familias">Familias</option>
-                        <option value="tercera-edad">Tercera Edad</option>
-                    </select>
-                </div>
+                <div class="field"><label>Descripción</label><textarea id="descripcion" rows="2"></textarea></div>
                 
                 <div class="field">
-                    <label>Fecha de Inicio</label>
-                    <input type="date" id="fecha-inicio">
-                </div>
-                
-                <div class="field">
-                    <label>Fecha de Fin (opcional)</label>
-                    <input type="date" id="fecha-fin">
-                </div>
-                
-                <div class="field">
-                    <label>Descripción/Notas</label>
-                    <textarea id="descripcion" rows="3" placeholder="Información adicional sobre este horario..."></textarea>
-                </div>
-                
-                <div class="field">
-                    <label>Restricciones o Reglas Especiales</label>
-                    <div class="restricciones-list" id="restricciones-list">
-                        <div class="restriccion-item">
-                            <input type="text" class="restriccion-input" placeholder="Ej: Traje de baño obligatorio">
-                            <button type="button" class="ui icon button eliminar-restriccion">
-                                <i class="times icon"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <button type="button" class="ui basic small button" id="agregar-restriccion">
-                        <i class="plus icon"></i>
-                        Agregar Restricción
+                    <label>Reglas / Restricciones</label>
+                    <div id="restricciones-list" style="margin-bottom: 10px;"></div>
+                    <button type="button" class="ui mini basic button" id="agregar-restriccion">
+                        <i class="plus icon"></i> Agregar Regla
                     </button>
                 </div>
-                
-                <div class="ui error message"></div>
             </form>
         </div>
         <div class="actions">
-            <div class="ui button cancel-horario">Cancelar</div>
-            <div class="ui primary button submit-horario">
-                <i class="save icon"></i>
-                Guardar Horario
-            </div>
+            <div class="ui cancel button">Cancelar</div>
+            <div class="ui primary button submit-horario">Guardar</div>
         </div>
     </div>
 
-    <!-- Modal de Detalle de Horario -->
-    <div class="ui modal modal-horario-detalle" id="detalle-modal">
-        <i class="close icon"></i>
-        <div class="header" id="detalle-header">
-            <i class="info circle icon"></i>
-            Detalle de Horario
-        </div>
-        <div class="scrolling content">
-            <div id="detalle-content">
-                <!-- Contenido dinámico -->
-            </div>
-        </div>
-        <div class="actions" id="detalle-actions">
-            <!-- Acciones dinámicas -->
-        </div>
-    </div>
-
-    <!-- Modal para Excepciones -->
     <div class="ui modal" id="excepciones-modal">
         <i class="close icon"></i>
-        <div class="header">
-            <i class="calendar times icon"></i>
-            Excepciones de Horario
-        </div>
-        <div class="scrolling content">
-            <div id="excepciones-content">
-                <div class="excepciones-calendario">
-                    <h4 class="ui header">Fechas Especiales</h4>
-                    
-                    <div class="field">
-                        <label>Agregar Excepción</label>
-                        <div class="fields">
-                            <div class="field">
-                                <input type="date" id="excepcion-fecha" placeholder="Fecha">
-                            </div>
-                            <div class="field">
-                                <select class="ui dropdown" id="excepcion-tipo">
-                                    <option value="cerrado">Cerrado</option>
-                                    <option value="horario-especial">Horario Especial</option>
-                                    <option value="mantenimiento">Mantenimiento</option>
-                                </select>
-                            </div>
-                            <div class="field">
-                                <button type="button" class="ui primary button" id="agregar-excepcion">
-                                    <i class="plus icon"></i>
-                                    Agregar
-                                </button>
-                            </div>
-                        </div>
+        <div class="header">Excepciones de Horario</div>
+        <div class="content">
+            <div class="ui form">
+                <div class="fields">
+                    <div class="six wide field"><input type="date" id="excepcion-fecha"></div>
+                    <div class="six wide field">
+                        <select class="ui dropdown" id="excepcion-tipo">
+                            <option value="cerrado">Cerrado</option>
+                            <option value="mantenimiento">Mantenimiento</option>
+                            <option value="horario-especial">Horario Especial</option>
+                        </select>
                     </div>
-                    
-                    <div id="lista-excepciones">
-                        <!-- Excepciones se cargarán aquí -->
-                    </div>
+                    <div class="four wide field"><button class="ui button primary fluid" id="btn-add-excepcion">Agregar</button></div>
                 </div>
             </div>
+            <div class="ui segment" id="lista-excepciones">
+                </div>
         </div>
-        <div class="actions">
-            <div class="ui button cerrar-excepciones">Cerrar</div>
-        </div>
-    </div>
-
-    <!-- Modal de Confirmación -->
-    <div class="ui small modal" id="confirm-modal">
-        <div class="header" id="confirm-header">Confirmar Acción</div>
-        <div class="content" id="confirm-content">
-            <p id="confirm-message"></p>
-        </div>
-        <div class="actions">
-            <div class="ui button cancel-confirm">Cancelar</div>
-            <div class="ui red button confirm-delete">
-                <i class="trash icon"></i> Eliminar
-            </div>
-            <div class="ui green button confirm-activar">
-                <i class="check icon"></i> Activar
-            </div>
-            <div class="ui orange button confirm-desactivar">
-                <i class="times icon"></i> Desactivar
-            </div>
-        </div>
+        <div class="actions"><div class="ui button cancel">Cerrar</div></div>
     </div>
 
     <script src="../Scripts/crear_horarios.js"></script>
