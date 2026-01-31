@@ -172,7 +172,7 @@ async function toggleLike(idPost, elementoHtml) {
     }
 }
 
-// --- CONFIGURACIÓN VISUAL (LO QUE YA TENÍAS) ---
+// --- CONFIGURACIÓN VISUAL---
 
 function initSidebar() {
     $('.ui.sidebar').sidebar({ context: $('.pusher'), transition: 'overlay' });
@@ -192,8 +192,8 @@ function configurarModal() {
         const $form = $('#modalAgregar .ui.form');
         // Validar visualmente
         if( !$('input[name="Tema"]').val() || !$('input[name="Descripción"]').val() ) {
-             $('#alertFail').fadeIn().delay(2000).fadeOut();
-             return false;
+            $('#alertFail').fadeIn().delay(2000).fadeOut();
+            return false;
         }
         // Si pasa, enviar a API
         publicarPost();

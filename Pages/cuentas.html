@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OIKOS - Pagina Inicio</title>
+    <link rel="shortcut icon" href="../Images/logo.ico" />
+    <script src="../Scripts/jquery-3.7.1.min.js"></script>
+    <script src="../Scripts/semantic.min.js"></script>
+    <link rel="stylesheet" type="text/CSS" href="../CSS/semantic.css">       
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <link rel="stylesheet" type="text/CSS" href="../CSS/cuentas.css">
+    <script src="../Scripts/seguridad.js"></script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="ui vertical inverted sidebar menu sidebar-menu" style="background-color: #9A9CEA;">
+        <div class="item">
+            <div class="header">
+                <h2 class="ui inverted header">
+                    <i class="home icon"></i>
+                    <div class="content">
+                        Habitante
+                        <div class="sub header">Gestión de vivienda</div>
+                    </div>
+                </h2>
+            </div>
+        </div>
+        <div class="item">
+            <div class="menu">
+                <a class="item sidebar-toggle-btn">
+                    <br>
+                    <i class="large arrow left icon"></i>
+                    Cerrar menú
+                    <br>
+                </a>
+                <a class="item" href="./home_page.html">
+                    <i class="home icon"></i>
+                    Página Principal
+                </a>
+                <a class="active item" href="./reglamento.html">
+                    <i class="book icon"></i>
+                    Reglamento del Condominio
+                </a>
+                <a class="item" href="./horario.html">
+                    <i class="clock icon"></i>
+                    Horarios
+                </a>
+                <a class="item" href="./cuentasparapagos">
+                    <i class="credit card icon"></i>
+                    Cuentas para Pagos
+                </a>
+                <a class="item" href="./configuracion">
+                    <i class="cogs icon"></i>
+                    Configuración
+                </a>
+            </div>
+        </div>
+        <div class="item">
+            <div class="ui divider" ></div>
+            <a class="item" onclick="cerrarSesion()">
+                <i class="sign out icon"></i>
+                Cerrar Sesión
+            </a>
+        </div>
+        <div class="sidebar-footer-image">
+            <img src="../Images/logo_neg.png" alt="Decoración de Sidebar">
+        </div>
+    </div>
+
+    <div class="pusher">
+        <!--Menú Superior-->
+        <div class="ui top fixed menu" style="background-color: #9A9CEA;">
+            <div class="ui container">
+                <div class="item">
+                    <img src="../Images/logopng.png" alt="Logo"> <!--logo de la pagina-->
+                </div>
+                <a class="item" id="sidebar-toggle"><!--activador del sidebar-->
+                    <i class="sidebar icon" style="color: white;"></i><!--Icono del sidebar-->
+                </a>
+                <div class="header item" style="color: white;"><!--color y titulo del menu superior-->
+                    Gestión de Vivienda
+                </div>
+                <div class="right menu">
+                    <div class="ui dropdown item" style="color: white;">
+                        <i class="user icon" style="color: white;"></i> Habitante
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <a class="item" href="./profile.html"><i class="user icon"></i> Mi Perfil</a>
+                            <a class="item"><i class="cog icon"></i> Configuración</a>
+                            <div class="divider"></div>
+                            <a class="item" onclick="cerrarSesion()"><i class="sign out icon"></i> Cerrar Sesión</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content-container">
+            <div class="ui container">
+                <div class="ui centered grid">
+                    <div class="fourteen wide computer sixteen wide tablet column">
+                        
+                        <div class="ui fluid raised card">
+                            <div class="content">
+                                <h1 class="ui center aligned header" style="color: #9A9CEA;">
+                                    <i class="credit card icon"></i>
+                                    Cuentas y Métodos de Pago
+                                </h1>
+                                <div class="ui divider"></div>
+
+                                <div class="description">
+                                    
+                                    <h3 class="ui dividing header"><i class="university icon"></i> Transferencias y Pago Móvil</h3>
+                                    <p>Utilice los siguientes datos para realizar sus pagos electrónicos. Recuerde reportar su comprobante.</p>
+                                    
+                                    <table class="ui celled table">
+                                        <thead style="background-color: #f9f9f9;">
+                                            <tr>
+                                                <th>Banco</th>
+                                                <th>Datos de la Cuenta</th>
+                                                <th>Pago Móvil</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <h4 class="ui image header">
+                                                        <i class="green building icon"></i>
+                                                        <div class="content">Banesco</div>
+                                                    </h4>
+                                                </td>
+                                                <td>
+                                                    <b>Nro:</b> 0134-XXXX-XX-XXXXXXXXXX<br>
+                                                    <b>Titular:</b> Condominio OIKOS<br>
+                                                    <b>RIF:</b> J-12345678-9
+                                                </td>
+                                                <td>
+                                                    <div class="ui horizontal list">
+                                                        <div class="item"><b>Telf:</b> 0412-5555555</div>
+                                                        <div class="item"><b>CI/RIF:</b> J-12345678-9</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <h4 class="ui image header">
+                                                        <i class="blue building icon"></i>
+                                                        <div class="content">Banco Mercantil</div>
+                                                    </h4>
+                                                </td>
+                                                <td>
+                                                    <b>Nro:</b> 0105-XXXX-XX-XXXXXXXXXX<br>
+                                                    <b>Titular:</b> Condominio OIKOS<br>
+                                                    <b>RIF:</b> J-12345678-9
+                                                </td>
+                                                <td>
+                                                    <div class="ui horizontal list">
+                                                        <div class="item"><b>Telf:</b> 0424-0000000</div>
+                                                        <div class="item"><b>CI/RIF:</b> J-12345678-9</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <div class="ui message">
+                                        <i class="info circle icon"></i>
+                                        <b>Nota:</b> Una vez realizada la transferencia, sus datos deben ser adjuntados en la sección de "Reportar Pago".
+                                    </div>
+
+                                    <h3 class="ui dividing header"><i class="money bill alternate icon"></i> Pagos en Efectivo</h3>
+                                    
+                                    <div class="ui icon message" style="background-color: #fcfcfc; border: 1px solid #9A9CEA;">
+                                        <i class="user tie icon" style="color: #9A9CEA;"></i>
+                                        <div class="content">
+                                            <div class="header" style="color: #9A9CEA;">
+                                                Atención Presencial para Recaudación
+                                            </div>
+                                            <p>Para aquellos habitantes que deseen cancelar en divisas o moneda nacional en efectivo, un administrador estará disponible en la oficina del condominio en los siguientes horarios:</p>
+                                            
+                                            <div class="ui horizontal segments">
+                                                <div class="ui segment">
+                                                    <p><b><i class="calendar check icon"></i> Martes y Jueves</b></p>
+                                                    <p>04:00 PM - 07:00 PM</p>
+                                                </div>
+                                                <div class="ui segment">
+                                                    <p><b><i class="calendar check icon"></i> Sábados</b></p>
+                                                    <p>09:00 AM - 12:00 PM</p>
+                                                </div>
+                                            </div>
+                                            <p><small>* Se emitirá un recibo provisional al momento de la entrega del dinero.</small></p>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="extra content right aligned">
+                                <button class="ui labeled icon primary button">
+                                    <i class="exclamation circle icon"></i>
+                                    Reportar Pago
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        <footer class="ui inverted vertical footer segment">
+        <div class="ui container">
+            <p>Hecho con <i class="heart icon"></i></p>
+        </div>
+        </footer>
+    </div>
+</body>
+<script src="../Scripts/cuentas.js"></script>
+</html>
