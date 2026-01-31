@@ -175,7 +175,34 @@ async function publicarPost() {
     }
 }
 
-// --- CONFIGURACIÓN VISUAL ---
+async function toggleLike(idPost, elementoHtml) {
+    const token = localStorage.getItem('token');
+    const icono = elementoHtml.querySelector('i');
+    const contador = elementoHtml.querySelector('.count');
+    let numeroLikes = parseInt(contador.innerText);
+
+    try {
+        const res = await fetch(`http://localhost:3000/api/foro/${idPost}/like`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await res.json();
+
+        if (data.dio_like) {
+            icono.classList.add('red');
+            contador.innerText = numeroLikes + 1;
+        } else {
+            icono.classList.remove('red');
+            contador.innerText = numeroLikes - 1;
+        }
+
+    } catch (error) {
+        console.error('Error dando like', error);
+    }
+}
+
+// --- CONFIGURACIÓN VISUAL---
 
 function initSidebar() {
     $('.ui.sidebar').sidebar({ context: $('.pusher'), transition: 'overlay' });
@@ -189,7 +216,15 @@ function configurarModal() {
         $('#modalAgregar').modal('show');
     });
 
-    $('#publicar').off('click').on('click', function() {
+    // Lógica del botón "Publicar" del modal
+    $('#publicar').on('click', function() {
+        const $form = $('#modalAgregar .ui.form');
+        // Validar visualmente
+        if( !$('input[name="Tema"]').val() || !$('input[name="Descripción"]').val() ) {
+            $('#alertFail').fadeIn().delay(2000).fadeOut();
+            return false;
+        }
+        // Si pasa, enviar a API
         publicarPost();
     });
 }
