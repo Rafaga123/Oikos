@@ -1950,6 +1950,69 @@ app.put('/api/gestor/actividades/:id', verificarToken, async (req, res) => {
         res.status(500).json({ error: 'Error al actualizar actividad' });
     }
 });
+// --- GESTIÓN DE ENCUESTAS (RESULTADOS) ---
+
+app.get('/api/gestor/encuestas/resultados', verificarToken, async (req, res) => {
+    try {
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+        if (!usuario.id_comunidad) return res.json([]);
+
+        // Obtener todas las encuestas de la comunidad con sus opciones y votos
+        const encuestas = await prisma.encuesta.findMany({
+            where: { id_comunidad: usuario.id_comunidad },
+            include: {
+                opciones: {
+                    include: {
+                        _count: {
+                            select: { votos: true } // Contar votos por opción
+                        }
+                    }
+                },
+                _count: {
+                    select: { votos: true } // Contar total de votos de la encuesta
+                }
+            },
+            orderBy: { fecha_inicio: 'desc' }
+        });
+
+        // Procesar datos para el frontend
+        const resultados = encuestas.map(encuesta => {
+            const totalVotosEncuesta = encuesta._count.votos;
+            
+            // Calcular estado
+            const hoy = new Date();
+            let estado = 'active';
+            if (hoy > new Date(encuesta.fecha_fin)) estado = 'closed';
+            if (hoy < new Date(encuesta.fecha_inicio)) estado = 'scheduled';
+
+            return {
+                id: encuesta.id,
+                titulo: encuesta.titulo,
+                descripcion: encuesta.descripcion,
+                fecha_inicio: encuesta.fecha_inicio,
+                fecha_fin: encuesta.fecha_fin,
+                estado: estado,
+                total_votos: totalVotosEncuesta,
+                // Calcular participación aproximada (si tuviéramos total de habitantes, podríamos ser exactos)
+                // Por ahora devolvemos el número crudo
+                opciones: encuesta.opciones.map(op => ({
+                    id: op.id,
+                    texto: op.texto,
+                    votos: op._count.votos,
+                    porcentaje: totalVotosEncuesta > 0 
+                        ? Math.round((op._count.votos / totalVotosEncuesta) * 100) 
+                        : 0
+                }))
+            };
+        });
+
+        res.json(resultados);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al obtener resultados' });
+    }
+});
 
 // Iniciar servidor
 app.listen(port, async () => {
