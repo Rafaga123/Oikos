@@ -1,37 +1,43 @@
 let cuentasCondominio = [];
-let metodoActual = 'transferencia'; // Valor por defecto
+let metodoActual = 'pago_movil'; // CAMBIO: Por defecto Pago Móvil
 
 $(document).ready(function() {
-    // 1. Inicializar componentes visuales de Semantic UI
+    // 1. Inicializar Dropdowns
     $('.ui.dropdown').dropdown();
-    $('.ui.sidebar').sidebar({ context: $('.pusher'), transition: 'overlay' });
-    $('#sidebar-toggle').click(() => $('.ui.sidebar').sidebar('toggle'));
 
-    // 2. Cargar las cuentas configuradas por el Gestor
+    // 2. Inicializar Sidebar
+    $('.ui.sidebar').sidebar({ 
+        transition: 'overlay',
+        dimPage: false 
+    });
+    
+    $('#sidebar-toggle').click(function(e) {
+        e.preventDefault();
+        $('.ui.sidebar').sidebar('toggle');
+    });
+
+    // 3. Cargar las cuentas
     cargarCuentasCondominio();
 
-    // 3. Control de pestañas (Métodos de Pago)
+    // 4. Control de Pestañas
     $('.pm-btn').click(function() {
-        // Cambiar estilo activo
         $('.pm-btn').removeClass('active');
         $(this).addClass('active');
-        
-        // Cambiar lógica según botón clickeado
-        metodoActual = $(this).data('method'); // 'transferencia' o 'pago_movil'
-        
-        // Refrescar la lista de cuentas destino
+        metodoActual = $(this).data('method'); 
         actualizarSelectDestino();
     });
 
-    // 4. Mostrar vista previa al seleccionar una cuenta destino
+    // 5. Evento al cambiar banco destino
     $('#bancoDestino').change(mostrarPreviewBanco);
 
-    // 5. Manejar el envío del formulario
+    // 6. Envío del Formulario
     $('#form-reportar-pago').submit(enviarPago);
 });
 
 async function cargarCuentasCondominio() {
     const token = localStorage.getItem('token');
+    const select = $('#bancoDestino');
+
     try {
         const res = await fetch('http://localhost:3000/api/bancos', {
             headers: { 'Authorization': `Bearer ${token}` }
@@ -39,192 +45,124 @@ async function cargarCuentasCondominio() {
         
         if(res.ok) {
             cuentasCondominio = await res.json();
-            // Una vez cargados los datos, llenamos el select inicial
             actualizarSelectDestino();
         } else {
-            console.error("Error al cargar cuentas bancarias del servidor");
+            console.error("Error servidor:", res.status);
+            select.html('<option value="">Error cargando cuentas</option>');
         }
     } catch(e) { 
-        console.error("Error de conexión:", e); 
+        console.error("Error conexión:", e); 
+        select.html('<option value="">Error de conexión</option>');
     }
 }
 
 function actualizarSelectDestino() {
     const select = $('#bancoDestino');
-    select.empty(); // Limpiar opciones previas
+    select.empty(); 
     select.append('<option value="">Selecciona la cuenta destino...</option>');
     
-    // Ocultar la tarjeta de detalle hasta que seleccione algo
     $('#bankPreview').hide();
     $('#bankPreviewEmpty').show();
 
-    // Filtrar las cuentas según el método seleccionado
-    // Lógica: Si es 'pago_movil', buscamos cuentas con campo 'telefono'. 
-    //         Si es 'transferencia', buscamos cuentas SIN 'telefono' (o que sean explícitamente cuentas).
     const cuentasFiltradas = cuentasCondominio.filter(c => {
         if(metodoActual === 'pago_movil') {
-            return c.telefono !== null && c.telefono !== "";
+            return c.telefono && c.telefono.trim() !== "";
         } else {
-            return !c.telefono; // Asumimos que si no tiene teléfono, es una cuenta corriente/ahorro estándar
+            return !c.telefono || c.telefono.trim() === "";
         }
     });
 
-    // Llenar el select
     if (cuentasFiltradas.length === 0) {
-        select.append('<option value="" disabled>No hay cuentas configuradas para este método</option>');
+        select.append('<option value="" disabled>No hay cuentas disponibles</option>');
     } else {
         cuentasFiltradas.forEach(c => {
-            // Personalizamos el texto de la opción para que sea claro
-            let textoOpcion = "";
+            let texto = "";
             if (metodoActual === 'pago_movil') {
-                textoOpcion = `${c.banco} - ${c.telefono}`; 
+                texto = `${c.banco} - ${c.telefono}`; 
             } else {
-                // Para transferencia mostramos Banco y últimos 4 dígitos de la cuenta
-                const ultimosDigitos = c.numero_cuenta ? c.numero_cuenta.slice(-4) : '****';
-                textoOpcion = `${c.banco} - Cuenta ...${ultimosDigitos}`;
+                const ultimos = c.numero_cuenta ? c.numero_cuenta.slice(-4) : '****';
+                texto = `${c.banco} - *${ultimos}`;
             }
-            
-            // Usamos el ID de la base de datos como value
-            select.append(`<option value="${c.id}">${textoOpcion}</option>`);
+            select.append(`<option value="${c.id}">${texto}</option>`);
         });
     }
-    
-    // Si usas Semantic UI dropdown avanzado, podrías necesitar: $('#bancoDestino').dropdown('refresh');
 }
 
 function mostrarPreviewBanco() {
     const idCuenta = $(this).val();
-    
-    // Si no hay selección válida, ocultar
     if (!idCuenta) {
         $('#bankPreview').hide();
         $('#bankPreviewEmpty').show();
         return;
     }
 
-    // Buscar los datos completos de la cuenta seleccionada en el array
     const cuenta = cuentasCondominio.find(c => c.id == idCuenta);
 
     if(cuenta) {
         $('#bankPreviewEmpty').hide();
-        $('#bankPreview').show();
+        $('#bankPreview').css('display', 'flex');
         
-        // Llenar datos de la tarjeta visual
         $('#preview-banco').text(cuenta.banco);
         $('#preview-titular').text(cuenta.titular);
         
-        let infoHtml = '';
+        let htmlInfo = '';
         if(metodoActual === 'pago_movil') {
-            infoHtml = `
-                <div style="margin-top:10px; font-size: 0.95em;">
-                    <p><i class="mobile alternate icon"></i> <strong>Tel:</strong> ${cuenta.telefono}</p>
-                    <p><i class="id card icon"></i> <strong>C.I./RIF:</strong> ${cuenta.cedula_rif}</p>
-                </div>
-            `;
+            htmlInfo = `<br>Tel: ${cuenta.telefono}<br>CI/RIF: ${cuenta.cedula_rif}`;
         } else {
-            infoHtml = `
-                <div style="margin-top:10px; font-size: 0.95em;">
-                    <p><i class="hashtag icon"></i> <strong>Cuenta:</strong> <br>
-                    <span style="font-family: monospace; letter-spacing: 1px;">${cuenta.numero_cuenta}</span></p>
-                    <p><i class="id card icon"></i> <strong>RIF:</strong> ${cuenta.cedula_rif}</p>
-                    <p><i class="info circle icon"></i> <strong>Tipo:</strong> ${cuenta.tipo_cuenta}</p>
-                </div>
-            `;
+            htmlInfo = `<br>Cuenta: <span style="font-family:monospace">${cuenta.numero_cuenta}</span><br>RIF: ${cuenta.cedula_rif}<br>Tipo: ${cuenta.tipo_cuenta}`;
         }
-        $('#preview-info').html(infoHtml);
+        $('#preview-info').html(htmlInfo);
     }
 }
 
 async function enviarPago(e) {
     e.preventDefault();
     
-    // 1. Recoger datos del formulario
     const bancoDestinoId = $('#bancoDestino').val();
-    const bancoEmisorNombre = $('#bancoEmisor').val(); // Aquí toma lo que el usuario seleccionó de la lista completa
+    const bancoEmisor = $('#bancoEmisor').val();
     const concepto = $('#conceptoPago').val();
     const referencia = $('#codigoRef').val();
     const monto = $('#monto').val();
     const fecha = $('#fechaPago').val();
     const archivo = document.getElementById('voucherFile').files[0];
 
-    // 2. Validaciones básicas
-    if(!bancoDestinoId || !bancoEmisorNombre || !monto || !referencia || !fecha) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Faltan datos',
-            text: 'Por favor completa todos los campos obligatorios (*)'
-        });
-        return;
-    }
+    if(!bancoDestinoId) return Swal.fire('Error', 'Selecciona el banco destino', 'error');
+    if(!monto || !referencia || !fecha) return Swal.fire('Error', 'Faltan datos obligatorios', 'error');
+    if(!archivo) return Swal.fire('Atención', 'Debes subir el comprobante', 'warning');
 
-    if (!archivo) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Falta el comprobante',
-            text: 'Debes adjuntar una imagen o PDF del comprobante de pago.'
-        });
-        return;
-    }
-
-    // 3. Preparar datos para enviar (FormData para soportar archivo)
     const formData = new FormData();
-    formData.append('id_cuenta_destino', bancoDestinoId);
-    formData.append('banco_origen', bancoEmisorNombre);
+    formData.append('banco_destino_id', bancoDestinoId);
+    formData.append('banco_origen', bancoEmisor);
     formData.append('concepto', concepto);
     formData.append('referencia', referencia);
     formData.append('monto', monto);
-    formData.append('fecha_pago', fecha);
-    formData.append('metodo_pago', metodoActual === 'pago_movil' ? 'PAGO_MOVIL' : 'TRANSFERENCIA');
+    formData.append('fecha', fecha);
+    formData.append('metodo', metodoActual === 'pago_movil' ? 'PAGO_MOVIL' : 'TRANSFERENCIA');
     formData.append('comprobante', archivo);
 
-    // Obtener token
     const token = localStorage.getItem('token');
-    
-    // Estado de carga en el botón
-    const btnSubmit = $(this).find('button[type="submit"]');
-    const textoOriginal = btnSubmit.text();
-    btnSubmit.addClass('loading disabled');
+    const btn = $(this).find('button[type="submit"]');
+    btn.addClass('loading disabled');
 
     try {
-        // 4. Petición al Backend
-        // Asegúrate de tener este endpoint configurado en tu backend/index.js
         const res = await fetch('http://localhost:3000/api/pagos/reportar', {
             method: 'POST',
-            headers: { 
-                'Authorization': `Bearer ${token}`
-                // NOTA: No agregamos 'Content-Type' aquí, fetch lo genera automáticamente para FormData
-            },
+            headers: { 'Authorization': `Bearer ${token}` },
             body: formData
         });
 
         const data = await res.json();
 
         if(res.ok) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Pago Reportado',
-                text: 'Tu pago ha sido enviado exitosamente para revisión.',
-                confirmButtonText: 'Ir a Inicio'
-            }).then(() => {
-                window.location.href = './home_page.html';
-            });
+            Swal.fire('¡Enviado!', 'Tu pago ha sido reportado.', 'success')
+            .then(() => window.location.href = 'home_page.html');
         } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: data.error || 'Ocurrió un problema al reportar el pago.'
-            });
+            Swal.fire('Error', data.error || 'No se pudo reportar el pago', 'error');
         }
     } catch(err) {
         console.error(err);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error de conexión',
-            text: 'No se pudo conectar con el servidor. Intenta más tarde.'
-        });
+        Swal.fire('Error', 'Fallo de conexión', 'error');
     } finally {
-        // Restaurar botón
-        btnSubmit.removeClass('loading disabled');
-        btnSubmit.text(textoOriginal);
+        btn.removeClass('loading disabled');
     }
 }
