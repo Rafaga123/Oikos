@@ -11,3 +11,55 @@ body { background: linear-gradient(135deg, var(--color-primario) 0%, var(--color
 .action-card { cursor: pointer; transition: transform 0.2s; }
 .action-card:hover { transform: translateY(-5px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 .hidden-form { display: none; margin-top: 20px; }
+
+/* Estilo para el contenedor del fondo animado */
+.finisher-header {
+    position: fixed;   /* Fijo para que no se mueva */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;     /* Ocupa toda la altura de la ventana */
+    z-index: -1;       /* Se coloca detrás de todo el contenido */
+    pointer-events: none; /* Permite hacer clic a través de él */
+}
+
+
+.ui.segment.raised.center.aligned{
+    max-width: 500px;
+    padding: 40px;
+    background: linear-gradient(to bottom, var(--color-cuaternario), var(--color-terciario));
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+}
+
+.ui.segment.action-card{
+    background: linear-gradient(to bottom, var(--color-primario), var(--color-secundario));
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+}
+
+.building.icon.huge{
+    color: var(--color-terciario);
+}
+
+.users.icon.huge{
+    color: var(--color-cuaternario)
+}
+
+.ui.button.fluid{
+    background-color: var(--color-primario);
+}
+
+.ui.button.fluid:hover{
+    background-color: #7b7fd6;
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.25); 
+    transform: translateY(-2px); 
+}
+
+.ui.segment.hidden-form{
+    max-width: 500px;
+    padding: 40px;
+    background: linear-gradient(to bottom, var(--color-cuaternario), var(--color-terciario));
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}

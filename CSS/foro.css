@@ -276,3 +276,26 @@ h2{
 .ui.card{
     background: linear-gradient(135deg, #adeee2, #a2dcee) !important;   
 }
+
+/* Botón Volver Arriba Flotante */
+#btn-back-to-top {
+    position: fixed !important; /* SE QUEDA FIJO EN LA PANTALLA */
+    bottom: 100px;             /* Distancia desde el borde inferior de tu monitor */
+    right: 30px;              /* Distancia desde el borde derecho */
+    z-index: 9999 !important; /* Asegura que esté por encima de TODO */
+    display: flex !important; /* Siempre visible */
+    
+    /* Estética */
+    width: 60px;
+    height: 60px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+#btn-back-to-top:hover {
+    transform: scale(1.1);
+    background-color: #7b7fd6 !important;
+}

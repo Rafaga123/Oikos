@@ -200,3 +200,8 @@ function configurarModal() {
         publicarPost();
     });
 }
+
+function subirInicio() {
+    // Esto intenta subir tanto el body como el contenedor de Semantic UI
+    $('html, body, .pusher').animate({ scrollTop: 0 }, 'slow');
+}

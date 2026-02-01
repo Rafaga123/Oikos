@@ -29,7 +29,7 @@ async function cargarAnuncios() {
                     <h3 class="announcement-title">Todo tranquilo por aquí</h3>
                     <div class="announcement-content">
                         <p>No hay anuncios recientes en tu comunidad.</p>
-                        <i class="coffee icon" style="font-size: 3em; margin-top: 20px; color: #ccc;"></i>
+                        <img src="../Images/logo.png" alt="No hay anuncios" style="max-width: 200px; margin-top: 20px;">
                     </div>
                 </div>
             `;
