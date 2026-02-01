@@ -2,7 +2,7 @@ let activities = [];
 let currentActivityId = null;
 
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. Inicialización
+    // 1. Carga de datos
     loadActivities();
     
     // Configurar inputs de fecha (mínimo hoy)
@@ -24,9 +24,26 @@ document.addEventListener('DOMContentLoaded', function() {
     if(startInput) startInput.value = startTime;
     if(endInput) endInput.value = endTime;
     
-    // Inicializar contadores de caracteres
+    // Inicializar contadores
     updateCharCounter('titleCounter', 0, 100);
     updateCharCounter('descCounter', 0, 500);
+});
+
+// --- INICIALIZACIÓN DE UI (SIDEBAR Y DROPDOWNS) ---
+$(document).ready(function() {
+    // Dropdowns
+    $('.ui.dropdown').dropdown();
+
+    // Sidebar
+    $('.ui.sidebar').sidebar({ 
+        context: $('.pusher'), 
+        transition: 'overlay',
+        dimPage: false
+    });
+
+    $('#sidebar-toggle').click(function() {
+        $('.ui.sidebar').sidebar('toggle');
+    });
 });
 
 // ==========================================
@@ -37,7 +54,7 @@ async function loadActivities() {
     const token = localStorage.getItem('token');
     const listContainer = document.getElementById('activitiesList');
     
-    // Loader mientras carga
+    // Loader
     if(listContainer) listContainer.innerHTML = '<div class="ui active centered inline loader" style="margin-top: 50px;"></div>';
 
     try {
@@ -48,13 +65,13 @@ async function loadActivities() {
         if(res.ok) {
             const data = await res.json();
             
-            // Mapeo de datos (Backend -> Frontend)
+            // Mapeo Backend -> Frontend
             activities = data.map(a => ({
                 id: a.id,
                 title: a.titulo,
                 type: a.tipo,
                 area: a.area,
-                date: a.fecha.split('T')[0], // Convertir ISO a YYYY-MM-DD
+                date: a.fecha.split('T')[0], 
                 startTime: a.hora_inicio,
                 endTime: a.hora_fin,
                 description: a.descripcion,
@@ -67,7 +84,6 @@ async function loadActivities() {
             
             renderActivities();
             updateStats();
-            loadUpcomingActivities();
         } else {
             console.error('Error al cargar actividades');
             if(listContainer) listContainer.innerHTML = '<div class="ui error message">No se pudieron cargar los datos.</div>';
@@ -122,15 +138,8 @@ async function saveActivity() {
 
         if(res.ok) {
             closeModal('newActivity');
-            
-            // Simulación de notificación si el check está activo
-            if (document.getElementById('sendNotification').checked) {
-                showMessage('Notificación enviada a los residentes', 'info');
-            } else {
-                showMessage('Actividad guardada exitosamente', 'success');
-            }
-            
-            loadActivities(); // Recargar datos
+            showMessage(currentActivityId ? 'Actividad actualizada' : 'Actividad creada', 'success');
+            loadActivities(); 
         } else {
             alert('Error al guardar la actividad');
         }
@@ -148,8 +157,7 @@ async function updateStatusActivity(id, newStatus) {
         
         if(res.ok) {
             closeModal('viewActivity');
-            const label = getStatusLabel(newStatus);
-            showMessage(`Estado actualizado a: ${label}`, 'success');
+            showMessage(`Estado actualizado: ${getStatusLabel(newStatus)}`, 'success');
             loadActivities();
         } else {
             alert('No se pudo actualizar el estado');
@@ -179,7 +187,6 @@ function renderActivities() {
     const listContainer = document.getElementById('activitiesList');
     if(!listContainer) return;
 
-    // Obtener valores de filtros
     const typeFilter = document.getElementById('filterType').value;
     const statusFilter = document.getElementById('filterStatus').value;
     const areaFilter = document.getElementById('filterArea').value;
@@ -187,19 +194,17 @@ function renderActivities() {
     
     let filtered = activities;
     
-    // Aplicar filtros
     if (typeFilter !== 'all') filtered = filtered.filter(a => a.type === typeFilter);
     if (statusFilter !== 'all') filtered = filtered.filter(a => a.status === statusFilter);
     if (areaFilter !== 'all') filtered = filtered.filter(a => a.area === areaFilter);
     if (dateFilter) filtered = filtered.filter(a => a.date === dateFilter);
     
-    // Ordenar por fecha y hora
     filtered.sort((a, b) => new Date(a.date + 'T' + a.startTime) - new Date(b.date + 'T' + b.startTime));
 
     if (filtered.length === 0) {
         listContainer.innerHTML = `
-            <div class="no-results">
-                <i class="calendar times icon" style="font-size: 3em; margin-bottom: 15px; color: #ccc;"></i>
+            <div class="no-results" style="text-align:center; padding:30px; color:#777;">
+                <i class="calendar times icon" style="font-size: 3em; margin-bottom: 15px;"></i>
                 <h3>No hay actividades</h3>
                 <p>No se encontraron resultados con los filtros actuales.</p>
             </div>
@@ -226,25 +231,16 @@ function renderActivities() {
                 <div><i class="clock icon"></i> ${activity.startTime} - ${activity.endTime}</div>
                 <div><i class="map marker alternate icon"></i> ${getAreaLabel(activity.area)}</div>
                 <div><i class="user icon"></i> ${activity.organizer}</div>
-                ${activity.maxParticipants ? `<div><i class="users icon"></i> Máx: ${activity.maxParticipants}</div>` : ''}
             </div>
             
             <div class="activity-actions">
-                <button class="btn btn-small btn-primary" onclick="viewActivity(${activity.id})">
-                    <i class="eye icon"></i> Ver
-                </button>
+                <button class="btn btn-small btn-primary" onclick="viewActivity(${activity.id})"><i class="eye icon"></i> Ver</button>
                 <button class="btn btn-small btn-success" onclick="confirmActivity(${activity.id})" 
-                    ${activity.status === 'confirmed' || activity.status === 'cancelled' ? 'disabled' : ''}>
-                    <i class="check icon"></i>
-                </button>
+                    ${activity.status === 'confirmed' || activity.status === 'cancelled' ? 'disabled' : ''}><i class="check icon"></i></button>
                 <button class="btn btn-small btn-warning" onclick="editActivity(${activity.id})" 
-                    ${activity.status === 'cancelled' ? 'disabled' : ''}>
-                    <i class="edit icon"></i>
-                </button>
+                    ${activity.status === 'cancelled' ? 'disabled' : ''}><i class="edit icon"></i></button>
                 <button class="btn btn-small btn-danger" onclick="cancelActivity(${activity.id})" 
-                    ${activity.status === 'cancelled' ? 'disabled' : ''}>
-                    <i class="times icon"></i>
-                </button>
+                    ${activity.status === 'cancelled' ? 'disabled' : ''}><i class="times icon"></i></button>
             </div>
         </div>
     `).join('');
@@ -255,7 +251,6 @@ function editActivity(id) {
     const activity = activities.find(a => a.id === activityId);
     if (!activity) return;
     
-    // Llenar formulario
     document.getElementById('activityTitle').value = activity.title;
     document.getElementById('activityType').value = activity.type;
     document.getElementById('activityArea').value = activity.area;
@@ -268,7 +263,6 @@ function editActivity(id) {
     document.getElementById('maxParticipants').value = activity.maxParticipants || '';
     document.getElementById('activityStatus').value = activity.status;
     
-    // Actualizar contadores
     updateCharCounter('titleCounter', activity.title.length, 100);
     updateCharCounter('descCounter', activity.description.length, 500);
     
@@ -284,8 +278,7 @@ function viewActivity(id) {
     currentActivityId = id;
     document.getElementById('viewActivityTitle').textContent = activity.title;
     
-    const detailsContainer = document.getElementById('activityDetails');
-    detailsContainer.innerHTML = `
+    document.getElementById('activityDetails').innerHTML = `
         <div style="margin-bottom: 20px;">
             <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
                 <span class="activity-badge badge-${activity.type}">${getTypeLabel(activity.type)}</span>
@@ -317,7 +310,6 @@ function viewActivity(id) {
         </div>
     `;
     
-    // Configurar estado de botones en el modal
     const confirmBtn = document.getElementById('confirmBtn');
     const editBtn = document.getElementById('editBtn');
     const cancelBtn = document.getElementById('cancelBtn');
@@ -327,43 +319,26 @@ function viewActivity(id) {
         if (activity.status === 'confirmed') confirmBtn.innerHTML = '<i class="check icon"></i> Confirmada';
         else confirmBtn.innerHTML = '<i class="check icon"></i> Confirmar';
     }
-    
     if (editBtn) editBtn.disabled = activity.status === 'cancelled';
     if (cancelBtn) cancelBtn.disabled = activity.status === 'cancelled';
 
     document.getElementById('viewActivityModal').classList.add('active');
 }
 
-// --- ESTADÍSTICAS Y SIDEBAR ---
+// --- ESTADÍSTICAS Y UTILS ---
 
 function updateStats() {
     const today = new Date().toISOString().split('T')[0];
     
-    const total = activities.length;
-    const pending = activities.filter(a => a.status === 'pending').length;
-    const todayActivities = activities.filter(a => a.date === today).length;
+    setText('total-activities', activities.length);
+    setText('pending-activities', activities.filter(a => a.status === 'pending').length);
+    setText('today-activities', activities.filter(a => a.date === today).length);
     
-    const meetings = activities.filter(a => a.type === 'meeting').length;
-    const reservations = activities.filter(a => a.type === 'reservation').length;
-    const communityActs = activities.filter(a => a.type === 'activity').length;
-    const maintenance = activities.filter(a => a.type === 'maintenance').length;
-    
-    setText('total-activities', total);
-    setText('pending-activities', pending);
-    setText('today-activities', todayActivities);
-    
-    setText('stat-meetings', meetings);
-    setText('stat-reservations', reservations);
-    setText('stat-activities', communityActs);
-    setText('stat-maintenance', maintenance);
+    setText('stat-meetings', activities.filter(a => a.type === 'meeting').length);
+    setText('stat-reservations', activities.filter(a => a.type === 'reservation').length);
+    setText('stat-activities', activities.filter(a => a.type === 'activity').length);
+    setText('stat-maintenance', activities.filter(a => a.type === 'maintenance').length);
 }
-
-function loadUpcomingActivities() {
-    // Esta función se puede expandir si tienes un sidebar derecho de "Próximas"
-    // Actualmente el HTML no lo muestra explícitamente, pero lo dejamos listo.
-}
-
-// --- UTILS ---
 
 function filterActivities(filter = null) {
     if (filter === 'all') {
@@ -374,11 +349,7 @@ function filterActivities(filter = null) {
     } else if (filter === 'pending') {
         setVal('filterStatus', 'pending');
     } else if (filter === 'today') {
-        const today = new Date().toISOString().split('T')[0];
-        setVal('filterDate', today);
-        setVal('filterType', 'all');
-        setVal('filterStatus', 'all');
-        setVal('filterArea', 'all');
+        setVal('filterDate', new Date().toISOString().split('T')[0]);
     }
     renderActivities();
 }
@@ -389,38 +360,27 @@ function clearDateFilter() {
     renderActivities();
 }
 
-function openModal(modalType) {
-    if(modalType === 'newActivity') {
+function openModal(type) {
+    if(type === 'newActivity') {
         resetForm();
         document.getElementById('newActivityModal').classList.add('active');
     }
 }
 
-function closeModal(modalType) {
-    document.getElementById(modalType + 'Modal').classList.remove('active');
+function closeModal(type) {
+    document.getElementById(type + 'Modal').classList.remove('active');
 }
 
 function resetForm() {
     document.getElementById('activityForm').reset();
-    
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('activityDate').value = today;
-    
+    document.getElementById('activityDate').value = new Date().toISOString().split('T')[0];
     document.getElementById('activityStatus').value = 'pending';
-    document.getElementById('sendNotification').checked = true;
-    
     currentActivityId = null;
-    updateCharCounter('titleCounter', 0, 100);
-    updateCharCounter('descCounter', 0, 500);
 }
 
 function updateCharCounter(id, len, max) {
     const el = document.getElementById(id);
-    if(el) {
-        el.textContent = `${len}/${max}`;
-        el.classList.toggle('warning', len > max * 0.9);
-        el.classList.toggle('danger', len > max);
-    }
+    if(el) el.textContent = `${len}/${max}`;
 }
 
 function setText(id, text) {
@@ -433,7 +393,7 @@ function setVal(id, val) {
     if(el) el.value = val;
 }
 
-// --- LABELS & FORMATS ---
+// --- ETIQUETAS Y FORMATO ---
 
 function getTypeLabel(type) {
     const types = { 'meeting': 'Reunión', 'reservation': 'Reserva', 'activity': 'Actividad', 'maintenance': 'Mantenimiento' };
@@ -456,37 +416,16 @@ function getAreaLabel(area) {
 
 function formatDate(dateString) {
     const date = new Date(dateString);
-    // Ajuste de zona horaria para evitar que salga un día antes
-    const userTimezoneOffset = date.getTimezoneOffset() * 60000;
-    const adjustedDate = new Date(date.getTime() + userTimezoneOffset);
-    
-    return adjustedDate.toLocaleDateString('es-ES', { 
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
-    });
+    const offset = date.getTimezoneOffset() * 60000;
+    const adjustedDate = new Date(date.getTime() + offset);
+    return adjustedDate.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 function showMessage(message, type = 'info') {
-    const messageEl = document.createElement('div');
-    messageEl.style.cssText = `
-        position: fixed; top: 100px; right: 20px; padding: 15px 25px;
-        border-radius: 8px; color: white; font-weight: 500; z-index: 9999;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; opacity: 0;
-    `;
-    
-    switch(type) {
-        case 'success': messageEl.style.background = 'linear-gradient(135deg, #00b09b 0%, #96c93d 100%)'; break;
-        case 'warning': messageEl.style.background = 'linear-gradient(135deg, #f7971e 0%, #ffd200 100%)'; break;
-        case 'danger': messageEl.style.background = 'linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%)'; break;
-        default: messageEl.style.background = 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)';
-    }
-    
-    messageEl.textContent = message;
-    document.body.appendChild(messageEl);
-    
-    // Animar
-    requestAnimationFrame(() => { messageEl.style.opacity = '1'; });
-    setTimeout(() => {
-        messageEl.style.opacity = '0';
-        setTimeout(() => document.body.removeChild(messageEl), 300);
-    }, 3000);
+    const div = document.createElement('div');
+    div.style.cssText = `position: fixed; top: 100px; right: 20px; padding: 15px 25px; border-radius: 8px; color: white; font-weight: 500; z-index: 9999; opacity: 0; transition: 0.3s; background: ${type === 'success' ? '#00b09b' : '#4facfe'}; box-shadow: 0 4px 15px rgba(0,0,0,0.2);`;
+    div.textContent = message;
+    document.body.appendChild(div);
+    requestAnimationFrame(() => div.style.opacity = '1');
+    setTimeout(() => { div.style.opacity = '0'; setTimeout(() => div.remove(), 300); }, 3000);
 }
