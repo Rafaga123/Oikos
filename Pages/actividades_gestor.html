@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Actividades Comunitarias</title>
+    <link rel="shortcut icon" href="../Images/logo.ico" />
+    <script src="../Scripts/jquery-3.7.1.min.js"></script>
+    <script src="../Scripts/semantic.min.js"></script>
+    <link rel="stylesheet" type="text/CSS" href="../CSS/semantic.css">       
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <link rel="stylesheet" href="../CSS/actividades_gestor.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="ui vertical inverted sidebar menu sidebar-menu" style="background-color: #9A9CEA;">
+        <div class="item">
+            <div class="header">
+                <h2 class="ui inverted header">
+                    <i class="cog icon"></i>
+                    <div class="content">
+                        Panel Gestor
+                        <div class="sub header">Gestión de Habitantes</div>
+                    </div>
+                </h2>
+            </div>
+        </div>
+        <div class="item">
+            <div class="menu">
+                <a class="item" href="./gestor.html">
+                    <i class="home icon"></i>
+                    Panel de Control
+                </a>
+                <a class="active item">
+                    <i class="users icon"></i>
+                    Habitantes
+                </a>
+                <a class="item" href="./solicitudes.html">
+                    <i class="chart bar icon" href=""></i>
+                    Incidencias
+                </a>
+                <a class="item" href="./solicitudes_nuevas.html">
+                    <i class="chart bar icon"></i>
+                    Solicitudes nuevas
+                </a>
+                <a class="item" href="./pagos_gestor.html">
+                    <i class="money bill alternate icon"></i>
+                    Pagos
+                </a>
+                <a class="item" href="./crear_horario.html">
+                    <i class="clock icon"></i>
+                    Modificar Horarios
+                </a>
+                <a class="item" href="./modificar_metodo_pago.html">
+                    <i class="credit card icon"></i>
+                    Modificar Pagomovil
+                </a>
+                <a class="item" href="./actividades_gestor.html">
+                    <i class="calendar icon"></i>
+                    Actividades
+                </a>
+                
+            </div>
+        </div>
+        <div class="item">
+            <div class="ui divider"></div>
+            <a class="item" onclick="cerrarSesion()">
+                <i class="sign out icon"></i>
+                Cerrar Sesión
+            </a>
+        </div>
+         <div class="sidebar-footer-image">
+            <img src="../Images/logopng.png" alt="Decoración de Sidebar">
+        </div>
+    </div>
+    </div>
+
+    <!-- Page Contents -->
+    <div class="pusher">
+        <!-- Top Menu -->
+        <div class="ui top fixed menu" style="background-color: #9A9CEA;">
+            <div class="ui container">
+                <div class="item">
+                    <img src="../Images/logopng.png" alt="Logo"> <!--logo de la pagina-->
+                </div>
+                <a class="item" id="sidebar-toggle">
+                    <i class="sidebar icon" style="color: white;"></i>
+                </a>
+                <div class="header item" style="color: white;">
+                    Gestión de Actividades
+                </div>
+                <div class="right menu">
+                    <div class="ui dropdown item" style="color: white;">
+                        <i class="user icon" style="color: white;"></i> Gestor
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <a class="item"><i class="user icon"></i> Mi Perfil</a>
+                            <a class="item"><i class="cog icon"></i> Configuración</a>
+                            <div class="divider"></div>
+                            <a class="item" onclick="cerrarSesion()"><i class="sign out icon"></i> Cerrar Sesión</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Contenido principal -->
+    <div class="main-container">
+        <!-- Dashboard Cards -->
+        <div class="dashboard-cards">
+            <div class="dashboard-card" onclick="filterActivities('all')">
+                <div class="card-icon icon-activity">
+                    <i class="calendar icon"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Total Actividades</h3>
+                    <div class="number" id="total-activities">0</div>
+                    <div class="text">Programadas</div>
+                </div>
+            </div>
+            
+            <div class="dashboard-card" onclick="filterActivities('pending')">
+                <div class="card-icon icon-reservation">
+                    <i class="clock icon"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Pendientes</h3>
+                    <div class="number" id="pending-activities">0</div>
+                    <div class="text">Por confirmar</div>
+                </div>
+            </div>
+            
+            <div class="dashboard-card" onclick="filterActivities('today')">
+                <div class="card-icon icon-meeting">
+                    <i class="users icon"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Para Hoy</h3>
+                    <div class="number" id="today-activities">0</div>
+                    <div class="text">Actividades hoy</div>
+                </div>
+            </div>
+            
+            <div class="dashboard-card" onclick="openModal('newActivity')">
+                <div class="card-icon icon-schedule">
+                    <i class="plus icon"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Nueva Actividad</h3>
+                    <div class="text">Crear actividad o reunión</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de control -->
+        <div class="control-panel">
+            <div class="panel-header">
+                <h2><i class="tasks icon"></i> Panel de Control de Actividades</h2>
+                
+            </div>
+            
+            <!-- Filtros -->
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label for="filterType">Tipo de Actividad</label>
+                    <select id="filterType" class="filter-select" onchange="filterActivities()">
+                        <option value="all">Todos los tipos</option>
+                        <option value="meeting">Reuniones</option>
+                        <option value="reservation">Reservas</option>
+                        <option value="activity">Actividades</option>
+                        <option value="maintenance">Mantenimiento</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filterStatus">Estado</label>
+                    <select id="filterStatus" class="filter-select" onchange="filterActivities()">
+                        <option value="all">Todos los estados</option>
+                        <option value="pending">Pendiente</option>
+                        <option value="confirmed">Confirmado</option>
+                        <option value="cancelled">Cancelado</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filterArea">Área Común</label>
+                    <select id="filterArea" class="filter-select" onchange="filterActivities()">
+                        <option value="all">Todas las áreas</option>
+                        <option value="salon">Salón Social</option>
+                        <option value="parque">Parque Infantil</option>
+                        <option value="piscina">Piscina</option>
+                        <option value="gym">Gimnasio</option>
+                        <option value="bbq">Zona BBQ</option>
+                        <option value="estacionamiento">Estacionamiento</option>
+                        <option value="jardin">Jardín</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group date-filter">
+                    <div>
+                        <label for="filterDate">Buscar por Fecha</label>
+                        <input type="date" id="filterDate" class="form-control" onchange="filterByDate()">
+                    </div>
+                    <button class="btn btn-info" onclick="clearDateFilter()">
+                        <i class="times icon"></i> Limpiar
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Estadísticas rápidas -->
+            <div class="quick-stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="stat-meetings">0</div>
+                    <div class="stat-label">Reuniones</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="stat-reservations">0</div>
+                    <div class="stat-label">Reservas</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="stat-activities">0</div>
+                    <div class="stat-label">Actividades</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="stat-maintenance">0</div>
+                    <div class="stat-label">Mantenimiento</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de actividades -->
+        <div class="activities-list" id="activitiesList">
+            <!-- Las actividades se cargarán aquí dinámicamente -->
+        </div>
+
+       
+    </div>
+
+    <!-- Modal para nueva actividad -->
+    <div class="modal-overlay" id="newActivityModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="calendar plus icon"></i> Nueva Actividad</h2>
+                <button class="close-modal" onclick="closeModal('newActivity')">&times;</button>
+            </div>
+            
+            <form id="activityForm">
+                <div class="form-group">
+                    <label for="activityTitle" class="required">Título de la Actividad</label>
+                    <input type="text" id="activityTitle" class="form-control" 
+                           placeholder="Ej: Reunión de Vecinos, Cumpleaños en el Parque" 
+                           maxlength="100"
+                           oninput="updateCharCounter('titleCounter', this.value.length, 100)"
+                           required>
+                    <div class="char-counter" id="titleCounter">0/100</div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="activityType" class="required">Tipo de Actividad</label>
+                        <select id="activityType" class="form-control" required>
+                            <option value="">Seleccionar tipo</option>
+                            <option value="meeting">Reunión</option>
+                            <option value="reservation">Reserva</option>
+                            <option value="activity">Actividad Comunitaria</option>
+                            <option value="maintenance">Mantenimiento</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="activityArea" class="required">Área Común</label>
+                        <select id="activityArea" class="form-control" required>
+                            <option value="">Seleccionar área</option>
+                            <option value="salon">Salón Social</option>
+                            <option value="parque">Parque Infantil</option>
+                            <option value="piscina">Piscina</option>
+                            <option value="gym">Gimnasio</option>
+                            <option value="bbq">Zona BBQ</option>
+                            <option value="estacionamiento">Estacionamiento</option>
+                            <option value="jardin">Jardín</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="activityDate" class="required">Fecha</label>
+                        <input type="date" id="activityDate" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="startTime" class="required">Hora Inicio</label>
+                            <input type="time" id="startTime" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="endTime" class="required">Hora Fin</label>
+                            <input type="time" id="endTime" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="activityDescription" class="required">Descripción</label>
+                    <textarea id="activityDescription" class="form-control" 
+                              placeholder="Describe la actividad, reunión o evento..." 
+                              rows="4" 
+                              maxlength="500"
+                              oninput="updateCharCounter('descCounter', this.value.length, 500)"
+                              required></textarea>
+                    <div class="char-counter" id="descCounter">0/500</div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="organizerName" class="required">Organizador / Responsable</label>
+                        <input type="text" id="organizerName" class="form-control" 
+                               placeholder="Nombre de la persona o departamento responsable" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="organizerContact">Contacto del Organizador</label>
+                        <input type="text" id="organizerContact" class="form-control" 
+                               placeholder="Teléfono o email de contacto">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="maxParticipants">Máximo de Participantes</label>
+                        <input type="number" id="maxParticipants" class="form-control" 
+                               placeholder="Cantidad máxima de personas" min="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="activityStatus">Estado Inicial</label>
+                        <select id="activityStatus" class="form-control">
+                            <option value="pending">Pendiente</option>
+                            <option value="confirmed">Confirmado</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="sendNotification" checked> 
+                        <i class="bell icon"></i> Enviar notificación a los residentes
+                    </label>
+                </div>
+                
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button type="button" class="btn btn-primary" onclick="saveActivity()">
+                        <i class="save icon"></i> Guardar Actividad
+                    </button>
+                    <button type="button" class="btn" onclick="closeModal('newActivity')">
+                        <i class="times icon"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para ver/editar actividad -->
+    <div class="modal-overlay" id="viewActivityModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="viewActivityTitle"></h2>
+                <button class="close-modal" onclick="closeModal('viewActivity')">&times;</button>
+            </div>
+            
+            <div id="activityDetails">
+                <!-- Los detalles se cargarán aquí -->
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 30px; flex-wrap: wrap;">
+                <button class="btn btn-success" onclick="confirmActivity()" id="confirmBtn">
+                    <i class="check icon"></i> Confirmar
+                </button>
+                <button class="btn btn-warning" onclick="editActivity()" id="editBtn">
+                    <i class="edit icon"></i> Editar
+                </button>
+                <button class="btn btn-danger" onclick="cancelActivity()" id="cancelBtn">
+                    <i class="times icon"></i> Cancelar
+                </button>
+                <button class="btn" onclick="closeModal('viewActivity')">
+                    <i class="close icon"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../Scripts/actividades_gestor.js"></script>
+</body>
+</html>
