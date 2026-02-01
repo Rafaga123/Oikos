@@ -2014,6 +2014,76 @@ app.get('/api/gestor/encuestas/resultados', verificarToken, async (req, res) => 
     }
 });
 
+// 1. OBTENER CUENTAS (Público para Gestor y Habitante)
+app.get('/api/bancos', verificarToken, async (req, res) => {
+    try {
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+        if (!usuario.id_comunidad) return res.json([]);
+
+        const cuentas = await prisma.cuentaBancaria.findMany({
+            where: { id_comunidad: usuario.id_comunidad }
+        });
+        res.json(cuentas);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al obtener cuentas' });
+    }
+});
+
+// 2. GUARDAR/EDITAR CUENTA (Solo Gestor)
+// Usamos "upsert" lógico: si ya existe una cuenta de ese banco y tipo para esa comunidad, la actualizamos.
+app.post('/api/gestor/bancos', verificarToken, async (req, res) => {
+    try {
+        const { banco, numero_cuenta, titular, cedula_rif, tipo_cuenta, telefono, email } = req.body; // email es opcional, lo guardamos en un campo extra o reutilizamos
+        const gestor = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        // Buscar si ya existe una configuración para este banco y tipo (ej: Banesco - Pago Movil)
+        // Como tu esquema no tiene un campo "tipo_metodo" explícito (solo "tipo_cuenta"), usaremos "tipo_cuenta" 
+        // para distinguir entre 'transferencia' (corriente/ahorro) y 'pago_movil'.
+        
+        // NOTA: Para simplificar y adaptar a tu HTML que separa por pestañas, asumiremos que:
+        // Si mandan telefono -> Es Pago Móvil.
+        // Si no mandan telefono -> Es Transferencia.
+
+        const cuentaExistente = await prisma.cuentaBancaria.findFirst({
+            where: {
+                id_comunidad: gestor.id_comunidad,
+                banco: banco,
+                // Si es pago móvil (tiene telefono), buscamos uno que tenga telefono. Si es transferencia, uno que no.
+                telefono: telefono ? { not: null } : null 
+            }
+        });
+
+        let resultado;
+        if (cuentaExistente) {
+            resultado = await prisma.cuentaBancaria.update({
+                where: { id: cuentaExistente.id },
+                data: { numero_cuenta, titular, cedula_rif, tipo_cuenta, telefono }
+            });
+        } else {
+            resultado = await prisma.cuentaBancaria.create({
+                data: {
+                    id_comunidad: gestor.id_comunidad,
+                    banco, numero_cuenta, titular, cedula_rif, tipo_cuenta, telefono
+                }
+            });
+        }
+
+        res.json({ message: 'Datos guardados correctamente', data: resultado });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al guardar datos bancarios' });
+    }
+});
+
+app.delete('/api/gestor/bancos/:id', verificarToken, async (req, res) => {
+    try {
+        await prisma.cuentaBancaria.delete({ where: { id: parseInt(req.params.id) } });
+        res.json({ message: 'Cuenta eliminada' });
+    } catch (e) { res.status(500).json({ error: 'Error al eliminar' }); }
+});
+
 // Iniciar servidor
 app.listen(port, async () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
