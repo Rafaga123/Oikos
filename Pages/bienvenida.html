@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../CSS/bienvenida.css">
 </head>
 <body>
-
+<div class="header finisher-header" style="width: 100%; height: 100vh;"></div>
 <div class="welcome-container">
     <div class="ui segment raised center aligned" id="main-selection">
         <h1 class="ui header text-primary">¡Bienvenido a Oikos!</h1>
@@ -19,14 +19,14 @@
         <div class="ui two column grid stackable">
             <div class="column">
                 <div class="ui segment action-card" id="btn-crear">
-                    <i class="building icon huge blue"></i>
+                    <i class="building icon huge"></i>
                     <h3 class="ui header">Crear Comunidad</h3>
                     <p>Soy el encargado/presidente y quiero registrar mi edificio o urbanización.</p>
                 </div>
             </div>
             <div class="column">
                 <div class="ui segment action-card" id="btn-unirse">
-                    <i class="users icon huge green"></i>
+                    <i class="users icon huge"></i>
                     <h3 class="ui header">Unirme a Comunidad</h3>
                     <p>Ya vivo en una comunidad registrada y tengo el código de acceso.</p>
                 </div>
@@ -71,11 +71,51 @@
                     </select>
                 </div>
             </div>
-            <button class="ui button green fluid" type="submit">Enviar Solicitud</button>
+            <button class="ui button fluid" type="submit">Enviar Solicitud</button>
             <div class="ui button fluid basic" style="margin-top:10px" id="cancelar-unir">Cancelar</div>
         </form>
     </div>
 </div>
+
+<script src="../Scripts/finisher-header.es5.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    new FinisherHeader({
+    "count": 6,
+    "size": {
+        "min": 1100,
+        "max": 1300,
+        "pulse": 0
+    },
+    "speed": {
+        "x": {
+        "min": 0.1,
+        "max": 0.3
+        },
+        "y": {
+        "min": 0.1,
+        "max": 0.3
+        }
+    },
+    "colors": {
+        "background": "#9a9cea",
+        "particles": [
+        "#a2b9ee",
+        "#a2dcee",
+        "#a544a5",
+        "#524ff2"
+        ]
+    },
+    "blending": "overlay",
+    "opacity": {
+        "center": 1,
+        "edge": 0.1
+    },
+    "skew": -2,
+    "shapes": [
+        "c"
+    ]
+    });
+</script>
 
 <script src="../Scripts/jquery-3.7.1.min.js"></script>
 <script src="../Scripts/semantic.min.js"></script>

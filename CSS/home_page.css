@@ -47,6 +47,21 @@ h3{
     border-radius: 15px;
 }
 
+/* Aumentar el tamaño del contenedor de la imagen en la parte inferior */
+.ui.card .extra.content .right.floated.author {
+    display: flex;
+    align-items: center;
+    /* Esto asegura que el contenedor tenga espacio suficiente */
+}
+
+/*Cambiar el tamaño del avatar específicamente en tarjetas */
+.ui.card .extra.content .right.floated.author img.ui.avatar.image {
+    width: 4em !important;   /* Ajusta este valor (4em es el doble del estándar) */
+    height: 4em !important;  /* Debe ser igual al ancho para mantener el círculo */
+    max-width: none !important; 
+    border-radius: 500rem;   /* Mantiene la forma circular */
+}
+
 
 .ui.placeholder {
     color: #ADEEE2;
