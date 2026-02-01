@@ -9,7 +9,7 @@ async function cargarReglamento() {
     const contenedor = document.getElementById('contenedor-reglamento');
     
     try {
-        const res = await fetch('http://localhost:3000/api/reglas', {
+        const res = await fetch('/api/reglas', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         

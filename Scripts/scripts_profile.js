@@ -49,7 +49,7 @@ async function cargarPerfil() {
     if (!token) return; // seguridad.js se encarga del resto
 
     try {
-        const res = await fetch('http://localhost:3000/api/perfil', {
+        const res = await fetch('/api/perfil', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const usuario = await res.json();
@@ -132,7 +132,7 @@ async function subirFoto(e) {
         const textoOriginal = nombreElem.textContent;
         nombreElem.textContent = "Subiendo foto...";
 
-        const res = await fetch('http://localhost:3000/api/perfil/foto', {
+        const res = await fetch('/api/perfil/foto', {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData

@@ -83,7 +83,7 @@ $(document).ready(function() {
 async function cargarPagos() {
     const token = localStorage.getItem('token');
     try {
-        const res = await fetch('http://localhost:3000/api/gestor/pagos', {
+        const res = await fetch('/api/gestor/pagos', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         

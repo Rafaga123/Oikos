@@ -18,7 +18,7 @@ async function cargarResultadosEncuestas() {
     const token = localStorage.getItem('token');
     
     try {
-        const res = await fetch('http://localhost:3000/api/gestor/encuestas/resultados', {
+        const res = await fetch('/api/gestor/encuestas/resultados', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         

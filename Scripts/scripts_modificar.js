@@ -36,7 +36,7 @@ $(document).ready(function() {
 async function loadRules() {
     const token = localStorage.getItem('token');
     try {
-        const res = await fetch('http://localhost:3000/api/reglas', {
+        const res = await fetch('/api/reglas', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         

@@ -58,7 +58,7 @@ async function loadActivities() {
     if(listContainer) listContainer.innerHTML = '<div class="ui active centered inline loader" style="margin-top: 50px;"></div>';
 
     try {
-        const res = await fetch('http://localhost:3000/api/actividades', {
+        const res = await fetch('/api/actividades', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         

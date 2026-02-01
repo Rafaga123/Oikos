@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
-      const resp = await fetch('http://localhost:3000/api/comunidades/unirse', {
+      const resp = await fetch('/api/comunidades/unirse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cedula, codigo_unico })

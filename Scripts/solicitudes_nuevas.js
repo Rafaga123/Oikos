@@ -26,7 +26,7 @@ $(document).ready(function() {
 async function loadSolicitudes() {
     const token = localStorage.getItem('token');
     try {
-        const res = await fetch('http://localhost:3000/api/gestor/solicitudes', {
+        const res = await fetch('/api/gestor/solicitudes', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
@@ -182,7 +182,7 @@ async function enviarRespuesta() {
     }
 
     try {
-        const res = await fetch('http://localhost:3000/api/gestor/responder-solicitud', {
+        const res = await fetch('/api/gestor/responder-solicitud', {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',

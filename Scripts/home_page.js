@@ -13,7 +13,7 @@ async function cargarAnuncios() {
     const container = document.getElementById('carousel-container');
     
     try {
-        const res = await fetch('http://localhost:3000/api/anuncios', {
+        const res = await fetch('/api/anuncios', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 

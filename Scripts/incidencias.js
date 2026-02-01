@@ -17,7 +17,7 @@ async function cargarMisReportes() {
     const contenedor = document.getElementById('contenedor-reportes');
     
     try {
-        const res = await fetch('http://localhost:3000/api/incidencias/mis-reportes', {
+        const res = await fetch('/api/incidencias/mis-reportes', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -76,7 +76,7 @@ async function enviarReporte() {
     };
 
     try {
-        const res = await fetch('http://localhost:3000/api/incidencias', {
+        const res = await fetch('/api/incidencias', {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',

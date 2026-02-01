@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pass !== conf) return showError('Las contraseñas no coinciden');
 
     try {
-      const res = await fetch('http://localhost:3000/api/password/reset', {
+      const res = await fetch('/api/password/reset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, password: pass })

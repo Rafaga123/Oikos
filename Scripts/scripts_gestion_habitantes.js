@@ -90,7 +90,7 @@ $(document).ready(function() {
 async function loadHabitantsFromAPI() {
     const token = localStorage.getItem('token');
     try {
-        const res = await fetch('http://localhost:3000/api/gestor/habitantes', {
+        const res = await fetch('/api/gestor/habitantes', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         

@@ -30,7 +30,7 @@ $(document).ready(function() {
         if(!titulo || !contenido) return;
 
         try {
-            const res = await fetch('http://localhost:3000/api/foro', {
+            const res = await fetch('/api/foro', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ titulo, contenido })
@@ -67,7 +67,7 @@ async function cargarPosts() {
     contenedor.innerHTML = '<div class="ui active centered inline loader" style="margin-top:20px;"></div>';
 
     try {
-        const res = await fetch('http://localhost:3000/api/foro', {
+        const res = await fetch('/api/foro', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         

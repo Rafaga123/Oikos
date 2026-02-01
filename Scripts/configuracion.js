@@ -118,7 +118,7 @@ function configurarPermisos(rol) {
 async function cargarInfoComunidad() {
     const token = localStorage.getItem('token');
     try {
-        const res = await fetch('http://localhost:3000/api/comunidad/info', {
+        const res = await fetch('/api/comunidad/info', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await res.json();
@@ -151,7 +151,7 @@ async function actualizarComunidad(e) {
     const direccion = $('#comunidad-direccion').val();
 
     try {
-        const res = await fetch('http://localhost:3000/api/comunidad', {
+        const res = await fetch('/api/comunidad', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ nombre, direccion })
@@ -201,7 +201,7 @@ async function cambiarPassword(e) {
 
     const token = localStorage.getItem('token');
     try {
-        const res = await fetch('http://localhost:3000/api/auth/cambiar-password', {
+        const res = await fetch('/api/auth/cambiar-password', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ passwordActual: passActual, passwordNuevo: passNueva })
@@ -261,7 +261,7 @@ async function eliminarCuenta() {
     if (password) {
         const token = localStorage.getItem('token');
         try {
-            const res = await fetch('http://localhost:3000/api/auth/eliminar-cuenta', {
+            const res = await fetch('/api/auth/eliminar-cuenta', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ password: password }) 
@@ -311,7 +311,7 @@ async function transferirGestoria() {
     if (password) {
         const token = localStorage.getItem('token');
         try {
-            const res = await fetch('http://localhost:3000/api/comunidad/transferir', {
+            const res = await fetch('/api/comunidad/transferir', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ cedulaNuevoGestor: cedula, password: password })
@@ -369,7 +369,7 @@ async function salirDeComunidad() {
     if (password) {
         const token = localStorage.getItem('token');
         try {
-            const res = await fetch('http://localhost:3000/api/comunidad/salir', {
+            const res = await fetch('/api/comunidad/salir', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ password: password })

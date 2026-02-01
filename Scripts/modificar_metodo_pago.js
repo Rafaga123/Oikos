@@ -28,7 +28,7 @@ $(document).ready(function() {
 async function cargarCuentas() {
     const token = localStorage.getItem('token');
     try {
-        const res = await fetch('http://localhost:3000/api/bancos', {
+        const res = await fetch('/api/bancos', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if(res.ok) {
@@ -179,7 +179,7 @@ async function guardarCuenta() {
 
     const token = localStorage.getItem('token');
     try {
-        const res = await fetch('http://localhost:3000/api/gestor/bancos', {
+        const res = await fetch('/api/gestor/bancos', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify(payload)

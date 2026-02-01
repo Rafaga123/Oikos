@@ -25,6 +25,15 @@ const port = 3000;
 app.use(express.json());
 app.use(cors());
 
+// 1. Decirle a Express dónde están tus archivos del frontend (CSS, JS, Imágenes)
+// Como 'index.js' está en la carpeta 'backend', subimos un nivel (../) para llegar a la raíz
+app.use(express.static(path.join(__dirname, '../')));
+
+// 2. Ruta principal: Cuando entren al link, mostrar el index.html (Login)
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../Pages/login.html')); // O '../index.html' si tienes uno principal afuera
+});
+
 const verificarToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1]; // Formato: "Bearer TOKEN_AQUI"

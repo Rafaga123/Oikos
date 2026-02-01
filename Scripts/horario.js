@@ -8,7 +8,7 @@ async function cargarDashboardHorarios() {
     const container = document.querySelector('.horarios-dashboard'); // Asegúrate que este div exista en horario.html
     
     try {
-        const res = await fetch('http://localhost:3000/api/horarios', {
+        const res = await fetch('/api/horarios', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         

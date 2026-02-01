@@ -9,7 +9,7 @@ async function loadResidentActivities() {
     const grid = document.getElementById('activities-grid');
     
     try {
-        const res = await fetch('http://localhost:3000/api/actividades', {
+        const res = await fetch('/api/actividades', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         

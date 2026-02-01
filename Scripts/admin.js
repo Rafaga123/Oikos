@@ -11,7 +11,7 @@ async function cargarEstadisticas() {
     const token = localStorage.getItem('token');
     
     try {
-        const res = await fetch('http://localhost:3000/api/gestor/dashboard-stats', {
+        const res = await fetch('/api/gestor/dashboard-stats', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 

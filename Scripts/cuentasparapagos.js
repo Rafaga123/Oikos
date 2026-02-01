@@ -14,7 +14,7 @@ async function cargarCuentasUsuario() {
     const container = document.querySelector('.ui.fluid.raised.card .description');
     
     try {
-        const res = await fetch('http://localhost:3000/api/bancos', {
+        const res = await fetch('/api/bancos', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         

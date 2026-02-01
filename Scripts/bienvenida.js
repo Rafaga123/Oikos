@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const direccion = document.getElementById('crear-direccion').value;
 
         try {
-            const res = await fetch('http://localhost:3000/api/comunidades', {
+            const res = await fetch('/api/comunidades', {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const tipo = document.getElementById('unir-tipo').value;
 
         try {
-            const res = await fetch('http://localhost:3000/api/comunidades/unirse', {
+            const res = await fetch('/api/comunidades/unirse', {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',

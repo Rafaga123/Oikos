@@ -49,7 +49,7 @@ $(document).ready(function() {
 async function cargarHorarios() {
     const token = localStorage.getItem('token');
     try {
-        const res = await fetch('http://localhost:3000/api/horarios', {
+        const res = await fetch('/api/horarios', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
@@ -228,7 +228,7 @@ async function guardarHorario() {
 
     const token = localStorage.getItem('token');
     try {
-        const res = await fetch('http://localhost:3000/api/gestor/horarios', {
+        const res = await fetch('/api/gestor/horarios', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify(payload)
@@ -304,7 +304,7 @@ async function agregarExcepcion() {
     if(!payload.fecha) return Swal.fire('Error', 'Selecciona una fecha', 'warning');
 
     const token = localStorage.getItem('token');
-    await fetch('http://localhost:3000/api/gestor/horarios/excepcion', {
+    await fetch('/api/gestor/horarios/excepcion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(payload)

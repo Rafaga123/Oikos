@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
-      const respuesta = await fetch('http://localhost:3000/api/login', {
+      const respuesta = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ usuario, password })
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const email = document.getElementById('forgotEmail').value.trim();
 
     try {
-        const res = await fetch('http://localhost:3000/api/password/forgot', {
+        const res = await fetch('/api/password/forgot', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email })

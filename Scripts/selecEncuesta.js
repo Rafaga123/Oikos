@@ -9,7 +9,7 @@ async function cargarEncuestas() {
     const contenedor = document.getElementById('lista-encuestas');
     
     try {
-        const res = await fetch('http://localhost:3000/api/encuestas', {
+        const res = await fetch('/api/encuestas', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         

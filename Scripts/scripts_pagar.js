@@ -39,7 +39,7 @@ async function cargarCuentasCondominio() {
     const select = $('#bancoDestino');
 
     try {
-        const res = await fetch('http://localhost:3000/api/bancos', {
+        const res = await fetch('/api/bancos', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
@@ -145,7 +145,7 @@ async function enviarPago(e) {
     btn.addClass('loading disabled');
 
     try {
-        const res = await fetch('http://localhost:3000/api/pagos/reportar', {
+        const res = await fetch('/api/pagos/reportar', {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData
