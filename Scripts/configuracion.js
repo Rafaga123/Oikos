@@ -47,6 +47,8 @@ function renderizarSidebar(rol) {
                     <a class="item" href="./solicitudes_nuevas.html"><i class="user icon"></i> Solicitudes</a>
                     <a class="item" href="./pagos_gestor.html"><i class="money bill alternate icon"></i> Pagos</a>
                     <a class="item" href="./crear_horario.html"><i class="clock icon"></i> Horarios</a>
+                    <a class="item" href="./modificar_metodo_pago.html"><i class="clock icon"></i>Modificar Pagomovil</a>
+                    <a class="item" href="./actividades_gestor.html"><i class="calendar icon"></i>Actividades</a>
                     <a class="active item" href="./configuracion.html"><i class="cogs icon"></i> Configuración</a>
                 </div>
             </div>
