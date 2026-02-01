@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración de Pagos - Gestor</title>
+    <link rel="shortcut icon" href="../Images/logo.ico" />
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <link rel="stylesheet" href="../CSS/modificar_metodo_pago.css">
+    
+    <script src="../Scripts/seguridad.js"></script>
+    <script>window.rolesPermitidos = ['ENCARGADO_COMUNIDAD'];</script>
+</head>
+<body>
+
+    <div class="ui vertical inverted sidebar menu sidebar-menu" style="background-color: #9A9CEA;">
+        <div class="item">
+            <div class="header">
+                <h2 class="ui inverted header">
+                    <i class="cog icon"></i>
+                    <div class="content">Panel Gestor<div class="sub header">Gestión de Habitantes</div></div>
+                </h2>
+            </div>
+        </div>
+        <div class="item">
+            <div class="menu">
+                <a class="item" href="./gestor.html"><i class="home icon"></i> Panel de Control</a>
+                <a class="item" href="./gestion_habitantes.html"><i class="users icon"></i> Habitantes</a>
+                <a class="item" href="./solicitudes.html"><i class="chart bar icon"></i> Incidencias</a>
+                <a class="item" href="./solicitudes_nuevas.html"><i class="user icon"></i> Solicitudes</a>
+                <a class="item" href="./pagos_gestor.html"><i class="money bill alternate icon"></i> Pagos</a>
+                <a class="item" href="./crear_horario.html"><i class="clock icon"></i> Horarios</a>
+                <a class="active item" href="./modificar_metodo_pago.html"><i class="credit card icon"></i> Cuentas Bancarias</a>
+                <a class="item" href="./actividades_gestor.html"><i class="calendar icon"></i> Actividades</a>
+                <a class="item" href="./foro_gestor.html"><i class="comments icon"></i> Foro</a>
+                <a class="item" href="./configuracion.html"><i class="cogs icon"></i> Configuración</a>
+            </div>
+        </div>
+        <div class="item">
+            <div class="ui divider"></div>
+            <a class="item" onclick="cerrarSesion()"><i class="sign out icon"></i> Cerrar Sesión</a>
+        </div>
+        <div class="sidebar-footer-image">
+            <img src="../Images/logopng.png" alt="Decoración de Sidebar">
+        </div>
+    </div>
+
+    <div class="pusher">
+        <div class="ui top fixed menu" style="background-color: #9A9CEA;">
+            <div class="ui container">
+                <div class="item"><img src="../Images/logopng.png" alt="Logo"></div>
+                <a class="item" id="sidebar-toggle"><i class="sidebar icon" style="color: white;"></i></a>
+                <div class="header item" style="color: white;">Configuración de Cuentas</div>
+                <div class="right menu">
+                    <div class="ui dropdown item" style="color: white;">
+                        <i class="user icon" style="color: white;"></i> Gestor
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <a class="item" href="./profile.html"><i class="user icon"></i> Mi Perfil</a>
+                            <div class="divider"></div>
+                            <a class="item" onclick="cerrarSesion()"><i class="sign out icon"></i> Cerrar Sesión</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-container" style="margin-top: 80px; padding: 20px;">
+            <div class="admin-header">
+                <h1><i class="credit card icon"></i> Configuración de Medios de Pago</h1>
+                <p>Agrega las cuentas y pagos móviles donde los habitantes realizarán sus depósitos.</p>
+            </div>
+
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="tab-pagomovil"><i class="mobile alternate icon"></i> Pago Móvil</button>
+                    <button class="tab-btn" data-tab="tab-transferencias"><i class="exchange icon"></i> Transferencias</button>
+                </div>
+
+                <div id="tab-pagomovil" class="tab-content active">
+                    <div class="ui info message">
+                        <i class="info circle icon"></i> Puedes registrar hasta 3 cuentas de Pago Móvil.
+                    </div>
+                    
+                    <div class="banks-grid" id="container-pagomovil">
+                        </div>
+
+                    <button class="ui dashed button fluid" id="btn-add-pagomovil" style="margin-top: 20px;">
+                        <i class="plus icon"></i> Agregar Nuevo Pago Móvil
+                    </button>
+                </div>
+
+                <div id="tab-transferencias" class="tab-content">
+                    <div class="ui info message">
+                        <i class="info circle icon"></i> Puedes registrar hasta 3 cuentas para Transferencias.
+                    </div>
+
+                    <div class="banks-grid" id="container-transferencias">
+                        </div>
+
+                    <button class="ui dashed button fluid" id="btn-add-transferencia" style="margin-top: 20px;">
+                        <i class="plus icon"></i> Agregar Nueva Cuenta
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui modal" id="modal-cuenta">
+        <i class="close icon"></i>
+        <div class="header" id="modal-title">Agregar Cuenta</div>
+        <div class="content">
+            <form class="ui form" id="form-cuenta">
+                <input type="hidden" id="cuenta-id">
+                <input type="hidden" id="cuenta-tipo-metodo"> <div class="field required">
+                    <label>Banco</label>
+                    <select class="ui search dropdown" id="cuenta-banco">
+                        <option value="">Selecciona el banco</option>
+                        <option value="Banesco">Banesco</option>
+                        <option value="Banco de Venezuela">Banco de Venezuela</option>
+                        <option value="Banco Mercantil">Banco Mercantil</option>
+                        <option value="Banco Provincial">Banco Provincial</option>
+                        <option value="Bancaribe">Bancaribe</option>
+                        <option value="Banco Exterior">Banco Exterior</option>
+                        <option value="Banco Occidental de Descuento">BOD</option>
+                        <option value="Banco Nacional de Crédito">BNC</option>
+                        <option value="Banplus">Banplus</option>
+                        <option value="Banco del Tesoro">Banco del Tesoro</option>
+                        <option value="Banco Agrícola de Venezuela">Banco Agrícola</option>
+                        <option value="Banco Bicentenario">Banco Bicentenario</option>
+                        <option value="Banco Activo">Banco Activo</option>
+                        <option value="Bancamiga">Bancamiga</option>
+                        <option value="Bancrecer">Bancrecer</option>
+                        <option value="Banco Plaza">Banco Plaza</option>
+                        <option value="Banco Caroní">Banco Caroní</option>
+                        <option value="Venezolano de Crédito">Venezolano de Crédito</option>
+                        <option value="Banco Sofitasa">Banco Sofitasa</option>
+                        <option value="100% Banco">100% Banco</option>
+                        <option value="Banco del Sur">Banco del Sur</option>
+                    </select>
+                </div>
+
+                <div class="two fields">
+                    <div class="field required">
+                        <label>Cédula / RIF</label>
+                        <input type="text" id="cuenta-cedula" placeholder="V-12345678 / J-12345678-9">
+                    </div>
+                    <div class="field required" id="field-telefono">
+                        <label>Teléfono</label>
+                        <input type="text" id="cuenta-telefono" placeholder="0414-1234567">
+                    </div>
+                    <div class="field required" id="field-numero-cuenta" style="display: none;">
+                        <label>Número de Cuenta (20 dígitos)</label>
+                        <input type="text" id="cuenta-numero" placeholder="0134...">
+                    </div>
+                </div>
+
+                <div class="field required">
+                    <label>Nombre del Beneficiario</label>
+                    <input type="text" id="cuenta-titular" placeholder="Ej: Condominio OIKOS">
+                </div>
+
+                <div class="field required" id="field-tipo-cuenta" style="display: none;">
+                    <label>Tipo de Cuenta</label>
+                    <select class="ui dropdown" id="cuenta-tipo">
+                        <option value="corriente">Corriente</option>
+                        <option value="ahorro">Ahorro</option>
+                    </select>
+                </div>
+
+            </form>
+        </div>
+        <div class="actions">
+            <div class="ui black deny button">Cancelar</div>
+            <div class="ui positive right labeled icon button" id="btn-save-cuenta">
+                Guardar
+                <i class="checkmark icon"></i>
+            </div>
+        </div>
+    </div>
+
+    <script src="../Scripts/modificar_metodo_pago.js"></script>
+</body>
+</html>

@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     title: 'Solicitud enviada',
                     text: 'El encargado revisará tu solicitud pronto.'
                 }).then(() => {
-                    window.location.href = 'home_page.html';
+                    window.location.href = '../index.html';
                 });
             } else {
                 Swal.fire({

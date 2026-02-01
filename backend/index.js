@@ -7,6 +7,7 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const _ = require('lodash');
 
 // Importar Mailjet
 const Mailjet = require('node-mailjet');
@@ -297,6 +298,18 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ error: 'Credenciales incorrectas' });
     }
 
+    // --- VALIDACIÓN DE ESTADO ACTUALIZADA ---
+    // Si es ADMIN o GESTOR, suele tener pase libre, pero validamos igual por seguridad
+    
+    if (userFound.estado_solicitud === 'PENDIENTE') {
+        return res.status(403).json({ error: 'Tu cuenta está en revisión. Espera la aprobación del gestor.' });
+    }
+
+    // AQUI ESTA EL CAMBIO PARA EL PUNTO 1:
+    if (userFound.estado_solicitud === 'RECHAZADO') {
+        return res.status(403).json({ error: 'Tu cuenta está inactiva. Contacta al administrador.' });
+    }
+
     // 2. Verificar contraseña
     const esCorrecto = await bcrypt.compare(password, userFound.password_hash);
     if (!esCorrecto) {
@@ -347,7 +360,7 @@ app.post('/api/comunidades', verificarToken, async (req, res) => {
 
     if (!nombre) return res.status(400).json({ error: 'El nombre es obligatorio' });
 
-    // Generar código único simple (ej: "RES-8821")
+    // Generar código único simple (ej: "8821")
     const aleatorio = Math.floor(1000 + Math.random() * 9000); 
     const codigo_unico = `${aleatorio}`;
 
@@ -613,37 +626,52 @@ app.post('/api/perfil/foto', verificarToken, upload.single('foto'), async (req, 
 
 // --- ENDPOINTS DEL FORO ---
 
-/**
- * 1. OBTENER POSTS (Solo de mi comunidad)
- */
+// 1. OBTENER POSTS (Con verificación de Like del usuario actual)
 app.get('/api/foro', verificarToken, async (req, res) => {
     try {
-        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
-        
-        if (!usuario.id_comunidad) {
-            return res.status(403).json({ error: 'Debes pertenecer a una comunidad para ver el foro.' });
-        }
+        const idUsuarioActual = req.usuario.id;
+        const usuarioActual = await prisma.usuario.findUnique({ where: { id: idUsuarioActual } });
 
+        // Obtener posts de la comunidad
         const posts = await prisma.post.findMany({
-            where: { id_comunidad: usuario.id_comunidad },
-            include: {
-                usuario: { select: { primer_nombre: true, foto_perfil_url: true } }, // Datos del autor
-                likes: { where: { id_usuario: req.usuario.id } } // Para saber si YO le di like
+            where: { 
+                usuario: { id_comunidad: usuarioActual.id_comunidad } 
             },
-            orderBy: { fecha_creacion: 'asc' } // Traemos los viejos primero para meterlos a la Pila
+            include: {
+                usuario: {
+                    select: {
+                        id: true,
+                        primer_nombre: true,
+                        primer_apellido: true,
+                        foto_perfil_url: true,
+                        rol: { select: { nombre: true } }
+                    }
+                },
+                likes: true // Traemos los likes para calcular
+            },
+            orderBy: { fecha_creacion: 'asc' } // Orden cronológico para la Pila
         });
 
-        // Formateamos para el frontend
-        const postsFormateados = posts.map(p => ({
-            ...p,
-            dio_like: p.likes.length > 0 // True si le di like
-        }));
+        // Procesar los datos para el frontend
+        const postsProcesados = posts.map(post => {
+            return {
+                id: post.id,
+                titulo: post.titulo,
+                contenido: post.contenido,
+                fecha_creacion: post.fecha_creacion,
+                usuario: post.usuario,
+                // Calculamos la cantidad total
+                cantidad_likes: post.likes.length,
+                // Verificamos si EL USUARIO ACTUAL está en la lista de likes
+                dioLike: post.likes.some(like => like.id_usuario === idUsuarioActual)
+            };
+        });
 
-        res.json(postsFormateados);
+        res.json(postsProcesados);
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error obteniendo posts' });
+        res.status(500).json({ error: 'Error al obtener posts' });
     }
 });
 
@@ -679,44 +707,79 @@ app.post('/api/foro', verificarToken, async (req, res) => {
     }
 });
 
-/**
- * 3. DAR / QUITAR LIKE
- */
+// 2. DAR / QUITAR LIKE (Toggle)
 app.post('/api/foro/:id/like', verificarToken, async (req, res) => {
     try {
         const idPost = parseInt(req.params.id);
         const idUsuario = req.usuario.id;
 
         // Verificar si ya existe el like
-        const existeLike = await prisma.like.findUnique({
-            where: { id_usuario_id_post: { id_usuario: idUsuario, id_post: idPost } }
+        const likeExistente = await prisma.like.findUnique({
+            where: {
+                id_usuario_id_post: { // Nombre de la llave compuesta en Prisma
+                    id_usuario: idUsuario,
+                    id_post: idPost
+                }
+            }
         });
 
-        if (existeLike) {
-            // QUITAR LIKE (Dislike)
+        if (likeExistente) {
+            // SI YA EXISTE -> LO BORRAMOS (Dislike)
             await prisma.like.delete({
-                where: { id_usuario_id_post: { id_usuario: idUsuario, id_post: idPost } }
+                where: {
+                    id_usuario_id_post: {
+                        id_usuario: idUsuario,
+                        id_post: idPost
+                    }
+                }
             });
-            await prisma.post.update({
-                where: { id: idPost },
-                data: { cantidad_likes: { decrement: 1 } }
-            });
-            res.json({ dio_like: false });
         } else {
-            // DAR LIKE
+            // SI NO EXISTE -> LO CREAMOS (Like)
             await prisma.like.create({
-                data: { id_usuario: idUsuario, id_post: idPost }
+                data: {
+                    id_usuario: idUsuario,
+                    id_post: idPost
+                }
             });
-            await prisma.post.update({
-                where: { id: idPost },
-                data: { cantidad_likes: { increment: 1 } }
-            });
-            res.json({ dio_like: true });
         }
+
+        // Devolver el nuevo conteo y el estado actual
+        const totalLikes = await prisma.like.count({ where: { id_post: idPost } });
+        const dioLike = !likeExistente; // Si existía es false (se quitó), si no, true (se puso)
+
+        res.json({ totalLikes, dioLike });
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error en like' });
+        res.status(500).json({ error: 'Error al procesar like' });
+    }
+});
+
+/**
+ * ELIMINAR POST (Solo Gestor)
+ */
+app.delete('/api/gestor/foro/:id', verificarToken, async (req, res) => {
+    try {
+        const idPost = parseInt(req.params.id);
+        const idUsuario = req.usuario.id;
+
+        // Verificar que quien pide esto sea Gestor
+        const usuario = await prisma.usuario.findUnique({ where: { id: idUsuario }, include: { rol: true } });
+        
+        if (usuario.rol.nombre !== 'ENCARGADO_COMUNIDAD' && usuario.rol.nombre !== 'ADMINISTRADOR') {
+            return res.status(403).json({ error: 'No tienes permisos para eliminar publicaciones de otros.' });
+        }
+
+        // Eliminar el post (Prisma se encarga de los Likes en cascada si está configurado, 
+        // si no, habría que borrar los likes primero manualmente)
+        await prisma.like.deleteMany({ where: { id_post: idPost } }); // Limpiar likes primero por seguridad
+        await prisma.post.delete({ where: { id: idPost } });
+
+        res.json({ message: 'Publicación eliminada correctamente' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al eliminar el post' });
     }
 });
 
@@ -853,21 +916,31 @@ app.get('/api/gestor/habitantes', verificarToken, async (req, res) => {
 app.put('/api/gestor/habitante/:id', verificarToken, async (req, res) => {
     try {
         const idHabitante = parseInt(req.params.id);
-        const { nombre, apellido, cedula, correo, estado_solicitud } = req.body; // 'estado' en el frontend es 'estado_solicitud' en BD?
-        
+        const { nombre, apellido, estado_solicitud } = req.body; // El frontend manda 'estado_solicitud' con valor 'activo' o 'inactivo'
+
+        // TRADUCCIÓN DE ESTADO (SOLUCIÓN PUNTO 2)
+        let estadoDB = undefined;
+        if (estado_solicitud === 'activo') estadoDB = 'ACEPTADO';
+        if (estado_solicitud === 'inactivo') estadoDB = 'RECHAZADO'; // Usamos RECHAZADO como estado inactivo/bloqueado
+
+        // Objeto de actualización dinámica
+        const dataToUpdate = {
+            primer_nombre: nombre,
+            primer_apellido: apellido
+        };
+
+        // Solo agregamos el estado si se envió uno válido
+        if (estadoDB) {
+            dataToUpdate.estado_solicitud = estadoDB;
+        }
+
         await prisma.usuario.update({
             where: { id: idHabitante },
-            data: {
-                primer_nombre: nombre,
-                primer_apellido: apellido,
-                // cedula: cedula,  <--- ELIMINADO (No se debe editar)
-                // email: correo,   <--- ELIMINADO (No se debe editar)
-                estado_solicitud: estado_solicitud === 'activo' ? 'ACEPTADO' : 'RECHAZADO'
-            }
+            data: dataToUpdate
         });
-// ...
 
-        res.json({ mensaje: 'Habitante actualizado' });
+        res.json({ message: 'Habitante actualizado correctamente' });
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al actualizar habitante' });
@@ -1245,6 +1318,802 @@ app.post('/api/encuestas/:id/votar', verificarToken, async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al votar' });
+    }
+});
+
+// --- PAGOS ---
+
+/**
+ * 1. LISTAR CUENTAS BANCARIAS (Para el select del habitante)
+ */
+app.get('/api/cuentas-bancarias', verificarToken, async (req, res) => {
+    try {
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+        if (!usuario.id_comunidad) return res.json([]);
+
+        const cuentas = await prisma.cuentaBancaria.findMany({
+            where: { id_comunidad: usuario.id_comunidad }
+        });
+        res.json(cuentas);
+    } catch (error) {
+        res.status(500).json({ error: 'Error cargando bancos' });
+    }
+});
+
+/**
+ * 2. REPORTAR PAGO
+ */
+app.post('/api/pagos/reportar', verificarToken, upload.single('comprobante'), async (req, res) => {
+    try {
+        // 1. Agregamos 'concepto' a la desestructuración
+        const { monto, fecha, referencia, banco_origen, banco_destino_id, metodo, concepto } = req.body;
+        
+        const idUsuario = req.usuario.id;
+        
+        const cuentaDestino = await prisma.cuentaBancaria.findUnique({ 
+            where: { id: parseInt(banco_destino_id) } 
+        });
+
+        const nuevoPago = await prisma.pago.create({
+            data: {
+                id_usuario: idUsuario,
+                monto: parseFloat(monto),
+                fecha_pago: new Date(fecha),
+                referencia,
+                
+                // 2. USAMOS LA VARIABLE REAL (Si llega vacía por error, ponemos un default)
+                concepto: concepto || "Pago de Condominio", 
+                
+                metodo_pago: metodo,
+                banco_origen: banco_origen,
+                banco_destino: cuentaDestino ? cuentaDestino.banco : "Desconocido",
+                comprobante_url: req.file ? `/uploads/${req.file.filename}` : null,
+                estado: 'PENDIENTE'
+            }
+        });
+
+        res.status(201).json({ mensaje: 'Pago reportado', pago: nuevoPago });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al reportar pago' });
+    }
+});
+
+// --- GESTIÓN DE PAGOS (GESTOR) ---
+
+/**
+ * 1. LISTAR PAGOS DE LA COMUNIDAD
+ */
+app.get('/api/gestor/pagos', verificarToken, async (req, res) => {
+    try {
+        const idGestor = req.usuario.id;
+        const gestor = await prisma.usuario.findUnique({ where: { id: idGestor } });
+
+        if (!gestor.id_comunidad) return res.status(400).json({ error: 'No tienes comunidad' });
+
+        const pagos = await prisma.pago.findMany({
+            where: {
+                usuario: { id_comunidad: gestor.id_comunidad }
+            },
+            include: {
+                usuario: {
+                    select: {
+                        primer_nombre: true,
+                        primer_apellido: true,
+                        numero_casa: true,
+                        cedula: true
+                    }
+                }
+            },
+            orderBy: { fecha_pago: 'desc' } // Los más recientes primero
+        });
+
+        res.json(pagos);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al cargar pagos' });
+    }
+});
+
+/**
+ * 2. CAMBIAR ESTADO DE PAGO (Aprobar o Rechazar)
+ */
+app.put('/api/gestor/pagos/:id/estado', verificarToken, async (req, res) => {
+    try {
+        const idPago = parseInt(req.params.id);
+        const { estado, nota } = req.body; // estado: 'APROBADO' o 'RECHAZADO'
+
+        // Validar que el estado sea válido según tu Enum de Prisma
+        if (!['APROBADO', 'RECHAZADO', 'PENDIENTE'].includes(estado)) {
+            return res.status(400).json({ error: 'Estado inválido' });
+        }
+
+        const pagoActualizado = await prisma.pago.update({
+            where: { id: idPago },
+            data: {
+                estado: estado,
+                nota_admin: nota || null 
+            }
+        });
+
+        res.json({ mensaje: 'Estado actualizado', pago: pagoActualizado });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al actualizar pago' });
+    }
+});
+
+// --- GESTIÓN DE REGLAMENTO ---
+
+/**
+ * 1. OBTENER REGLAS (Para Gestor y Habitante)
+ */
+app.get('/api/reglas', verificarToken, async (req, res) => {
+    try {
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+        if (!usuario.id_comunidad) return res.json([]);
+
+        const reglas = await prisma.regla.findMany({
+            where: { id_comunidad: usuario.id_comunidad },
+            orderBy: { fecha_creacion: 'desc' }
+        });
+        res.json(reglas);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al cargar reglas' });
+    }
+});
+
+/**
+ * 2. CREAR REGLA (Gestor)
+ */
+app.post('/api/gestor/reglas', verificarToken, async (req, res) => {
+    try {
+        const { titulo, contenido, categoria } = req.body;
+        const gestor = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        if (!gestor.id_comunidad) return res.status(403).json({ error: 'Sin comunidad' });
+
+        const nuevaRegla = await prisma.regla.create({
+            data: {
+                titulo,
+                contenido,
+                categoria,
+                id_comunidad: gestor.id_comunidad
+            }
+        });
+        res.status(201).json(nuevaRegla);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al crear regla' });
+    }
+});
+
+/**
+ * 3. EDITAR REGLA (Gestor)
+ */
+app.put('/api/gestor/reglas/:id', verificarToken, async (req, res) => {
+    try {
+        const { titulo, contenido, categoria } = req.body;
+        const idRegla = parseInt(req.params.id);
+
+        await prisma.regla.update({
+            where: { id: idRegla },
+            data: { titulo, contenido, categoria }
+        });
+        res.json({ mensaje: 'Regla actualizada' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al editar regla' });
+    }
+});
+
+/**
+ * 4. ELIMINAR REGLA (Gestor)
+ */
+app.delete('/api/gestor/reglas/:id', verificarToken, async (req, res) => {
+    try {
+        const idRegla = parseInt(req.params.id);
+        await prisma.regla.delete({ where: { id: idRegla } });
+        res.json({ mensaje: 'Regla eliminada' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar regla' });
+    }
+});
+
+// --- GESTIÓN DE HORARIOS ---
+
+// 1. OBTENER HORARIOS (Gestor y Habitante)
+app.get('/api/horarios', verificarToken, async (req, res) => {
+    try {
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+        if (!usuario.id_comunidad) return res.json([]);
+
+        const horarios = await prisma.horario.findMany({
+            where: { id_comunidad: usuario.id_comunidad },
+            include: { excepciones: true },
+            orderBy: { area: 'asc' }
+        });
+
+        // Parsear los strings JSON de vuelta a Arrays
+        const horariosFormateados = horarios.map(h => ({
+            ...h,
+            dias: JSON.parse(h.dias || '[]'),
+            restricciones: JSON.parse(h.restricciones || '[]')
+        }));
+
+        res.json(horariosFormateados);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al cargar horarios' });
+    }
+});
+
+// 2. CREAR/EDITAR HORARIO (Gestor)
+app.post('/api/gestor/horarios', verificarToken, async (req, res) => {
+    try {
+        const { id, area, tipo, nombre, dias, horaInicio, horaFin, estado, capacidad, grupo, descripcion, restricciones, fechaInicio, fechaFin } = req.body;
+        const gestor = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        const dataPayload = {
+            area, tipo, nombre,
+            hora_inicio: horaInicio,
+            hora_fin: horaFin,
+            estado,
+            capacidad: capacidad ? parseInt(capacidad) : null,
+            grupo,
+            descripcion,
+            dias: JSON.stringify(dias), // Convertir Array a String para BD
+            restricciones: JSON.stringify(restricciones),
+            fecha_inicio: fechaInicio ? new Date(fechaInicio) : null,
+            fecha_fin: fechaFin ? new Date(fechaFin) : null,
+            id_comunidad: gestor.id_comunidad
+        };
+
+        let resultado;
+        if (id) {
+            // Editar
+            resultado = await prisma.horario.update({
+                where: { id: parseInt(id) },
+                data: _.omit(dataPayload, ['id_comunidad']) // No cambiamos comunidad al editar
+            });
+        } else {
+            // Crear
+            resultado = await prisma.horario.create({ data: dataPayload });
+        }
+
+        res.json(resultado);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al guardar horario' });
+    }
+});
+
+// 3. ELIMINAR HORARIO
+app.delete('/api/gestor/horarios/:id', verificarToken, async (req, res) => {
+    try {
+        await prisma.horario.delete({ where: { id: parseInt(req.params.id) } });
+        res.json({ message: 'Eliminado' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar' });
+    }
+});
+
+// 4. CAMBIAR ESTADO (Activar/Desactivar)
+app.put('/api/gestor/horarios/:id/estado', verificarToken, async (req, res) => {
+    try {
+        const { estado } = req.body;
+        await prisma.horario.update({
+            where: { id: parseInt(req.params.id) },
+            data: { estado }
+        });
+        res.json({ message: 'Estado actualizado' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar estado' });
+    }
+});
+
+// 5. AGREGAR EXCEPCIÓN
+app.post('/api/gestor/horarios/excepcion', verificarToken, async (req, res) => {
+    try {
+        const { horarioId, fecha, tipo, descripcion, horarioEspecial } = req.body;
+        const nuevaExcepcion = await prisma.excepcionHorario.create({
+            data: {
+                id_horario: parseInt(horarioId),
+                fecha: new Date(fecha),
+                tipo,
+                descripcion,
+                horario_especial: horarioEspecial
+            }
+        });
+        res.json(nuevaExcepcion);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al crear excepción' });
+    }
+});
+
+// 6. ELIMINAR EXCEPCIÓN
+app.delete('/api/gestor/excepciones/:id', verificarToken, async (req, res) => {
+    try {
+        await prisma.excepcionHorario.delete({ where: { id: parseInt(req.params.id) } });
+        res.json({ message: 'Excepción eliminada' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar excepción' });
+    }
+});
+
+app.get('/api/gestor/dashboard-stats', verificarToken, async (req, res) => {
+    try {
+        const idGestor = req.usuario.id;
+        const gestor = await prisma.usuario.findUnique({ where: { id: idGestor } });
+        const idComunidad = gestor.id_comunidad;
+
+        if (!idComunidad) return res.status(400).json({ error: 'No tienes comunidad' });
+
+        // 1. Habitantes (Activos vs Total)
+        const totalHabitantes = await prisma.usuario.count({
+            where: { id_comunidad: idComunidad, id_rol: 3, estado_solicitud: { not: 'PENDIENTE' } }
+        });
+        const habitantesActivos = await prisma.usuario.count({
+            where: { id_comunidad: idComunidad, id_rol: 3, estado_solicitud: 'ACEPTADO' } // O activos según tu lógica
+        });
+
+        // 2. Pagos (Historial últimos 6 meses para la gráfica)
+        const fechaLimite = new Date();
+        fechaLimite.setMonth(fechaLimite.getMonth() - 6);
+        
+        const pagosHistorial = await prisma.pago.findMany({
+            where: { 
+                usuario: { id_comunidad: idComunidad },
+                fecha_pago: { gte: fechaLimite },
+                estado: 'APROBADO' // Solo contamos los aprobados/recibidos para la gráfica
+            },
+            select: { fecha_pago: true }
+        });
+
+        // Conteo de Pagos Pendientes (para el número grande)
+        const pagosPendientes = await prisma.pago.count({
+            where: { usuario: { id_comunidad: idComunidad }, estado: 'PENDIENTE' }
+        });
+
+        // 3. Incidentes Pendientes (Alertas)
+        const incidentesPendientes = await prisma.incidencia.count({
+            where: { 
+                usuario: { id_comunidad: idComunidad }, 
+                estado: { in: ['ABIERTO', 'EN_PROGRESO'] } 
+            }
+        });
+
+        // 4. Solicitudes Nuevas (Completado)
+        const solicitudesPendientes = await prisma.usuario.count({
+            where: { id_comunidad: idComunidad, estado_solicitud: 'PENDIENTE' }
+        });
+
+        res.json({
+            habitantes: { total: totalHabitantes, activos: habitantesActivos },
+            pagos: { pendientes: pagosPendientes, historial: pagosHistorial },
+            incidentes: incidentesPendientes,
+            solicitudes: solicitudesPendientes
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al cargar estadísticas' });
+    }
+});
+// ==========================================
+//  CONFIGURACIÓN Y PERFIL
+// ==========================================
+
+// 1. ACTUALIZAR INFO COMUNIDAD (Solo Gestor)
+app.put('/api/comunidad', verificarToken, async (req, res) => {
+    try {
+        const { nombre, direccion } = req.body;
+        const usuario = await prisma.usuario.findUnique({ 
+            where: { id: req.usuario.id },
+            include: { rol: true }
+        });
+
+        if (usuario.rol.nombre !== 'ENCARGADO_COMUNIDAD' && usuario.rol.nombre !== 'ADMINISTRADOR') {
+            return res.status(403).json({ error: 'No tienes permisos para editar la comunidad.' });
+        }
+
+        const comunidadActualizada = await prisma.comunidad.update({
+            where: { id: usuario.id_comunidad },
+            data: { nombre, direccion }
+        });
+
+        res.json({ message: 'Comunidad actualizada', comunidad: comunidadActualizada });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar comunidad' });
+    }
+});
+
+// 2. CAMBIAR CONTRASEÑA
+app.put('/api/auth/cambiar-password', verificarToken, async (req, res) => {
+    try {
+        const { passwordActual, passwordNuevo } = req.body;
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        // Verificar password anterior
+        const esValido = await bcrypt.compare(passwordActual, usuario.password_hash);
+        if (!esValido) {
+            return res.status(400).json({ error: 'La contraseña actual es incorrecta.' });
+        }
+
+        // Encriptar nueva
+        const hashedPassword = await bcrypt.hash(passwordNuevo, 10);
+        await prisma.usuario.update({
+            where: { id: usuario.id },
+            data: { password_hash: hashedPassword }
+        });
+
+        res.json({ message: 'Contraseña actualizada correctamente.' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al cambiar contraseña' });
+    }
+});
+
+// 3. ELIMINAR CUENTA (Zona Roja - PROTEGIDO CON CONTRASEÑA)
+app.delete('/api/auth/eliminar-cuenta', verificarToken, async (req, res) => {
+    try {
+        const { password } = req.body; // Recibimos la contraseña
+        
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        // VERIFICACIÓN DE SEGURIDAD
+        const esValido = await bcrypt.compare(password, usuario.password_hash);
+        if (!esValido) {
+            return res.status(401).json({ error: 'Contraseña incorrecta. No se pudo eliminar la cuenta.' });
+        }
+
+        await prisma.usuario.delete({ where: { id: req.usuario.id } });
+        res.json({ message: 'Cuenta eliminada permanentemente.' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al eliminar cuenta.' });
+    }
+});
+
+// 4. TRANSFERIR GESTORÍA (Zona Roja - PROTEGIDO CON CONTRASEÑA)
+app.post('/api/comunidad/transferir', verificarToken, async (req, res) => {
+    try {
+        const { cedulaNuevoGestor, password } = req.body; // Recibimos la contraseña
+        const gestorActual = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        // VERIFICACIÓN DE SEGURIDAD
+        const esValido = await bcrypt.compare(password, gestorActual.password_hash);
+        if (!esValido) {
+            return res.status(401).json({ error: 'Contraseña incorrecta. Transferencia cancelada.' });
+        }
+
+        // Buscar al sucesor
+        const sucesor = await prisma.usuario.findUnique({ where: { cedula: cedulaNuevoGestor } });
+
+        if (!sucesor) return res.status(404).json({ error: 'Usuario no encontrado.' });
+        if (sucesor.id_comunidad !== gestorActual.id_comunidad) return res.status(400).json({ error: 'El usuario no pertenece a esta comunidad.' });
+
+        // Transacción
+        await prisma.$transaction([
+            prisma.usuario.update({
+                where: { id: gestorActual.id },
+                data: { id_rol: 3 } 
+            }),
+            prisma.usuario.update({
+                where: { id: sucesor.id },
+                data: { id_rol: 2 } 
+            })
+        ]);
+
+        res.json({ message: 'Gestoría transferida exitosamente.' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al transferir gestoría.' });
+    }
+});
+
+// 5. OBTENER INFO COMUNIDAD (Público para los miembros)
+app.get('/api/comunidad/info', verificarToken, async (req, res) => {
+    try {
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+        const comunidad = await prisma.comunidad.findUnique({ where: { id: usuario.id_comunidad } });
+        res.json(comunidad);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al cargar datos' });
+    }
+});
+
+app.post('/api/gestor/habitante', verificarToken, async (req, res) => {
+    try {
+        const { nombre, apellido, cedula, correo, anio_registro, estado } = req.body;
+        const gestor = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        // Verificar si ya existe
+        const existe = await prisma.usuario.findFirst({
+            where: { OR: [{ cedula }, { email: correo }] }
+        });
+
+        if (existe) {
+            return res.status(400).json({ error: 'La cédula o el correo ya están registrados.' });
+        }
+
+        // Crear contraseña por defecto (Cédula) para que luego la cambien si quieren
+        const passwordHash = await bcrypt.hash(cedula, 10);
+
+        const nuevoUsuario = await prisma.usuario.create({
+            data: {
+                primer_nombre: nombre,
+                primer_apellido: apellido,
+                cedula: cedula,
+                email: correo,
+                password_hash: passwordHash,
+                id_rol: 3, // Habitante
+                id_comunidad: gestor.id_comunidad,
+                estado_solicitud: estado === 'activo' ? 'ACEPTADO' : 'PENDIENTE',
+                fecha_registro: new Date(`${anio_registro}-01-01`) // Fecha aproximada
+            }
+        });
+
+        res.json({ message: 'Habitante creado exitosamente', usuario: nuevoUsuario });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al crear habitante.' });
+    }
+});
+app.get('/api/actividades', verificarToken, async (req, res) => {
+    try {
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+        if (!usuario.id_comunidad) return res.json([]);
+
+        const actividades = await prisma.actividad.findMany({
+            where: { id_comunidad: usuario.id_comunidad },
+            orderBy: { fecha: 'asc' }
+        });
+
+        res.json(actividades);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al obtener actividades' });
+    }
+});
+
+// 2. CREAR ACTIVIDAD (Gestor)
+app.post('/api/gestor/actividades', verificarToken, async (req, res) => {
+    try {
+        const { title, type, area, date, startTime, endTime, description, organizer, contact, maxParticipants, status } = req.body;
+        const gestor = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        const nuevaActividad = await prisma.actividad.create({
+            data: {
+                titulo: title,
+                tipo: type,
+                area: area,
+                fecha: new Date(date),
+                hora_inicio: startTime,
+                hora_fin: endTime,
+                descripcion: description,
+                organizador: organizer,
+                contacto: contact,
+                max_participantes: maxParticipants ? parseInt(maxParticipants) : null,
+                estado: status,
+                id_comunidad: gestor.id_comunidad
+            }
+        });
+
+        res.status(201).json(nuevaActividad);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al crear actividad' });
+    }
+});
+
+// 3. EDITAR ACTIVIDAD (Gestor - PUT completo o parcial para cambiar estado)
+app.put('/api/gestor/actividades/:id', verificarToken, async (req, res) => {
+    try {
+        const idActividad = parseInt(req.params.id);
+        const { title, type, area, date, startTime, endTime, description, organizer, contact, maxParticipants, status } = req.body;
+
+        // Si solo envían el status (para confirmar/cancelar)
+        if (Object.keys(req.body).length === 1 && status) {
+             await prisma.actividad.update({
+                where: { id: idActividad },
+                data: { estado: status }
+            });
+            return res.json({ message: 'Estado actualizado' });
+        }
+
+        // Actualización completa
+        await prisma.actividad.update({
+            where: { id: idActividad },
+            data: {
+                titulo: title,
+                tipo: type,
+                area: area,
+                fecha: new Date(date),
+                hora_inicio: startTime,
+                hora_fin: endTime,
+                descripcion: description,
+                organizador: organizer,
+                contacto: contact,
+                max_participantes: maxParticipants ? parseInt(maxParticipants) : null,
+                estado: status
+            }
+        });
+
+        res.json({ message: 'Actividad actualizada' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al actualizar actividad' });
+    }
+});
+// --- GESTIÓN DE ENCUESTAS (RESULTADOS) ---
+
+app.get('/api/gestor/encuestas/resultados', verificarToken, async (req, res) => {
+    try {
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+        if (!usuario.id_comunidad) return res.json([]);
+
+        // Obtener todas las encuestas de la comunidad con sus opciones y votos
+        const encuestas = await prisma.encuesta.findMany({
+            where: { id_comunidad: usuario.id_comunidad },
+            include: {
+                opciones: {
+                    include: {
+                        _count: {
+                            select: { votos: true } // Contar votos por opción
+                        }
+                    }
+                },
+                _count: {
+                    select: { votos: true } // Contar total de votos de la encuesta
+                }
+            },
+            orderBy: { fecha_inicio: 'desc' }
+        });
+
+        // Procesar datos para el frontend
+        const resultados = encuestas.map(encuesta => {
+            const totalVotosEncuesta = encuesta._count.votos;
+            
+            // Calcular estado
+            const hoy = new Date();
+            let estado = 'active';
+            if (hoy > new Date(encuesta.fecha_fin)) estado = 'closed';
+            if (hoy < new Date(encuesta.fecha_inicio)) estado = 'scheduled';
+
+            return {
+                id: encuesta.id,
+                titulo: encuesta.titulo,
+                descripcion: encuesta.descripcion,
+                fecha_inicio: encuesta.fecha_inicio,
+                fecha_fin: encuesta.fecha_fin,
+                estado: estado,
+                total_votos: totalVotosEncuesta,
+                // Calcular participación aproximada (si tuviéramos total de habitantes, podríamos ser exactos)
+                // Por ahora devolvemos el número crudo
+                opciones: encuesta.opciones.map(op => ({
+                    id: op.id,
+                    texto: op.texto,
+                    votos: op._count.votos,
+                    porcentaje: totalVotosEncuesta > 0 
+                        ? Math.round((op._count.votos / totalVotosEncuesta) * 100) 
+                        : 0
+                }))
+            };
+        });
+
+        res.json(resultados);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al obtener resultados' });
+    }
+});
+
+// 1. OBTENER CUENTAS (Público para Gestor y Habitante)
+app.get('/api/bancos', verificarToken, async (req, res) => {
+    try {
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+        if (!usuario.id_comunidad) return res.json([]);
+
+        const cuentas = await prisma.cuentaBancaria.findMany({
+            where: { id_comunidad: usuario.id_comunidad }
+        });
+        res.json(cuentas);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al obtener cuentas' });
+    }
+});
+
+// 2. GUARDAR/EDITAR CUENTA (Solo Gestor)
+// Usamos "upsert" lógico: si ya existe una cuenta de ese banco y tipo para esa comunidad, la actualizamos.
+app.post('/api/gestor/bancos', verificarToken, async (req, res) => {
+    try {
+        const { banco, numero_cuenta, titular, cedula_rif, tipo_cuenta, telefono, email } = req.body; // email es opcional, lo guardamos en un campo extra o reutilizamos
+        const gestor = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        // Buscar si ya existe una configuración para este banco y tipo (ej: Banesco - Pago Movil)
+        // Como tu esquema no tiene un campo "tipo_metodo" explícito (solo "tipo_cuenta"), usaremos "tipo_cuenta" 
+        // para distinguir entre 'transferencia' (corriente/ahorro) y 'pago_movil'.
+        
+        // NOTA: Para simplificar y adaptar a tu HTML que separa por pestañas, asumiremos que:
+        // Si mandan telefono -> Es Pago Móvil.
+        // Si no mandan telefono -> Es Transferencia.
+
+        const cuentaExistente = await prisma.cuentaBancaria.findFirst({
+            where: {
+                id_comunidad: gestor.id_comunidad,
+                banco: banco,
+                // Si es pago móvil (tiene telefono), buscamos uno que tenga telefono. Si es transferencia, uno que no.
+                telefono: telefono ? { not: null } : null 
+            }
+        });
+
+        let resultado;
+        if (cuentaExistente) {
+            resultado = await prisma.cuentaBancaria.update({
+                where: { id: cuentaExistente.id },
+                data: { numero_cuenta, titular, cedula_rif, tipo_cuenta, telefono }
+            });
+        } else {
+            resultado = await prisma.cuentaBancaria.create({
+                data: {
+                    id_comunidad: gestor.id_comunidad,
+                    banco, numero_cuenta, titular, cedula_rif, tipo_cuenta, telefono
+                }
+            });
+        }
+
+        res.json({ message: 'Datos guardados correctamente', data: resultado });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al guardar datos bancarios' });
+    }
+});
+
+app.delete('/api/gestor/bancos/:id', verificarToken, async (req, res) => {
+    try {
+        await prisma.cuentaBancaria.delete({ where: { id: parseInt(req.params.id) } });
+        res.json({ message: 'Cuenta eliminada' });
+    } catch (e) { res.status(500).json({ error: 'Error al eliminar' }); }
+});
+
+app.post('/api/comunidad/salir', verificarToken, async (req, res) => {
+    try {
+        const { password } = req.body;
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        // 1. Verificar contraseña
+        const esValido = await bcrypt.compare(password, usuario.password_hash);
+        if (!esValido) {
+            return res.status(401).json({ error: 'Contraseña incorrecta.' });
+        }
+
+        // 2. Verificar si es el único gestor (Opcional, por seguridad de la comunidad)
+        // Si es el único gestor, no debería poder salir sin transferir o borrar la comunidad.
+        // Aquí asumimos lógica simple: se le permite salir.
+
+        // 3. Desvincular
+        await prisma.usuario.update({
+            where: { id: req.usuario.id },
+            data: {
+                id_comunidad: null,
+                estado_solicitud: 'SIN_COMUNIDAD',
+                id_rol: 3 // Forzamos a que vuelva a ser Habitante (por si era Gestor)
+            }
+        });
+
+        res.json({ message: 'Has salido de la comunidad exitosamente.' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al procesar la solicitud.' });
     }
 });
 

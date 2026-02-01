@@ -10,6 +10,7 @@
     <title>Registro</title>
 </head>
 <body>
+    <div class="header finisher-header" style="width: 100%; height: 100vh;"></div>
 <header class="ui menu navbar-responsive">
     <div class="ui container">
         
@@ -51,7 +52,7 @@
     <main class="centered-form-container">
 
         <form class="ui form attached fluid segment horizontal-register-form" id="register-form">
-            <h2 class="ui center aligned header" style="margin-bottom:1.5rem;">Registrarme</h2>
+            <h2 class="ui center aligned header" style="margin-bottom:1.5rem;">Registro de usuario</h2>
             <!-- Paso 1: Nombre y Apellido -->
             <div class="step" id="step-1">
                 <div class="two fields">
@@ -93,6 +94,7 @@
                     <div class="field">
                         <label>Fecha de Nacimiento</label>
                         <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                        
                     </div>
                     <div class="field">
                         <label>Teléfono</label>
@@ -112,10 +114,10 @@
                                 </select>
                             </div>
                             <div class="field">
-                                <input type="tel" id="telefono" name="telefono" placeholder="Ej: +584144601965" required>
+                                <input type="tel" id="telefono" name="telefono" placeholder="Ej: +58XXXXXXXXXX" required>
                             </div>
                         </div>
-                        <small>Empieza con "+" y se detecta el país automáticamente.</small>
+                        <small>Empieza con "+" y se detecta el país automáticamente. Ej: +58XXXXXXXXXX</small>
                     </div>
                 </div>
                 <div class="ui two buttons">
@@ -145,6 +147,7 @@
                         </button>
                     </div>
                 </div>
+                
                 <div class="ui two buttons">
                     <button class="ui button back-btn" type="button">Volver</button>
                     <div class="or" data-text="o"></div>
@@ -154,6 +157,7 @@
             </div>
             <!-- Mensaje de Error -->
             <div class="ui error message" id="error-message"></div>
+            <small>Podra continuar con a la siguiente pägina al completar todos los datos solicitados</small>
         </form>
     </main>
     <main class="container">
@@ -186,5 +190,44 @@
         button.setAttribute('aria-label', showing ? 'Mostrar contraseña' : 'Ocultar contraseña');
     }
     </script>
+    <script src="../Scripts/finisher-header.es5.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+new FinisherHeader({
+  "count": 6,
+  "size": {
+    "min": 1100,
+    "max": 1300,
+    "pulse": 0
+  },
+  "speed": {
+    "x": {
+      "min": 0.1,
+      "max": 0.3
+    },
+    "y": {
+      "min": 0.1,
+      "max": 0.3
+    }
+  },
+  "colors": {
+    "background": "#9a9cea",
+    "particles": [
+      "#a2b9ee",
+      "#a2dcee",
+      "#a544a5",
+      "#524ff2"
+    ]
+  },
+  "blending": "overlay",
+  "opacity": {
+    "center": 1,
+    "edge": 0.1
+  },
+  "skew": -2,
+  "shapes": [
+    "c"
+  ]
+});
+</script>
 </body>
 </html>

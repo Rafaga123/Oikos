@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OIKOS - Horarios</title>
+    <link rel="shortcut icon" href="../Images/logo.ico" />
+    
+    <script src="../Scripts/jquery-3.7.1.min.js"></script>
+    <script src="../Scripts/semantic.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <link rel="stylesheet" type="text/CSS" href="../CSS/semantic.css">       
+    <link rel="stylesheet" type="text/CSS" href="../CSS/horario.css">
+    
+    <script src="../Scripts/seguridad.js"></script>
+    <script src="../Scripts/horario.js"></script> </head>
+<body>
+    <div class="ui vertical inverted sidebar menu sidebar-menu" style="background-color: #9A9CEA;">
+        <div class="item">
+            <div class="header">
+                <h2 class="ui inverted header">
+                    <i class="home icon"></i>
+                    <div class="content">
+                        Habitante
+                        <div class="sub header">Gestión de vivienda</div>
+                    </div>
+                </h2>
+            </div>
+        </div>
+        <div class="item">
+            <div class="menu">
+                <a class="item sidebar-toggle-btn">
+                    <br>
+                    <i class="large arrow left icon"></i>
+                    Cerrar menú
+                    <br>
+                </a>
+                <a class="item" href="./home_page.html">
+                    <i class="home icon"></i>
+                    Página Principal
+                </a>
+                <a class="item" href="./reglamento.html">
+                    <i class="book icon"></i>
+                    Reglamento del Condominio
+                </a>
+                <a class="active item" href="./horario.html">
+                    <i class="clock icon"></i>
+                    Horarios
+                </a>
+                <a class="item" href="./cuentasparapagos.html">
+                    <i class="credit card icon"></i>
+                    Cuentas para Pagos
+                </a>
+                <a class="item" href="./configuracion.html">
+                    <i class="cogs icon"></i>
+                    Configuración
+                </a>
+            </div>
+        </div>
+        <div class="item">
+            <div class="ui divider" ></div>
+            <a class="item" onclick="cerrarSesion()">
+                <i class="sign out icon"></i>
+                Cerrar Sesión
+            </a>
+        </div>
+        <div class="sidebar-footer-image">
+            <img src="../Images/logo_neg.png" alt="Decoración de Sidebar">
+        </div>
+    </div>
+
+    <div class="pusher">
+        <div class="ui top fixed menu" style="background-color: #9A9CEA;">
+            <div class="ui container">
+                <div class="item">
+                    <img src="../Images/logopng.png" alt="Logo">
+                </div>
+                <a class="item" id="sidebar-toggle">
+                    <i class="sidebar icon" style="color: white;"></i>
+                </a>
+                <div class="header item" style="color: white;">
+                    Gestión de Vivienda
+                </div>
+                <div class="right menu">
+                    <div class="ui dropdown item" style="color: white;">
+                        <i class="user icon" style="color: white;"></i> Habitante
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <a class="item" href="./profile.html"><i class="user icon"></i> Mi Perfil</a>
+                            <a class="item"><i class="cog icon"></i> Configuración</a>
+                            <div class="divider"></div>
+                            <a class="item" onclick="cerrarSesion()"><i class="sign out icon"></i> Cerrar Sesión</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content-container" style="margin-top: 80px; margin-bottom: 50px;">
+            <div class="ui container">
+                
+                <div class="ui header">
+                    <h1>
+                        <i class="clock icon"></i>
+                        Horarios de Áreas y Servicios
+                        <div class="sub header">Consulta la disponibilidad de las áreas comunes</div>
+                    </h1>
+                </div>
+                
+                <div class="ui divider"></div>
+                
+                <div class="horarios-dashboard">
+                    <div class="ui active centered inline loader" style="margin-top: 50px;"></div>
+                    <p style="text-align: center; color: #777; margin-top: 10px;">Cargando horarios...</p>
+                </div>
+
+            </div>
+        </div>
+        
+        <footer class="ui inverted vertical footer segment">
+            <div class="ui container">
+                <p>Hecho con <i class="heart icon"></i></p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

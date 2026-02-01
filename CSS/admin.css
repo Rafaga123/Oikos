@@ -1,5 +1,5 @@
 body {
-    background-image: url(/Images/Fondopagina.png);
+    background-image: url(../Images/Fondopagina.png);
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -104,7 +104,7 @@ body {
 .card-icon {
     font-size: 2.5em;
     margin-bottom: 15px;
-    color: #2185d0;
+    color: #9A9CEA;
     text-align: center; /* Centra el icono */
 }
 

@@ -1,0 +1,190 @@
+/* --- CONFIGURACIÓN DE COLORES (Para que funcione el JS dinámico) --- */
+:root {
+    --blue: #2185d0;
+    --blue-light: #e0f0fa;
+    --orange: #f2711c;
+    --orange-light: #ffedde;
+    --purple: #a333c8;
+    --purple-light: #f6e7ff;
+    --green: #21ba45;
+    --green-light: #e6f9e6;
+    --red: #db2828;
+    --red-light: #ffe8e8;
+    --teal: #00b5ad;
+    --teal-light: #e0f7fa;
+    --grey: #767676;
+    --grey-light: #f3f3f3;
+    --black: #1b1c1d;
+    --black-light: #e0e0e0;
+}
+
+body {
+    background-image: url('../Images/Fondopagina.png');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-color: #f0f0f0;
+}
+
+.pusher {
+    margin-left: 0px;
+    transition: margin-left 0.3s ease;
+}
+
+.main-content-container {
+    padding: 20px;
+    min-height: 100vh;
+    padding-top: 100px; /* Espacio para el menú superior */
+}
+
+/* --- ESTILOS DEL DASHBOARD DE HORARIOS --- */
+
+.horarios-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); /* Tarjetas responsive */
+    gap: 25px;
+    padding: 10px 0;
+}
+
+/* Tarjeta Individual */
+.area-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    padding: 25px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #e0e0e0;
+    position: relative;
+    overflow: hidden;
+}
+
+.area-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+/* Cabecera: Icono, Título y Estado */
+.area-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.area-title {
+    display: flex;
+    align-items: center;
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #444;
+    gap: 15px;
+}
+
+.area-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
+    /* El color de fondo y texto lo pone el JS usando las variables :root */
+}
+
+/* Badges de Estado */
+.area-status {
+    font-size: 0.75em;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.status-abierto {
+    background-color: #e6f9e6;
+    color: #21ba45;
+    border: 1px solid #c3e6cb;
+}
+
+.status-cerrado {
+    background-color: #f3f3f3;
+    color: #767676;
+    border: 1px solid #ddd;
+}
+
+/* Contenido del Horario */
+.horario-item {
+    margin-bottom: 15px;
+}
+
+.horario-dias {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.horario-dias i.icon {
+    color: #9A9CEA;
+}
+
+.horario-horas {
+    font-size: 1em;
+    color: #666;
+    background-color: #f9f9f9;
+    padding: 8px 12px;
+    border-radius: 6px;
+    display: inline-block;
+    border-left: 3px solid #9A9CEA;
+}
+
+.horario-notas {
+    margin-top: 12px;
+    font-size: 0.9em;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Restricciones y Descripción */
+.ui.segment.secondary {
+    margin-top: 15px;
+    background: #f8f9fa;
+    border: none;
+    color: #666;
+    font-style: italic;
+}
+
+.ui.list.bulleted {
+    margin-top: 15px;
+    padding-left: 10px;
+}
+
+.ui.list.bulleted .item {
+    color: #777;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+/* --- SIDEBAR STYLES (Manteniendo consistencia) --- */
+.sidebar-menu {
+    width: 260px;
+    /* ... resto de estilos del sidebar que ya tenías ... */
+}
+
+/* Footer */
+.ui.vertical.footer {
+    background-color: #A2B9EE;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    margin-top: 40px;
+}

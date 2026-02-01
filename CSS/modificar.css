@@ -1,5 +1,5 @@
 body {
-    background-image: url(/Images/Fondopagina.png);
+    background-image: url(../Images/Fondopagina.png);
    
 }
 
@@ -46,7 +46,7 @@ body {
 
 /* Contenido Principal */
 .main-content {
-    background-image: url(/Images/Fondopagina.png);
+    background-image: url(../Images/Fondopagina.png);
     background-size:auto;
     background-position: center;
     background-attachment: fixed;

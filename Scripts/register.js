@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
           title: '¡Registro exitoso!',
           text: 'Inicia sesión para continuar.'
         }).then(() => {
-          window.location.href = 'login.html';
+          window.location.href = 'bienvenida.html';
         });
       } else {
         window.location.href = 'login.html';

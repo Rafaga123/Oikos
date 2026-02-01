@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor</title>
+    <title>Gestor - Dashboard OIKOS</title>
     <link rel="shortcut icon" href="../Images/logo.ico" />
-    <link rel="stylesheet" type="text/CSS" href="../../CSS/semantic.css">       
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+    
     <link rel="stylesheet" href="../CSS/admin.css">
     <script src="../Scripts/seguridad.js"></script>
     <script>window.rolesPermitidos = ['ENCARGADO_COMUNIDAD'];</script>
 </head>
 <body>
+
     <div class="ui vertical inverted sidebar menu sidebar-menu" style="background-color: #9A9CEA;">
         <div class="item">
             <div class="header">
@@ -26,26 +30,47 @@
         </div>
         <div class="item">
             <div class="menu">
-                <a class="active item">
-                    <i class="home icon"></i>
-                    Panel de Control
+                <a class="active item" href="./gestor.html">
+                    <i class="home icon"></i> Panel de Control
                 </a>
                 <a class="item" href="./gestion_habitantes.html">
-                    <i class="users icon"></i>
-                    Habitantes
+                    <i class="users icon"></i> Habitantes
                 </a>
                 <a class="item" href="./solicitudes.html">
-                    <i class="chart bar icon"></i>
-                    Solicitudes
+                    <i class="chart bar icon"></i> Incidencias
+                </a>
+                <a class="item" href="./solicitudes_nuevas.html">
+                    <i class="user icon"></i> Solicitudes nuevas
+                </a>
+                <a class="item" href="./pagos_gestor.html">
+                    <i class="money bill alternate icon"></i> Pagos
+                </a>
+                <a class="item" href="./crear_horario.html">
+                    <i class="clock icon"></i> Modificar Horarios
+                </a>
+                <a class="item" href="./modificar_metodo_pago.html">
+                    <i class="credit card icon"></i> Modificar Pagomovil
+                </a>
+                <a class="item" href="./actividades_gestor.html">
+                    <i class="calendar icon"></i> Actividades
+                </a>
+                <a class="item" href="./foro_gestor.html">
+                    <i class="comments icon"></i> Foro comunitario
+                </a>
+                <a class="item" href="./configuracion.html">
+                    <i class="cogs icon"></i> Configuración
+                </a>
+                <a class="item" href="./ver_encuestas.html">
+                    <i class="chart pie icon"></i>
+                    Resultados de Encuestas
                 </a>
                 
             </div>
         </div>
-        <div class="item" >
+        <div class="item">
             <div class="ui divider"></div>
             <a class="item" onclick="cerrarSesion()">
-                <i class="sign out icon"></i>
-                Cerrar Sesión
+                <i class="sign out icon"></i> Cerrar Sesión
             </a>
         </div>
         <div class="sidebar-footer-image">
@@ -53,27 +78,18 @@
         </div>
     </div>
 
-    <!--contenido de la pagina del gestor-->
     <div class="pusher">
-        <!--Menú Superior-->
         <div class="ui top fixed menu" style="background-color: #9A9CEA;">
             <div class="ui container">
-                <div class="item">
-                    <img src="../Images/logopng.png" alt="Logo"> <!--logo de la pagina-->
-                </div>
-                <a class="item" id="sidebar-toggle"><!--activador del sidebar-->
-                    <i class="sidebar icon" style="color: white;"></i><!--Icono del sidebar-->
-                </a>
-                <div class="header item" style="color: white;"><!--color y titulo del menu superior-->
-                    Gestión de Habitantes
-                </div>
+                <div class="item"><img src="../Images/logopng.png" alt="Logo"></div>
+                <a class="item" id="sidebar-toggle"><i class="sidebar icon" style="color: white;"></i></a>
+                <div class="header item" style="color: white;">Gestión de Habitantes</div>
                 <div class="right menu">
                     <div class="ui dropdown item" style="color: white;">
                         <i class="user icon" style="color: white;"></i> Gestor
                         <i class="dropdown icon"></i>
                         <div class="menu">
                             <a class="item"><i class="user icon"></i> Mi Perfil</a>
-                            
                             <div class="divider"></div>
                             <a class="item" onclick="cerrarSesion()"><i class="sign out icon"></i> Cerrar Sesión</a>
                         </div>
@@ -82,212 +98,129 @@
             </div>
         </div>
 
-        <!--Contenido Principal -->
         <div class="main-content">
             <div class="ui container">
-                <h1 class="ui header"> <!--titulo superior-->
+                <h1 class="ui header">
                     Panel de Control
-                    <div class="sub header">Panel de administración para la gestión de habitantes</div> <!--descripcion de la pagina-->
+                    <div class="sub header">Resumen de actividad de la comunidad</div>
                 </h1>
+                <div class="ui divider"></div>
                 
-                <div class="ui divider"></div> <!--linea divisoria entre el titulo y las link cards-->
+                <div class="charts-container">
+                    
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div>
+                                <div class="chart-title">Habitantes Activos</div>
+                                <div class="chart-value" id="val-habitantes">0</div>
+                            </div>
+                            <div class="chart-icon users"><i class="users icon"></i></div>
+                        </div>
+                        <div class="circle-chart">
+                            <svg viewBox="0 0 36 36">
+                                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path id="circle-habitantes" class="circle users" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            </svg>
+                            <div class="circle-value" id="pct-habitantes">0%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div>
+                                <div class="chart-title">Pagos Pendientes</div>
+                                <small>(Ultimos 6 meses)</small>
+                                <div class="chart-value" id="val-pagos-pendientes">0</div>
+                            </div>
+                            <div class="chart-icon payment"><i class="dollar sign icon"></i></div>
+                        </div>
+                        <div class="bar-chart" id="chart-pagos-barras">
+                            <div class="ui active loader text">Cargando...</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div>
+                                <div class="chart-title">Incidentes Pendientes</div>
+                                <div class="chart-value" id="val-incidentes">0</div>
+                            </div>
+                            <div class="chart-icon alert"><i class="exclamation triangle icon"></i></div>
+                        </div>
+                        <div class="line-chart">
+                            <svg viewBox="0 0 200 100">
+                                <path class="area-path alert" d="M0,80 L40,60 L80,70 L120,30 L160,40 L200,20 L200,100 L0,100 Z"></path>
+                                <path class="line-path alert" d="M0,80 L40,60 L80,70 L120,30 L160,40 L200,20"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div>
+                                <div class="chart-title">Solicitudes Nuevas</div>
+                                <div class="chart-value" id="val-solicitudes">0</div>
+                            </div>
+                            <div class="chart-icon complete"><i class="user plus icon"></i></div>
+                        </div>
+                        <div class="circle-chart">
+                            <svg viewBox="0 0 36 36">
+                                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path id="circle-solicitudes" class="circle complete" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            </svg>
+                            <div class="circle-value" id="pct-solicitudes">0</div>
+                        </div>
+                    </div>
+                </div>
                 
-                
-<div class="charts-container">
-    <!-- Habitantes Activos - Gráfico Circular -->
-    <div class="chart-card">
-        <div class="chart-header">
-            <div>
-                <div class="chart-title">Habitantes Activos</div>
-                <div class="chart-value">245</div>
-            </div>
-            <div class="chart-icon users">
-                <i class="users icon"></i>
-            </div>
-        </div>
-        <div class="circle-chart">
-            <svg viewBox="0 0 36 36">
-                <path class="circle-bg"
-                    d="M18 2.0845
-                      a 15.9155 15.9155 0 0 1 0 31.831
-                      a 15.9155 15.9155 0 0 1 0 -31.831"
-                />
-                <path class="circle users"
-                    stroke-dasharray="82, 100"
-                    d="M18 2.0845
-                      a 15.9155 15.9155 0 0 1 0 31.831
-                      a 15.9155 15.9155 0 0 1 0 -31.831"
-                />
-            </svg>
-            <div class="circle-value">80%</div>
-        </div>
-    </div>
-    
-    <!-- Pagos Pendientes - Gráfico de Barra -->
-    <div class="chart-card">
-        <div class="chart-header">
-            <div>
-                <div class="chart-title">Pagos Pendientes</div>
-                <div class="chart-value">12</div>
-            </div>
-            <div class="chart-icon payment">
-                <i class="dollar sign icon"></i>
-            </div>
-        </div>
-        <div class="bar-chart">
-            <div class="bar" style="height: 60%;">
-                <div class="bar-label">Ene</div>
-            </div>
-            <div class="bar" style="height: 80%;">
-                <div class="bar-label">Feb</div>
-            </div>
-            <div class="bar" style="height: 40%;">
-                <div class="bar-label">Mar</div>
-            </div>
-            <div class="bar" style="height: 100%;">
-                <div class="bar-label">Abr</div>
-            </div>
-            <div class="bar" style="height: 70%;">
-                <div class="bar-label">May</div>
-            </div>
-            <div class="bar" style="height: 90%;">
-                <div class="bar-label">Jun</div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Alertas - Gráfico de Línea -->
-    <div class="chart-card">
-        <div class="chart-header">
-            <div>
-                <div class="chart-title">Alertas</div>
-                <div class="chart-value">5</div>
-            </div>
-            <div class="chart-icon alert">
-                <i class="exclamation triangle icon"></i>
-            </div>
-        </div>
-        <div class="line-chart">
-            <svg viewBox="0 0 200 100">
-                <path class="area-path alert" 
-                    d="M0,80 L40,60 L80,70 L120,30 L160,40 L200,20 L200,100 L0,100 Z">
-                </path>
-                <path class="line-path alert" 
-                    d="M0,80 L40,60 L80,70 L120,30 L160,40 L200,20"
-                    stroke-dasharray="300"
-                    stroke-dashoffset="300">
-                </path>
-            </svg>
-        </div>
-    </div>
-    
-    <!-- Completado - Gráfico Circular -->
-    <div class="chart-card">
-        <div class="chart-header">
-            <div>
-                <div class="chart-title">Completado</div>
-                <div class="chart-value">98%</div>
-            </div>
-            <div class="chart-icon complete">
-                <i class="check circle icon"></i>
-            </div>
-        </div>
-        <div class="circle-chart">
-            <svg viewBox="0 0 36 36">
-                <path class="circle-bg"
-                    d="M18 2.0845
-                      a 15.9155 15.9155 0 0 1 0 31.831
-                      a 15.9155 15.9155 0 0 1 0 -31.831"
-                />
-                <path class="circle complete"
-                    stroke-dasharray="98, 100"
-                    d="M18 2.0845
-                      a 15.9155 15.9155 0 0 1 0 31.831
-                      a 15.9155 15.9155 0 0 1 0 -31.831"
-                />
-            </svg>
-            <div class="circle-value">98%</div>
-        </div>
-    </div>
-</div>
-                
-                <!-- LINK CARDS -->
                 <div class="cards-container">
-                    <!-- Gestión de Habitantes -->
-                    <div class="ui card link-card">
+                    <div class="ui card link-card" onclick="window.location.href='./gestion_habitantes.html'">
                         <div class="content">
-                            <div class="center aligned"></div>
-                            <div class="center aligned header">
-                                Gestión de Habitantes
-                            </div>
-                            <div class="center aligned description">
-                                <p>Administra la información de los habitantes registrados en el sistema.</p>
-                            </div>
+                            <div class="center aligned header">Gestión de Habitantes</div>
+                            <div class="center aligned description"><p>Administra la información de los habitantes.</p></div>
                         </div>
                         <div class="extra content">
                             <div class="center aligned">
-                                <button class="ui primary button" data-href="../Pages/gestion_habitantes.html">
-                                    Acceder
-                                    <i class="right arrow icon"></i>
+                                <button class="ui primary button" style="background: linear-gradient(135deg, #6a11cb 0%, #9A9CEA 100%);">
+                                    Acceder <i class="right arrow icon"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Modificar -->
-                    <div class="ui card link-card">
+                    <div class="ui card link-card" onclick="window.location.href='./modificar.html'">
                         <div class="content">
-                            <div class="center aligned">
-                            </div>
-                            <div class="center aligned header">
-                                Modificar
-                            </div>
-                            <div class="center aligned description">
-                                <p>Actualiza o edita la información existente de las reglas del condominio.
-                                </p>
-                            </div>
+                            <div class="center aligned header">Modificar Reglas</div>
+                            <div class="center aligned description"><p>Actualiza el reglamento del condominio.</p></div>
                         </div>
                         <div class="extra content">
                             <div class="center aligned">
-                                <button class="ui primary button" data-href="../Pages/modificar.html">
-                                    Acceder
-                                    <i class="right arrow icon"></i>
+                                <button class="ui primary button" style="background: linear-gradient(135deg, #6a11cb 0%, #9A9CEA 100%);">
+                                    Acceder <i class="right arrow icon"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
                     
-                    
-                    <!-- Crear -->
-                    <div class="ui card link-card">
+                    <div class="ui card link-card" onclick="window.location.href='./Crear.html'">
                         <div class="content">
-                            <div class="center aligned">
-                            </div>
-                            <div class="center aligned header">
-                                Crear
-                            </div>
-                            <div class="center aligned description">
-                                <p>Crea una encuesta o anuncio en el sistema.</p>
-                            </div>
+                            <div class="center aligned header">Crear Contenido</div>
+                            <div class="center aligned description"><p>Publica encuestas o anuncios importantes.</p></div>
                         </div>
                         <div class="extra content">
                             <div class="center aligned">
-                                <button class="ui primary button" data-href="../Pages/Crear.html">
-                                    Acceder
-                                    <i class="right arrow icon"></i>
+                                <button class="ui primary button" style="background: linear-gradient(135deg, #6a11cb 0%, #9A9CEA 100%);">
+                                    Acceder <i class="right arrow icon"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
-
-    <script src="../Scripts/jquery-3.7.1.min.js"></script>
-    <script src="../Scripts/semantic.min.js"></script>
-    <script src="../Scripts/admin.js"></script>
-
     
+    <script src="../Scripts/admin.js"></script>
 </body>
 </html>

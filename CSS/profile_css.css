@@ -1,6 +1,6 @@
  
 body { /*Atributos del Fondo de la pagina*/
-  background-image: url(/Images/Fondopagina.png);
+  background-image: url(../Images/Fondopagina.png);
 }
 /*Atributos CSS de la alerta exitosa*/
 .alert {

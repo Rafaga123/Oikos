@@ -1,46 +1,33 @@
 // --- ESTRUCTURA DE DATOS: PILA (STACK) ---
 class PilaPosts {
-    constructor() {
-        this.items = [];
-    }
-    // Agregar elemento al tope
-    push(element) {
-        this.items.push(element);
-    }
-    // Sacar elemento del tope
-    pop() {
-        if (this.items.length === 0) return null;
-        return this.items.pop();
-    }
-    isEmpty() {
-        return this.items.length === 0;
-    }
-    limpiar() {
-        this.items = [];
-    }
+    constructor() { this.items = []; }
+    push(element) { this.items.push(element); }
+    pop() { return this.isEmpty() ? null : this.items.pop(); }
+    isEmpty() { return this.items.length === 0; }
+    limpiar() { this.items = []; }
 }
 
-// Instancia global de la pila
 const pilaDelForo = new PilaPosts();
 
-document.addEventListener('DOMContentLoaded', function() {
+$(document).ready(function() {
     initSidebar();
     configurarModal();
-    cargarPosts(); // Cargar datos reales al iniciar
-
-    // Inicializar componentes Semantic
     $('.ui.dropdown').dropdown();
+    
+    // Cargar posts al iniciar
+    cargarPosts();
 });
 
-// --- LÓGICA DE API Y RENDERIZADO ---
+// --- LÓGICA DE API ---
 
 async function cargarPosts() {
     const token = localStorage.getItem('token');
-    const contenedor = document.getElementById('contenedor-posts'); // OJO: Debes agregar este ID en el HTML
+    const contenedor = document.getElementById('contenedor-posts'); 
     
-    // Limpiamos visualmente y la pila
-    contenedor.innerHTML = '<div class="ui active loader"></div>'; 
+    if(!contenedor) return;
+
     pilaDelForo.limpiar();
+    contenedor.innerHTML = '<div class="ui active centered inline loader" style="margin-top:20px;"></div>';
 
     try {
         const res = await fetch('http://localhost:3000/api/foro', {
@@ -50,51 +37,52 @@ async function cargarPosts() {
         if (!res.ok) throw new Error('Error al cargar posts');
         
         const posts = await res.json();
-        contenedor.innerHTML = ''; // Quitar loader
+        contenedor.innerHTML = ''; 
 
         if (posts.length === 0) {
             contenedor.innerHTML = `
-                <div class="ui placeholder segment" style="width: 100%; margin-top: 20px;">
+                <div class="ui placeholder segment center aligned" style="margin-top: 20px;">
                     <div class="ui icon header">
                         <i class="comments outline icon"></i>
-                        El foro está muy tranquilo hoy
+                        El foro está tranquilo
                     </div>
-                    <div class="inline">Aún no hay publicaciones en tu comunidad. ¡Sé el primero en escribir algo!</div>
+                    <p>Sé el primero en iniciar una conversación.</p>
                 </div>
             `;
             return;
         }
 
-        // 1. LLENAR LA PILA
-        // El servidor los manda por fecha ascendente (viejos primero).
-        // Al hacer push, el más nuevo queda en el tope (ultimo index).
+        // Llenar Pila
         posts.forEach(post => pilaDelForo.push(post));
 
-        // 2. VACIAR LA PILA PARA RENDERIZAR
-        // Al hacer pop, sacamos el más nuevo primero (LIFO) y lo pintamos arriba.
+        // Renderizar LIFO
         while (!pilaDelForo.isEmpty()) {
             const post = pilaDelForo.pop();
-            const htmlPost = crearHTMLPost(post);
-            contenedor.innerHTML += htmlPost; // Añadir al DOM
+            const html = crearHTMLPost(post);
+            contenedor.insertAdjacentHTML('beforeend', html);
         }
 
     } catch (error) {
         console.error(error);
-        contenedor.innerHTML = '<p style="text-align:center">No se pudieron cargar los posts.</p>';
+        contenedor.innerHTML = '<div class="ui error message">No se pudieron cargar las publicaciones.</div>';
     }
 }
 
 function crearHTMLPost(post) {
     const fecha = new Date(post.fecha_creacion).toLocaleDateString();
     const avatar = post.usuario.foto_perfil_url || '../Images/default.jpg';
-    const claseLike = post.dio_like ? 'red' : ''; // Corazón rojo si ya dio like
+    
+    // Si dioLike es true -> clase 'red', si no -> vacía
+    // NOTA: El backend debe devolver 'dioLike' (camelCase) según tu index.js
+    const claseLike = post.dioLike ? 'red' : ''; 
+    const nombre = `${post.usuario.primer_nombre} ${post.usuario.primer_apellido || ''}`.trim();
 
     return `
-    <div class="column">
+    <div class="column" style="margin-bottom: 20px;">
         <div class="ui fluid card">
             <div class="content">
                 <div class="right floated meta">${fecha}</div>
-                <img class="ui avatar image" src="${avatar}"> ${post.usuario.primer_nombre}
+                <img class="ui avatar image" src="${avatar}"> ${nombre}
             </div>
             <div class="content">
                 <div class="header">${post.titulo}</div>
@@ -103,7 +91,7 @@ function crearHTMLPost(post) {
                 </div>
             </div>
             <div class="extra content">
-                <span class="left floated like-btn" onclick="toggleLike(${post.id}, this)" style="cursor: pointer;">
+                <span class="left floated like-btn" onclick="toggleLike(${post.id}, this)" style="cursor: pointer; user-select: none;">
                     <i class="${claseLike} like icon"></i>
                     <span class="count">${post.cantidad_likes}</span> Likes
                 </span>
@@ -113,10 +101,54 @@ function crearHTMLPost(post) {
     `;
 }
 
+async function toggleLike(idPost, elementoHtml) {
+    const token = localStorage.getItem('token');
+    const icono = elementoHtml.querySelector('i');
+    const contador = elementoHtml.querySelector('.count');
+
+    // 1. Deshabilitar clics temporalmente para evitar spam
+    elementoHtml.style.pointerEvents = 'none';
+
+    try {
+        const res = await fetch(`http://localhost:3000/api/foro/${idPost}/like`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if(res.ok) {
+            const data = await res.json();
+            
+            // 2. CORRECCIÓN CRÍTICA: Usar siempre el valor del servidor
+            // Esto evita números negativos o desincronizados
+            contador.innerText = data.totalLikes;
+            
+            // Actualizar icono según el estado real
+            if (data.dioLike) {
+                icono.classList.add('red');
+            } else {
+                icono.classList.remove('red');
+            }
+        }
+    } catch (error) {
+        console.error('Error al dar like:', error);
+    } finally {
+        // 3. Reactivar el botón
+        elementoHtml.style.pointerEvents = 'auto';
+    }
+}
+
 async function publicarPost() {
     const token = localStorage.getItem('token');
-    const titulo = document.querySelector('input[name="Tema"]').value;
-    const contenido = document.querySelector('input[name="Descripción"]').value;
+    const titulo = document.querySelector('input[name="Tema"]').value.trim();
+    
+    // Busca input o textarea
+    let contenido = document.querySelector('input[name="Descripción"]')?.value || document.querySelector('textarea[name="Descripción"]')?.value;
+    contenido = contenido ? contenido.trim() : '';
+
+    if(!titulo || !contenido) {
+        $('#alertFail').fadeIn().delay(2000).fadeOut();
+        return;
+    }
 
     try {
         const res = await fetch('http://localhost:3000/api/foro', {
@@ -129,15 +161,19 @@ async function publicarPost() {
         });
 
         if (res.ok) {
-            // Éxito
             $('#modalAgregar').modal('hide');
+            // Limpiar campos
+            document.querySelector('input[name="Tema"]').value = '';
+            if(document.querySelector('input[name="Descripción"]')) document.querySelector('input[name="Descripción"]').value = '';
+            if(document.querySelector('textarea[name="Descripción"]')) document.querySelector('textarea[name="Descripción"]').value = '';
+            
             $('#alertSuccess').fadeIn().delay(2000).fadeOut();
-            cargarPosts(); // Recargar todo para ver el nuevo post
+            cargarPosts(); 
         } else {
             Swal.fire({
                 icon: 'error',
-                title: 'No se publicó',
-                text: 'Hubo un problema al crear la publicación.'
+                title: 'Error',
+                text: 'No se pudo publicar el mensaje.'
             });
         }
     } catch (error) {
@@ -145,34 +181,7 @@ async function publicarPost() {
     }
 }
 
-async function toggleLike(idPost, elementoHtml) {
-    const token = localStorage.getItem('token');
-    const icono = elementoHtml.querySelector('i');
-    const contador = elementoHtml.querySelector('.count');
-    let numeroLikes = parseInt(contador.innerText);
-
-    try {
-        const res = await fetch(`http://localhost:3000/api/foro/${idPost}/like`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        const data = await res.json();
-
-        if (data.dio_like) {
-            icono.classList.add('red');
-            contador.innerText = numeroLikes + 1;
-        } else {
-            icono.classList.remove('red');
-            contador.innerText = numeroLikes - 1;
-        }
-
-    } catch (error) {
-        console.error('Error dando like', error);
-    }
-}
-
-// --- CONFIGURACIÓN VISUAL (LO QUE YA TENÍAS) ---
+// --- CONFIGURACIÓN VISUAL ---
 
 function initSidebar() {
     $('.ui.sidebar').sidebar({ context: $('.pusher'), transition: 'overlay' });
@@ -183,20 +192,11 @@ function initSidebar() {
 
 function configurarModal() {
     $('#agregarBtn').on('click', function() {
-        $('#modalAgregar .ui.form').form('clear');
         $('#modalAgregar').modal('show');
     });
 
     // Lógica del botón "Publicar" del modal
     $('#publicar').on('click', function() {
-        const $form = $('#modalAgregar .ui.form');
-        // Validar visualmente
-        if( !$('input[name="Tema"]').val() || !$('input[name="Descripción"]').val() ) {
-             $('#alertFail').fadeIn().delay(2000).fadeOut();
-             return false;
-        }
-        // Si pasa, enviar a API
         publicarPost();
-        return false; // Evitamos que cierre el modal automáticamente hasta que responda la API
     });
 }
