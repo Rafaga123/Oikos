@@ -1,37 +1,5 @@
 // Scripts/Estructuras/Cola.js
 
-class Cola {
-    constructor() {
-        this.items = [];
-    }
-
-    enqueue(element) {
-        this.items.push(element);
-    }
-
-    dequeue() {
-        if (this.isEmpty()) return null;
-        return this.items.shift(); // Saca el primero (FIFO)
-    }
-
-    front() {
-        if (this.isEmpty()) return null;
-        return this.items[0];
-    }
-
-    isEmpty() {
-        return this.items.length === 0;
-    }
-
-    size() {
-        return this.items.length;
-    }
-    
-    print() {
-        console.log(this.items);
-    }
-}
-
 class ColaDePublicacion {
     constructor() {
         this.items = [];
@@ -51,7 +19,7 @@ $(document).ready(function() {
     $('.ui.checkbox').checkbox();
     $('#sidebar-toggle').click(() => $('.ui.sidebar').sidebar('toggle'));
 
-    // --- LÓGICA VISUAL (Tabs y Preview) ---
+    // --- LÓGICA VISUAL (Tabs) ---
     let selectedType = null;
     
     $('.type-card').click(function() {
@@ -60,7 +28,6 @@ $(document).ready(function() {
         selectedType = $(this).data('type');
         $('.creation-form').removeClass('active');
         $(`#${selectedType}-form`).addClass('active');
-        updatePreview();
     });
 
     // --- MANEJO DE OPCIONES DE ENCUESTA ---
@@ -73,13 +40,11 @@ $(document).ready(function() {
                 <button type="button" class="ui icon button remove-option"><i class="minus icon"></i></button>
             </div>
         `);
-        updatePreview();
     });
     
     $(document).on('click', '.remove-option', function() {
         if ($('.option-item').length > 2) {
             $(this).closest('.option-item').remove();
-            updatePreview();
         }
     });
 
@@ -110,7 +75,7 @@ $(document).ready(function() {
             if($(this).val()) opciones.push($(this).val());
         });
 
-        if (opciones.length < 2) return alert('Mínimo 2 opciones');
+        if (opciones.length < 2) return Swal.fire('Error', 'Debes añadir al menos 2 opciones', 'error');
 
         const data = {
             tipo: 'encuesta', // Flag
@@ -123,12 +88,12 @@ $(document).ready(function() {
         
         if (!data.fecha_fin) {
             Swal.fire({
-                    icon: 'warning',
-                    title: '¡Error!',
-                    text: `Por favor selecciona una fecha de cierre.`,
-                    timer: 2000
-                });
-        return;
+                icon: 'warning',
+                title: '¡Error!',
+                text: `Por favor selecciona una fecha de cierre.`,
+                timer: 2000
+            });
+            return;
         }
 
         colaPublicaciones.encolar(data);
@@ -136,7 +101,7 @@ $(document).ready(function() {
         procesarCola(); // Intentar procesar
     });
 
-    // 3. Procesador de la Cola (Recursivo o Iterativo)
+    // 3. Procesador de la Cola
     async function procesarCola() {
         if (procesando || colaPublicaciones.estaVacia()) return;
 
@@ -164,11 +129,16 @@ $(document).ready(function() {
                 Swal.fire({
                     icon: 'success',
                     title: '¡Publicado!',
-                    text: `El ${item.tipo} se procesó correctamente desde la cola.`,
+                    text: `El ${item.tipo} se procesó correctamente.`,
                     timer: 2000
                 });
                 // Limpiar formularios
                 $('form').trigger('reset');
+                // Restaurar fechas por defecto
+                const today = new Date().toISOString().split('T')[0];
+                $('#announcement-date').val(today);
+                $('#survey-start-date').val(today);
+                
             } else {
                 throw new Error('Error en servidor');
             }
@@ -196,37 +166,5 @@ $(document).ready(function() {
             icon: 'info',
             title: `${tipo} agregado a la cola de procesamiento...`
         });
-    }
-
-    // --- VISTA PREVIA ---
-    $('#announcementForm input, #announcementForm textarea, #announcementForm select').on('input change', updatePreview);
-    $('#surveyForm input, #surveyForm textarea').on('input change', updatePreview);
-    $('#preview-announcement, #preview-survey').click(updatePreview);
-
-    function updatePreview() {
-        const preview = $('#preview-content');
-        if (!selectedType) return preview.html('<p class="text-muted">Selecciona un tipo...</p>');
-        
-        if (selectedType === 'announcement') {
-            const title = $('#announcement-title').val() || '[Título]';
-            const content = $('#announcement-content').val() || '...';
-            const cat = $('#announcement-category').val() || 'General';
-            preview.html(`
-                <div class="ui segment">
-                    <div class="ui blue ribbon label">${cat}</div>
-                    <h3>${title}</h3>
-                    <p>${content}</p>
-                </div>
-            `);
-        } else {
-            const title = $('#survey-title').val() || '[Pregunta]';
-            preview.html(`
-                <div class="ui segment">
-                    <div class="ui orange ribbon label">Encuesta</div>
-                    <h3>${title}</h3>
-                    <div class="ui form"><div class="grouped fields"><label>Opciones...</label></div></div>
-                </div>
-            `);
-        }
     }
 });

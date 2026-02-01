@@ -22,7 +22,6 @@ $(document).ready(function() {
 
 async function cargarPosts() {
     const token = localStorage.getItem('token');
-    // Asegúrate de que este ID exista en tu HTML (foro.html)
     const contenedor = document.getElementById('contenedor-posts'); 
     
     if(!contenedor) return;
@@ -73,12 +72,11 @@ function crearHTMLPost(post) {
     const fecha = new Date(post.fecha_creacion).toLocaleDateString();
     const avatar = post.usuario.foto_perfil_url || '../Images/default.jpg';
     
-    // Si dioLike es true -> clase 'red', si no -> vacía o 'outline' (dependiendo de tu icono preferido)
-    // En tu diseño original usabas 'red' si activo.
+    // Si dioLike es true -> clase 'red', si no -> vacía
+    // NOTA: El backend debe devolver 'dioLike' (camelCase) según tu index.js
     const claseLike = post.dioLike ? 'red' : ''; 
     const nombre = `${post.usuario.primer_nombre} ${post.usuario.primer_apellido || ''}`.trim();
 
-    // DISEÑO ORIGINAL RESTAURADO
     return `
     <div class="column" style="margin-bottom: 20px;">
         <div class="ui fluid card">
@@ -93,7 +91,7 @@ function crearHTMLPost(post) {
                 </div>
             </div>
             <div class="extra content">
-                <span class="left floated like-btn" onclick="toggleLike(${post.id}, this)" style="cursor: pointer;">
+                <span class="left floated like-btn" onclick="toggleLike(${post.id}, this)" style="cursor: pointer; user-select: none;">
                     <i class="${claseLike} like icon"></i>
                     <span class="count">${post.cantidad_likes}</span> Likes
                 </span>
@@ -108,6 +106,9 @@ async function toggleLike(idPost, elementoHtml) {
     const icono = elementoHtml.querySelector('i');
     const contador = elementoHtml.querySelector('.count');
 
+    // 1. Deshabilitar clics temporalmente para evitar spam
+    elementoHtml.style.pointerEvents = 'none';
+
     try {
         const res = await fetch(`http://localhost:3000/api/foro/${idPost}/like`, {
             method: 'POST',
@@ -117,10 +118,11 @@ async function toggleLike(idPost, elementoHtml) {
         if(res.ok) {
             const data = await res.json();
             
-            // 1. Actualizar número real
+            // 2. CORRECCIÓN CRÍTICA: Usar siempre el valor del servidor
+            // Esto evita números negativos o desincronizados
             contador.innerText = data.totalLikes;
             
-            // 2. Actualizar icono real
+            // Actualizar icono según el estado real
             if (data.dioLike) {
                 icono.classList.add('red');
             } else {
@@ -129,13 +131,17 @@ async function toggleLike(idPost, elementoHtml) {
         }
     } catch (error) {
         console.error('Error al dar like:', error);
+    } finally {
+        // 3. Reactivar el botón
+        elementoHtml.style.pointerEvents = 'auto';
     }
 }
 
 async function publicarPost() {
     const token = localStorage.getItem('token');
     const titulo = document.querySelector('input[name="Tema"]').value.trim();
-    // Intenta buscar como input o textarea por si acaso
+    
+    // Busca input o textarea
     let contenido = document.querySelector('input[name="Descripción"]')?.value || document.querySelector('textarea[name="Descripción"]')?.value;
     contenido = contenido ? contenido.trim() : '';
 
@@ -175,34 +181,7 @@ async function publicarPost() {
     }
 }
 
-async function toggleLike(idPost, elementoHtml) {
-    const token = localStorage.getItem('token');
-    const icono = elementoHtml.querySelector('i');
-    const contador = elementoHtml.querySelector('.count');
-    let numeroLikes = parseInt(contador.innerText);
-
-    try {
-        const res = await fetch(`http://localhost:3000/api/foro/${idPost}/like`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        const data = await res.json();
-
-        if (data.dio_like) {
-            icono.classList.add('red');
-            contador.innerText = numeroLikes + 1;
-        } else {
-            icono.classList.remove('red');
-            contador.innerText = numeroLikes - 1;
-        }
-
-    } catch (error) {
-        console.error('Error dando like', error);
-    }
-}
-
-// --- CONFIGURACIÓN VISUAL---
+// --- CONFIGURACIÓN VISUAL ---
 
 function initSidebar() {
     $('.ui.sidebar').sidebar({ context: $('.pusher'), transition: 'overlay' });
@@ -218,13 +197,6 @@ function configurarModal() {
 
     // Lógica del botón "Publicar" del modal
     $('#publicar').on('click', function() {
-        const $form = $('#modalAgregar .ui.form');
-        // Validar visualmente
-        if( !$('input[name="Tema"]').val() || !$('input[name="Descripción"]').val() ) {
-            $('#alertFail').fadeIn().delay(2000).fadeOut();
-            return false;
-        }
-        // Si pasa, enviar a API
         publicarPost();
     });
 }

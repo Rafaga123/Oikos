@@ -2084,6 +2084,39 @@ app.delete('/api/gestor/bancos/:id', verificarToken, async (req, res) => {
     } catch (e) { res.status(500).json({ error: 'Error al eliminar' }); }
 });
 
+app.post('/api/comunidad/salir', verificarToken, async (req, res) => {
+    try {
+        const { password } = req.body;
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        // 1. Verificar contraseña
+        const esValido = await bcrypt.compare(password, usuario.password_hash);
+        if (!esValido) {
+            return res.status(401).json({ error: 'Contraseña incorrecta.' });
+        }
+
+        // 2. Verificar si es el único gestor (Opcional, por seguridad de la comunidad)
+        // Si es el único gestor, no debería poder salir sin transferir o borrar la comunidad.
+        // Aquí asumimos lógica simple: se le permite salir.
+
+        // 3. Desvincular
+        await prisma.usuario.update({
+            where: { id: req.usuario.id },
+            data: {
+                id_comunidad: null,
+                estado_solicitud: 'SIN_COMUNIDAD',
+                id_rol: 3 // Forzamos a que vuelva a ser Habitante (por si era Gestor)
+            }
+        });
+
+        res.json({ message: 'Has salido de la comunidad exitosamente.' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al procesar la solicitud.' });
+    }
+});
+
 // Iniciar servidor
 app.listen(port, async () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);

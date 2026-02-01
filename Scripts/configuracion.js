@@ -29,7 +29,6 @@ function renderizarSidebar(rol) {
     const contenedor = $('#sidebar-container');
     let htmlSidebar = '';
 
-    // NOTA: Se agregan clases y estilos inline en la imagen para forzar el diseño correcto
     if (rol === 'ENCARGADO_COMUNIDAD' || rol === 'ADMINISTRADOR') {
         // Sidebar GESTOR
         htmlSidebar = `
@@ -47,8 +46,9 @@ function renderizarSidebar(rol) {
                     <a class="item" href="./solicitudes_nuevas.html"><i class="user icon"></i> Solicitudes</a>
                     <a class="item" href="./pagos_gestor.html"><i class="money bill alternate icon"></i> Pagos</a>
                     <a class="item" href="./crear_horario.html"><i class="clock icon"></i> Horarios</a>
-                    <a class="item" href="./modificar_metodo_pago.html"><i class="clock icon"></i>Modificar Pagomovil</a>
-                    <a class="item" href="./actividades_gestor.html"><i class="calendar icon"></i>Actividades</a>
+                    <a class="item" href="./modificar_metodo_pago.html"><i class="credit card icon"></i> Cuentas Bancarias</a>
+                    <a class="item" href="./actividades_gestor.html"><i class="calendar icon"></i> Actividades</a>
+                    <a class="item" href="./foro_gestor.html"><i class="comments icon"></i> Foro comunitario</a>
                     <a class="active item" href="./configuracion.html"><i class="cogs icon"></i> Configuración</a>
                 </div>
             </div>
@@ -74,7 +74,8 @@ function renderizarSidebar(rol) {
                     <a class="item" href="./home_page.html"><i class="home icon"></i> Inicio</a>
                     <a class="item" href="./reglamento.html"><i class="book icon"></i> Reglamento</a>
                     <a class="item" href="./horario.html"><i class="clock icon"></i> Horarios</a>
-                    <a class="item" href="./pagar.html"><i class="credit card icon"></i> Pagos</a>
+                    <a class="item" href="./cuentasparapagos.html"><i class="credit card icon"></i> Pagos</a>
+                    <a class="item" href="./actividades.html"><i class="calendar alternate icon"></i> Actividades</a>
                     <a class="item" href="./foro.html"><i class="comments icon"></i> Foro</a>
                     <a class="active item" href="./configuracion.html"><i class="cogs icon"></i> Configuración</a>
                 </div>
@@ -98,14 +99,14 @@ function renderizarSidebar(rol) {
 
 function configurarPermisos(rol) {
     if (rol === 'ENCARGADO_COMUNIDAD' || rol === 'ADMINISTRADOR') {
-        // Habilitar edición
+        // Habilitar edición para Gestor
         $('#comunidad-nombre').prop('disabled', false);
         $('#comunidad-direccion').prop('disabled', false);
         $('#btn-guardar-comunidad').show();
         $('#zona-transferir').show();
         $('#divider-transferir').show();
     } else {
-        // Modo solo lectura
+        // Modo solo lectura para Habitante
         $('#btn-guardar-comunidad').hide();
         $('#zona-transferir').hide();
         $('#divider-transferir').hide();
@@ -130,7 +131,7 @@ async function cargarInfoComunidad() {
     } catch (error) { console.error(error); }
 }
 
-// 1. ACTUALIZAR COMUNIDAD (Con confirmación)
+// 1. ACTUALIZAR COMUNIDAD
 async function actualizarComunidad(e) {
     e.preventDefault();
     
@@ -164,13 +165,26 @@ async function actualizarComunidad(e) {
     } catch(err) { console.error(err); }
 }
 
-// 2. CAMBIAR PASSWORD (Con confirmación)
+// 2. CAMBIAR PASSWORD (Con Validaciones Fuertes)
 async function cambiarPassword(e) {
     e.preventDefault();
     const passActual = $('#pass-actual').val();
     const passNueva = $('#pass-nueva').val();
     const passConfirm = $('#pass-confirm').val();
 
+    // --- VALIDACIONES DE SEGURIDAD ---
+    
+    // A. Longitud mínima
+    if (passNueva.length < 8) {
+        return Swal.fire('Contraseña Insegura', 'La nueva contraseña debe tener al menos 8 caracteres.', 'warning');
+    }
+
+    // B. Complejidad (Letras y Números)
+    if (!/[A-Za-z]/.test(passNueva) || !/\d/.test(passNueva)) {
+        return Swal.fire('Contraseña Insegura', 'La nueva contraseña debe incluir al menos una letra y un número.', 'warning');
+    }
+
+    // C. Coincidencia
     if (passNueva !== passConfirm) {
         return Swal.fire('Error', 'Las contraseñas nuevas no coinciden.', 'warning');
     }
@@ -215,7 +229,7 @@ function copiarCodigo() {
     setTimeout(() => { btn.innerHTML = originalHtml; }, 2000);
 }
 
-// --- ZONA DE PELIGRO (CON PASSWORD) ---
+// --- ZONA DE PELIGRO (ACCIONES PROTEGIDAS) ---
 
 async function eliminarCuenta() {
     // 1. Confirmación inicial
@@ -247,12 +261,10 @@ async function eliminarCuenta() {
     if (password) {
         const token = localStorage.getItem('token');
         try {
-            // Enviamos la contraseña en el cuerpo (algunos frameworks requieren POST para body, pero fetch DELETE lo soporta)
-            // Si hay problemas, cambiamos el método en backend a POST
             const res = await fetch('http://localhost:3000/api/auth/eliminar-cuenta', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ password: password }) // Enviamos password para validar en backend
+                body: JSON.stringify({ password: password }) 
             });
 
             if (res.ok) {
@@ -308,6 +320,67 @@ async function transferirGestoria() {
             if (res.ok) {
                 await Swal.fire('Transferencia Exitosa', 'Has cedido tu cargo. Serás redirigido al inicio de sesión.', 'success');
                 cerrarSesion();
+            } else {
+                const data = await res.json();
+                Swal.fire('Error', data.error || 'Contraseña incorrecta', 'error');
+            }
+        } catch (err) { console.error(err); }
+    }
+}
+
+async function salirDeComunidad() {
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+
+    // VERIFICACIÓN DE GESTOR: Bloquear salida si es administrador
+    if (usuario.rol === 'ENCARGADO_COMUNIDAD' || usuario.rol === 'ADMINISTRADOR') {
+        return Swal.fire({
+            icon: 'error',
+            title: 'Acción no permitida',
+            text: 'Como Gestor, no puedes abandonar la comunidad directamente. Debes transferir tu cargo a otro habitante o eliminar tu cuenta.'
+        });
+    }
+
+    // 1. Confirmación inicial
+    const result = await Swal.fire({
+        title: '¿Salir de la comunidad?',
+        text: "Dejarás de tener acceso a los datos de este condominio, pero tu cuenta de usuario seguirá existiendo.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Sí, quiero salir'
+    });
+
+    if (!result.isConfirmed) return;
+
+    // 2. Pedir contraseña
+    const { value: password } = await Swal.fire({
+        title: 'Confirmar Salida',
+        text: 'Por seguridad, ingresa tu contraseña para confirmar:',
+        input: 'password',
+        inputPlaceholder: 'Tu contraseña actual',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Confirmar Salida',
+        inputValidator: (value) => {
+            if (!value) return 'Debes ingresar tu contraseña';
+        }
+    });
+
+    if (password) {
+        const token = localStorage.getItem('token');
+        try {
+            const res = await fetch('http://localhost:3000/api/comunidad/salir', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ password: password })
+            });
+
+            if (res.ok) {
+                await Swal.fire('Listo', 'Has salido de la comunidad. Serás redirigido.', 'success');
+                // Cerrar sesión y redirigir
+                localStorage.removeItem('token');
+                localStorage.removeItem('usuario');
+                window.location.href = 'login.html';
             } else {
                 const data = await res.json();
                 Swal.fire('Error', data.error || 'Contraseña incorrecta', 'error');
