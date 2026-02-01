@@ -1864,6 +1864,92 @@ app.post('/api/gestor/habitante', verificarToken, async (req, res) => {
         res.status(500).json({ error: 'Error al crear habitante.' });
     }
 });
+app.get('/api/actividades', verificarToken, async (req, res) => {
+    try {
+        const usuario = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+        if (!usuario.id_comunidad) return res.json([]);
+
+        const actividades = await prisma.actividad.findMany({
+            where: { id_comunidad: usuario.id_comunidad },
+            orderBy: { fecha: 'asc' }
+        });
+
+        res.json(actividades);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al obtener actividades' });
+    }
+});
+
+// 2. CREAR ACTIVIDAD (Gestor)
+app.post('/api/gestor/actividades', verificarToken, async (req, res) => {
+    try {
+        const { title, type, area, date, startTime, endTime, description, organizer, contact, maxParticipants, status } = req.body;
+        const gestor = await prisma.usuario.findUnique({ where: { id: req.usuario.id } });
+
+        const nuevaActividad = await prisma.actividad.create({
+            data: {
+                titulo: title,
+                tipo: type,
+                area: area,
+                fecha: new Date(date),
+                hora_inicio: startTime,
+                hora_fin: endTime,
+                descripcion: description,
+                organizador: organizer,
+                contacto: contact,
+                max_participantes: maxParticipants ? parseInt(maxParticipants) : null,
+                estado: status,
+                id_comunidad: gestor.id_comunidad
+            }
+        });
+
+        res.status(201).json(nuevaActividad);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al crear actividad' });
+    }
+});
+
+// 3. EDITAR ACTIVIDAD (Gestor - PUT completo o parcial para cambiar estado)
+app.put('/api/gestor/actividades/:id', verificarToken, async (req, res) => {
+    try {
+        const idActividad = parseInt(req.params.id);
+        const { title, type, area, date, startTime, endTime, description, organizer, contact, maxParticipants, status } = req.body;
+
+        // Si solo envían el status (para confirmar/cancelar)
+        if (Object.keys(req.body).length === 1 && status) {
+             await prisma.actividad.update({
+                where: { id: idActividad },
+                data: { estado: status }
+            });
+            return res.json({ message: 'Estado actualizado' });
+        }
+
+        // Actualización completa
+        await prisma.actividad.update({
+            where: { id: idActividad },
+            data: {
+                titulo: title,
+                tipo: type,
+                area: area,
+                fecha: new Date(date),
+                hora_inicio: startTime,
+                hora_fin: endTime,
+                descripcion: description,
+                organizador: organizer,
+                contacto: contact,
+                max_participantes: maxParticipants ? parseInt(maxParticipants) : null,
+                estado: status
+            }
+        });
+
+        res.json({ message: 'Actividad actualizada' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al actualizar actividad' });
+    }
+});
 
 // Iniciar servidor
 app.listen(port, async () => {

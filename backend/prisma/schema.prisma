@@ -69,6 +69,7 @@ model Comunidad {
   cuentas_bancarias CuentaBancaria[]
   reglas            Regla[]
   Horario           Horario[]
+  actividades Actividad[]
 }
 
 model Usuario {
@@ -324,4 +325,24 @@ model ExcepcionHorario {
 
   id_horario Int
   horario    Horario @relation(fields: [id_horario], references: [id], onDelete: Cascade)
+}
+
+model Actividad {
+  id                Int      @id @default(autoincrement())
+  titulo            String
+  tipo              String   // meeting, reservation, activity, maintenance
+  area              String   // salon, parque, piscina, etc.
+  fecha             DateTime
+  hora_inicio       String
+  hora_fin          String
+  descripcion       String   @db.Text
+  organizador       String
+  contacto          String?
+  max_participantes Int?
+  estado            String   // pending, confirmed, cancelled
+  
+  fecha_creacion    DateTime @default(now())
+
+  id_comunidad      Int
+  comunidad         Comunidad @relation(fields: [id_comunidad], references: [id])
 }
