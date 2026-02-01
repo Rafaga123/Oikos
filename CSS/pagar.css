@@ -1,617 +1,243 @@
+/* CSS/pagar.css */
+
 body {
-  font-family: "Segoe UI", Tahoma, sans-serif; 
-  background-image: url('../Images/Fondopagina.png');
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-color: #f0f0f0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh; /* Ocupa el 100% de la altura de la ventana */
-  padding: 80px 0 0 0; /* Solo padding superior para el menú */
+    /* FONDO RESTAURADO */
+    background-image: url('../Images/Fondopagina.png');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-color: #f0f0f0;
+    overflow-x: hidden; 
 }
 
-form {
-  flex: 1; /* Esto hace que el formulario ocupe todo el espacio disponible */
-  display: flex;
-  align-items: center; /* Centra el contenido verticalmente si quieres */
-  justify-content: center;
-  padding: 20px; /* Padding interno para que no toque los bordes en móvil */
+/* Ajuste para el Sidebar y el Header fijo */
+.pusher {
+    min-height: 100vh;
+    /* Fondo ligeramente transparente para ver la imagen de fondo */
+    background-color: rgba(247, 247, 247, 0.85); 
+    transform: none !important; 
 }
 
-  .main-form-container { 
-    max-width:980px; 
-    margin:0 auto; 
-    padding:20px; 
-    box-shadow:0 6px 24px rgba(16,24,40,0.06); 
-    background: #a2b9ee;
-    border-radius: 14px;
-  }
-
-  /*Estilos para el footer*/
-.ui.vertical.footer {
-    background-color: #A2B9EE;
-    color: white;
-    padding: 20px 0;
-    text-align: center;
-    bottom: 0;
-    width: 100%;
-    align-items: flex-end;
-}
-    
-    h2 { 
-      margin:0 0 14px;
-    }
-    .payment-methods {
-      display:flex; 
-      gap:10px; 
-      margin-bottom:18px; 
-      flex-wrap:wrap;
-    }
-    .pm-btn { 
-      padding:10px 14px; 
-      border:1px solid #9a9cea; 
-      background: linear-gradient(to bottom, #adeee2, #a2dcee);
-      cursor:pointer; 
-      border-radius:15px; 
-    }
-    .pm-btn.active { 
-      background:#a2dcee; 
-      box-shadow:0 0 0 3px rgba(22,119,255,0.06);
-      border-color:#cfe3ff; 
-      }
-
-    .payment-grid { display:grid; 
-      grid-template-columns:1fr 320px; 
-      gap:20px; 
-      align-items:start;
-      margin-top:10px;
-    }
-    label { 
-      display:block; 
-      margin:12px 0 6px; 
-      font-weight:600; 
-      color:#24324a; 
-      font-size:13px; 
-    }
-    select, input[type="text"], input[type="number"], input[type="date"] {
-      width:100%; 
-      padding:10px; 
-      border-radius:6px; 
-      border:1px solid #9a9cea; 
-      background:#fff; 
-      box-sizing:border-box;
-    }
-
-    .two-cols {
-      display:flex;
-      gap:12px; 
-      margin-top:8px; 
-    }
-
-    .two-cols > div { flex:1; }
-
-    .bank-card { 
-    background:#a2dcee; 
-    padding:18px; 
-    border-radius:8px; 
-    text-align:center; 
-    margin-bottom:14px; 
-    color:#24324a; 
-    border:1px dashed #e6eefc; 
-  }
-    .bank-icon {
-      font-size:40px; 
-      margin-bottom:8px; 
-    }
-    .voucher-card { 
-    background:#a2dcee; 
-    padding:14px; 
-    border-radius:8px; 
-    border:1px solid #f0f2f7; 
-  }
-
-    .voucher-name { 
-    margin-top:8px; 
-    color:#24324a; 
-    font-size:13px; 
-    }
-    .actions-row { 
-    display:flex; 
-    justify-content:space-between; 
-      gap:12px;
-      margin-top:18px; 
-    }
-    .btn {
-      padding:10px 16px; 
-      border-radius:6px; 
-      cursor:pointer; 
-      border:1px solid transparent;
-      font-weight:600; 
-    }
-    .btn.ghost {
-      background:#fff; 
-      color:#333; 
-      border-color:#e2e6ef; 
-    }
-
-    .btn.primary { 
-      background:#a2dcee; 
-      color:#fff; 
-    }
-
-    .btn.primary:hover { 
-      background:#9a9cea; 
-    }
-
-    /* Alerta global */
-    .alert { 
-      position:fixed; 
-      top:20px; 
-      right:20px; 
-      z-index:9999; 
-      min-width:260px;
-      padding:14px 18px; 
-      border-radius:6px;
-      color:#fff; 
-      background:#4caf50;
-      box-shadow:0 6px 18px rgba(0,0,0,0.12); 
-      display:none; 
-      opacity:0; 
-      transition:opacity .45s ease;
-    }
-
-    .alert.success { background:#4caf50; }
-    .alert.danger  { background:#f44336; }
-    .alert.info    { background:#2196F3; }
-    .alert .closebtn { position:absolute; 
-      top:6px; right:10px; 
-      cursor:pointer; 
-      font-size:18px; 
-      color:#fff; }
-
-    /* Responsivo */
-    @media (max-width:840px) {
-      .payment-grid { grid-template-columns:1fr; }
-      .actions-row { 
-        flex-direction:column-reverse;
-        align-items:stretch; }
-    }
-
-    /* Botón flotante de Pago Móvil */
-.floating-pm-button {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 60px;
-    height: 60px;
-    background-color: #21ba45;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(33, 186, 69, 0.4);
+/* Header Fijo */
+.ui.top.fixed.menu {
     z-index: 1000;
-    transition: all 0.3s ease;
+    background-color: #9A9CEA !important;
     border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.floating-pm-button:hover {
-    background-color: #16ab39;
-    transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(33, 186, 69, 0.6);
+.ui.top.fixed.menu .item, 
+.ui.top.fixed.menu .header {
+    color: white !important;
 }
 
-.floating-pm-button:active {
-    transform: scale(0.95);
-}
-
-/* Modal de Pago Móvil */
-.pm-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1001;
-    align-items: center;
-    justify-content: center;
-}
-
-.pm-modal.active {
-    display: flex;
-    animation: fadeIn 0.3s ease;
-}
-
-.pm-modal-content {
-    background-color: white;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 500px;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    animation: slideUp 0.4s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes slideUp {
-    from { 
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to { 
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.pm-modal-header {
-    background: linear-gradient(135deg, #21ba45 0%, #16ab39 100%);
-    color: white;
+/* Contenedor Principal */
+.main-form-container {
     padding: 20px;
-    border-radius: 12px 12px 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    padding-top: 100px; /* Espacio para el header fijo */
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
-.pm-modal-header h3 {
-    margin: 0;
-    font-size: 1.3rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.pm-close-btn {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-}
-
-.pm-close-btn:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
-.pm-modal-body {
-    padding: 25px;
-}
-
-/* Tarjetas de información bancaria */
-.bank-info-card {
-    background: #f8f9fa;
-    border-radius: 10px;
-    padding: 20px;
+/* Título */
+.main-form-container .ui.header {
+    color: #555;
     margin-bottom: 20px;
-    border-left: 4px solid #21ba45;
-    transition: transform 0.3s ease;
 }
 
-.bank-info-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.bank-info-header {
+/* Tabs de Métodos de Pago */
+.payment-methods {
     display: flex;
-    align-items: center;
     gap: 15px;
-    margin-bottom: 15px;
-}
-
-.bank-logo {
-    width: 50px;
-    height: 50px;
-    background: white;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-}
-
-.bank-name {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #24324a;
-    margin: 0;
-}
-
-.bank-details {
-    display: grid;
-    gap: 15px;
-}
-
-.detail-item {
-    display: flex;
-    justify-content: space-between;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eaeaea;
-}
-
-.detail-item:last-child {
-    border-bottom: none;
-}
-
-.detail-label {
-    font-weight: 500;
-    color: #666;
-    font-size: 0.95rem;
-}
-
-.detail-value {
-    font-weight: 600;
-    color: #24324a;
-    font-size: 1rem;
-    text-align: right;
-    word-break: break-word;
-    max-width: 60%;
-}
-
-.copy-btn {
-    background-color: #2185d0;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 15px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    margin-top: 5px;
-}
-
-.copy-btn:hover {
-    background-color: #1678c2;
-}
-
-.copy-btn.copied {
-    background-color: #21ba45;
-}
-
-/* Instrucciones */
-.pm-instructions {
-    background: #e8f4fc;
-    border-radius: 10px;
-    padding: 20px;
-    margin-top: 25px;
-}
-
-.pm-instructions h4 {
-    color: #2185d0;
-    margin-top: 0;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.instructions-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
-
-.instructions-list li {
-    padding: 8px 0;
-    padding-left: 25px;
-    position: relative;
-    color: #24324a;
-}
-
-.instructions-list li:before {
-    content: "✓";
-    position: absolute;
-    left: 0;
-    color: #21ba45;
-    font-weight: bold;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .floating-pm-button {
-        bottom: 20px;
-        right: 20px;
-        width: 55px;
-        height: 55px;
-        font-size: 22px;
-    }
-    
-    .pm-modal-content {
-        width: 95%;
-        max-height: 85vh;
-    }
-    
-    .detail-item {
-        flex-direction: column;
-        gap: 5px;
-    }
-    
-    .detail-value {
-        max-width: 100%;
-        text-align: left;
-    }
-}
-
-/* Notificación de copiado */
-.copy-notification {
-    position: fixed;
-    bottom: 100px;
-    right: 30px;
-    background-color: #21ba45;
-    color: white;
-    padding: 12px 20px;
+    margin-bottom: 30px;
+    background: #fff;
+    padding: 5px;
     border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(33, 186, 69, 0.4);
-    z-index: 1002;
-    display: none;
-    align-items: center;
-    gap: 10px;
-    animation: slideInRight 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    width: fit-content;
 }
 
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
+.pm-btn {
+    border: none;
+    background: transparent;
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 6px;
+    color: #666;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.pm-btn:hover {
+    background-color: #f0f0f0;
+    color: #9A9CEA;
+}
+
+.pm-btn.active {
+    background-color: #9A9CEA;
+    color: white;
+    box-shadow: 0 4px 10px rgba(154, 156, 234, 0.4);
+}
+
+/* Grid del Formulario */
+.payment-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 30px;
+}
+
+@media (max-width: 768px) {
+    .payment-grid {
+        grid-template-columns: 1fr;
     }
 }
 
-.copy-notification.show {
+/* Columnas */
+.left-col {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.right-col {
     display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
-/* Estilos para las pestañas */
-    .payment-tabs {
-        display: flex;
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #dee2e6;
-        padding: 0 20px;
-    }
+/* Inputs y Labels */
+.payment-grid label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #444;
+    font-size: 0.95rem;
+    margin-top: 15px;
+}
 
-    .payment-tab {
-        flex: 1;
-        padding: 15px 20px;
-        background: none;
-        border: none;
-        border-bottom: 3px solid transparent;
-        font-size: 1rem;
-        font-weight: 600;
-        color: #6c757d;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }
+.payment-grid input, 
+.payment-grid select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
 
-    .payment-tab:hover {
-        color: #495057;
-        background-color: #e9ecef;
-    }
+.payment-grid input:focus, 
+.payment-grid select:focus {
+    border-color: #9A9CEA;
+}
 
-    .payment-tab.active {
-        color: #9A9CEA;
-        border-bottom-color: #9A9CEA;
-        background-color: white;
-    }
+.two-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
 
-    .payment-tab i {
-        font-size: 1.2rem;
-    }
+/* Tarjeta de Previsualización de Banco */
+.bank-card {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(37, 117, 252, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-height: 100px;
+}
 
-    /* Badges para tipo de pago */
-    .payment-badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-left: 10px;
-        background-color: #e8f5e9;
-        color: #2e7d32;
-    }
+.bank-card.empty {
+    background: #e9ecef;
+    color: #888;
+    box-shadow: none;
+    border: 2px dashed #ccc;
+}
 
-    .payment-badge.transfer {
-        background-color: #e3f2fd;
-        color: #1565c0;
-    }
+.bank-icon {
+    font-size: 2.5rem;
+    opacity: 0.8;
+}
 
-    /* Mejoras en las tarjetas de banco */
-    .bank-info-card {
-        border-left: 4px solid #9A9CEA;
-    }
+.bank-text {
+    flex: 1;
+}
 
-    .bank-info-card .payment-badge {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-    }
+.bank-text strong {
+    display: block;
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+}
 
-    /* Botones de copia mejorados */
-    .copy-buttons {
-        display: flex;
-        gap: 10px;
-        margin-top: 15px;
-    }
+.bank-text span {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    display: block;
+    line-height: 1.4;
+}
 
-    .copy-btn.secondary {
-        background-color: #6c757d;
-    }
+/* Carga de Archivo */
+.voucher-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px dashed #ddd;
+    text-align: center;
+    transition: border-color 0.3s;
+}
 
-    .copy-btn.secondary:hover {
-        background-color: #5a6268;
-    }
+.voucher-card:hover {
+    border-color: #9A9CEA;
+}
 
-    /* Contenido de pestañas */
-    .tab-content {
-        display: none;
-        max-height: 500px;
-        overflow-y: auto;
-        padding: 20px;
-    }
+.voucher-card h4 {
+    margin-top: 0;
+    color: #555;
+}
 
-    .tab-content.active {
-        display: block;
-    }
+/* Botones de Acción */
+.actions-row {
+    margin-top: 30px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
 
-    /* Responsive */
-    @media (max-width: 768px) {
-        .payment-tabs {
-            padding: 0 10px;
-        }
-        
-        .payment-tab {
-            padding: 12px 10px;
-            font-size: 0.9rem;
-        }
-        
-        .payment-tab i {
-            font-size: 1rem;
-        }
-        
-        .copy-buttons {
-            flex-direction: column;
-        }
-        
-        .bank-info-card .payment-badge {
-            position: relative;
-            top: 0;
-            right: 0;
-            margin: 5px 0 0 0;
-            align-self: flex-start;
-        }
-        
-        .bank-info-header {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-    }
+.btn {
+    padding: 12px 25px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    border: none;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
 
+.btn.primary {
+    background-color: #9A9CEA;
+    color: white;
+}
+
+.btn.primary:hover {
+    background-color: #7b7dd1;
+    transform: translateY(-2px);
+}
+
+.btn.ghost {
+    background-color: transparent;
+    color: #666;
+    border: 1px solid #ddd;
+}
+
+.btn.ghost:hover {
+    background-color: #f5f5f5;
+    color: #333;
+}

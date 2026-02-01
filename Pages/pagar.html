@@ -48,82 +48,87 @@
     </div>
 
     <div class="pusher">
-        <div class="ui top fixed menu" style="background-color: #9A9CEA;">
+        <div class="ui top fixed menu" style="background-color: #9A9CEA; border-radius: 0;">
             <div class="ui container">
-                <div class="item"><img src="../Images/logopng.png" alt="Logo"></div>
-                <a class="item" id="sidebar-toggle"><i class="sidebar icon" style="color: white;"></i></a>
-                <div class="header item" style="color: white;">Gestión de Pagos</div>
+                <a class="item" id="sidebar-toggle">
+                    <i class="sidebar icon" style="color: white; font-size: 1.2em;"></i>
+                </a>
+                <div class="header item" style="color: white; font-size: 1.1em;">
+                    Reportar Pago
+                </div>
                 <div class="right menu">
                     <div class="ui dropdown item" style="color: white;">
-                        <i class="user icon" style="color: white;"></i> Habitante
-                        <i class="dropdown icon"></i>
+                        <i class="user icon" style="color: white;"></i> Habitante <i class="dropdown icon"></i>
                         <div class="menu">
-                            <a class="item" href="./profile.html"><i class="user icon"></i> Mi Perfil</a>
-                            <div class="divider"></div>
-                            <a class="item" onclick="cerrarSesion()"><i class="sign out icon"></i> Cerrar Sesión</a>
+                            <a class="item" href="./profile.html">Mi Perfil</a>
+                            <a class="item" onclick="cerrarSesion()">Salir</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="main-form-container" style="margin-top: 100px;">
-            <h2 class="ui header"><i class="file invoice dollar icon"></i> Reportar Pago</h2>
+        <div class="main-form-container">
+            <h2 class="ui header">
+                <i class="file invoice dollar icon"></i> 
+                <div class="content">
+                    Reportar Nuevo Pago
+                    <div class="sub header">Adjunta tu comprobante para validación</div>
+                </div>
+            </h2>
+            
             <div class="ui divider"></div>
 
             <div class="payment-methods">
-                <button class="pm-btn active" data-method="transferencia" type="button">Transferencia Bancaria</button>
-                <button class="pm-btn" data-method="pago_movil" type="button">Pago Móvil</button>
+                <button class="pm-btn active" data-method="pago_movil" type="button">
+                    <i class="mobile alternate icon"></i> Pago Móvil
+                </button>
+                <button class="pm-btn" data-method="transferencia" type="button">
+                    <i class="exchange icon"></i> Transferencia
+                </button>
             </div>
 
-            <form id="form-reportar-pago" enctype="multipart/form-data">
+            <form id="form-reportar-pago" class="ui form">
                 <div class="payment-grid">
                     <div class="left-col">
-                        
-                        <label for="bancoDestino">Banco de Destino (Condominio) <span style="color:red">*</span></label>
-                        <select id="bancoDestino" class="ui dropdown fluid" required>
-                            <option value="">Cargando cuentas...</option>
-                        </select>
-                        
-                        <label for="conceptoPago">Concepto del Pago <span style="color:red">*</span></label>
-                        <input type="text" id="conceptoPago" placeholder="Ej: Condominio Enero 2026" required>
-                        
-                        <label for="bancoEmisor">Banco Emisor (Tu banco)</label>
-                        <select id="bancoEmisor" class="ui search dropdown fluid">
-                            <option value="">Selecciona tu banco...</option>
-                            <option value="Banesco">Banesco</option>
-                            <option value="Banco de Venezuela">Banco de Venezuela</option>
-                            <option value="Banco Mercantil">Banco Mercantil</option>
-                            <option value="Banco Provincial">Banco Provincial</option>
-                            <option value="Bancaribe">Bancaribe</option>
-                            <option value="Banco Exterior">Banco Exterior</option>
-                            <option value="Banco Occidental de Descuento">BOD</option>
-                            <option value="Banco Nacional de Crédito">BNC</option>
-                            <option value="Banplus">Banplus</option>
-                            <option value="Banco del Tesoro">Banco del Tesoro</option>
-                            <option value="Banco Agrícola de Venezuela">Banco Agrícola</option>
-                            <option value="Banco Bicentenario">Banco Bicentenario</option>
-                            <option value="Banco Activo">Banco Activo</option>
-                            <option value="Bancamiga">Bancamiga</option>
-                            <option value="Bancrecer">Bancrecer</option>
-                            <option value="Banco Plaza">Banco Plaza</option>
-                            <option value="Banco Caroní">Banco Caroní</option>
-                            <option value="Venezolano de Crédito">Venezolano de Crédito</option>
-                            <option value="Banco Sofitasa">Banco Sofitasa</option>
-                            <option value="100% Banco">100% Banco</option>
-                            <option value="Banco del Sur">Banco del Sur</option>
-                        </select>
+                        <div class="field">
+                            <label>Banco Destino (Condominio)</label>
+                            <select id="bancoDestino" class="ui dropdown fluid" required>
+                                <option value="">Cargando cuentas...</option>
+                            </select>
+                        </div>
 
-                        <label for="codigoRef">Número de Referencia <span style="color:red">*</span></label>
-                        <input type="text" id="codigoRef" placeholder="Ej: 12345678" required>
+                        <div class="field">
+                            <label>Concepto</label>
+                            <input type="text" id="conceptoPago" placeholder="Ej: Condominio Enero 2026" required>
+                        </div>
+
+                        <div class="field">
+                            <label>Banco Emisor (Tu Banco)</label>
+                            <select id="bancoEmisor" class="ui search dropdown fluid">
+                                <option value="">Selecciona...</option>
+                                <option value="Banesco">Banesco</option>
+                                <option value="Banco de Venezuela">Banco de Venezuela</option>
+                                <option value="Mercantil">Mercantil</option>
+                                <option value="Provincial">Provincial</option>
+                                <option value="Bancaribe">Bancaribe</option>
+                                <option value="BNC">BNC</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label>Referencia</label>
+                            <input type="text" id="codigoRef" placeholder="Ej: 123456" required>
+                        </div>
 
                         <div class="two-cols">
-                            <div>
-                                <label for="monto">Monto (Bs) <span style="color:red">*</span></label>
-                                <input type="number" id="monto" placeholder="0.00" step="0.01" required>
+                            <div class="field">
+                                <label>Monto (Bs)</label>
+                                <input type="number" id="monto" step="0.01" placeholder="0.00" required>
                             </div>
-                            <div>
-                                <label for="fechaPago">Fecha del Pago <span style="color:red">*</span></label>
+                            <div class="field">
+                                <label>Fecha</label>
                                 <input type="date" id="fechaPago" required>
                             </div>
                         </div>
@@ -135,25 +140,27 @@
                             <div class="bank-text">
                                 <strong id="preview-banco">Banco</strong><br>
                                 <span id="preview-titular">Titular</span><br>
-                                <span id="preview-info" style="font-family: monospace;">Info</span>
+                                <span id="preview-info" style="font-family: monospace;">...</span>
                             </div>
                         </div>
                         <div class="bank-card empty" id="bankPreviewEmpty">
                             <div class="bank-icon"><i class="hand point left outline icon"></i></div>
-                            <div class="bank-text">Selecciona un banco destino para ver los datos</div>
+                            <div class="bank-text">Selecciona una cuenta destino para ver los detalles</div>
                         </div>
 
                         <div class="voucher-card">
-                            <h4>Comprobante de Pago</h4>
-                            <p>Adjunta captura o PDF</p>
-                            <input type="file" id="voucherFile" accept="image/*,.pdf">
+                            <h4><i class="cloud upload icon"></i> Comprobante</h4>
+                            <p>Sube la captura o PDF</p>
+                            <input type="file" id="voucherFile" accept="image/*,.pdf" required>
                         </div>
                     </div>
                 </div>
 
                 <div class="actions-row">
                     <a href="./home_page.html" class="btn ghost">Cancelar</a>
-                    <button type="submit" class="btn primary">Enviar Reporte</button>
+                    <button type="submit" class="btn primary">
+                        <i class="paper plane icon"></i> Enviar Reporte
+                    </button>
                 </div>
             </form>
         </div>
