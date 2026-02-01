@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"> 
     <script src="../Scripts/scripts_pagar.js"></script>
     <link rel="stylesheet" href="../CSS/pagar.css">
-    <script src="../Scripts/seguridad.js"></script>
+    
     <script>window.rolesPermitidos = ['HABITANTE'];</script>
 </head>
 <body>
@@ -123,6 +123,320 @@
               <p>Hecho con <i class="heart icon"></i></p>
           </div>
   </footer>
+
+  <!-- Botón flotante de Pago Móvil -->
+<button class="floating-pm-button" id="floatingPmButton" title="Ver datos de Pago Móvil">
+    <i class="mobile alternate icon"></i>
+</button>
+
+<!-- Modal de Medios de Pago -->
+<div class="pm-modal" id="pmModal">
+    <div class="pm-modal-content">
+        <div class="pm-modal-header">
+            <h3>
+                <i class="money bill alternate icon"></i>
+                Datos Bancarios para Pagos
+            </h3>
+            <button class="pm-close-btn" id="pmCloseBtn">&times;</button>
+        </div>
+        
+        <!-- Pestañas de navegación -->
+        <div class="payment-tabs">
+            <button class="payment-tab active" data-tab="pagomovil">
+                <i class="mobile alternate icon"></i> Pago Móvil
+            </button>
+            <button class="payment-tab" data-tab="transferencias">
+                <i class="exchange icon"></i> Transferencias
+            </button>
+        </div>
+        
+        <!-- Contenido de Pago Móvil -->
+        <div class="pm-modal-body tab-content active" id="tab-pagomovil">
+            <!-- Información de Banesco -->
+            <div class="bank-info-card">
+                <div class="bank-info-header">
+                    <div class="bank-logo" style="background: linear-gradient(135deg, #f2f2f2 0%, #ffffff 100%); color: #e30613;">
+                        <i class="university icon"></i>
+                    </div>
+                    <h4 class="bank-name">Banesco</h4>
+                    <span class="payment-badge">Pago Móvil</span>
+                </div>
+                
+                <div class="bank-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Número de Teléfono:</span>
+                        <span class="detail-value" id="pm-tel-banesco">0414-555-1234</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Cédula:</span>
+                        <span class="detail-value" id="pm-cedula-banesco">V-26.789.456</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Banco Receptor:</span>
+                        <span class="detail-value" id="pm-banco-banesco">Banesco</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Beneficiario:</span>
+                        <span class="detail-value" id="pm-beneficiario-banesco">OIKOS</span>
+                    </div>
+                    <div class="copy-buttons">
+                        <button class="copy-btn" data-copy="0414-555-1234">
+                            <i class="copy icon"></i> Copiar Teléfono
+                        </button>
+                        <button class="copy-btn secondary" data-copy="V-26.789.456">
+                            <i class="id card icon"></i> Copiar Cédula
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información de Banco de Venezuela -->
+            <div class="bank-info-card">
+                <div class="bank-info-header">
+                    <div class="bank-logo" style="background: linear-gradient(135deg, #f2f2f2 0%, #ffffff 100%); color: #ff0000;">
+                        <i class="building icon"></i>
+                    </div>
+                    <h4 class="bank-name">Banco de Venezuela</h4>
+                    <span class="payment-badge">Pago Móvil</span>
+                </div>
+                
+                <div class="bank-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Número de Teléfono:</span>
+                        <span class="detail-value" id="pm-tel-bdv">0412-987-6543</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Cédula:</span>
+                        <span class="detail-value" id="pm-cedula-bdv">V-26.789.456</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Banco Receptor:</span>
+                        <span class="detail-value" id="pm-banco-bdv">Banco de Venezuela</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Beneficiario:</span>
+                        <span class="detail-value" id="pm-beneficiario-bdv">OIKOS</span>
+                    </div>
+                    <div class="copy-buttons">
+                        <button class="copy-btn" data-copy="0412-987-6543">
+                            <i class="copy icon"></i> Copiar Teléfono
+                        </button>
+                        <button class="copy-btn secondary" data-copy="V-26.789.456">
+                            <i class="id card icon"></i> Copiar Cédula
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información de Banco Provincial -->
+            <div class="bank-info-card">
+                <div class="bank-info-header">
+                    <div class="bank-logo" style="background: linear-gradient(135deg, #f2f2f2 0%, #ffffff 100%); color: #0033a0;">
+                        <i class="landmark icon"></i>
+                    </div>
+                    <h4 class="bank-name">Banco Provincial</h4>
+                    <span class="payment-badge">Pago Móvil</span>
+                </div>
+                
+                <div class="bank-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Número de Teléfono:</span>
+                        <span class="detail-value" id="pm-tel-provincial">0416-789-0123</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Cédula:</span>
+                        <span class="detail-value" id="pm-cedula-provincial">V-26.789.456</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Banco Receptor:</span>
+                        <span class="detail-value" id="pm-banco-provincial">Banco Provincial</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Beneficiario:</span>
+                        <span class="detail-value" id="pm-beneficiario-provincial">OIKOS</span>
+                    </div>
+                    <div class="copy-buttons">
+                        <button class="copy-btn" data-copy="0416-789-0123">
+                            <i class="copy icon"></i> Copiar Teléfono
+                        </button>
+                        <button class="copy-btn secondary" data-copy="V-26.789.456">
+                            <i class="id card icon"></i> Copiar Cédula
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Instrucciones Pago Móvil -->
+            <div class="pm-instructions">
+                <h4>
+                    <i class="info circle icon"></i>
+                    Instrucciones para Pago Móvil
+                </h4>
+                <ul class="instructions-list" id="instrucciones-pagomovil">
+                    <li>Selecciona "Pago Móvil" en tu aplicación bancaria</li>
+                    <li>Ingresa el número de teléfono del banco correspondiente</li>
+                    <li>Verifica que el nombre del beneficiario sea correcto</li>
+                    <li>Ingresa el monto a pagar en Bolívares</li>
+                    <li>Guarda el comprobante de la transacción</li>
+                    <li>Regresa a esta página para reportar tu pago</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Contenido de Transferencias -->
+        <div class="pm-modal-body tab-content" id="tab-transferencias">
+            <!-- Transferencia Banesco -->
+            <div class="bank-info-card">
+                <div class="bank-info-header">
+                    <div class="bank-logo" style="background: linear-gradient(135deg, #f2f2f2 0%, #ffffff 100%); color: #e30613;">
+                        <i class="university icon"></i>
+                    </div>
+                    <h4 class="bank-name">Banesco</h4>
+                    <span class="payment-badge transfer">Transferencia</span>
+                </div>
+                
+                <div class="bank-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Número de Cuenta:</span>
+                        <span class="detail-value" id="transfer-cuenta-banesco">0134-1234-56-1234567890</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Tipo de Cuenta:</span>
+                        <span class="detail-value" id="transfer-tipo-banesco">Corriente</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Beneficiario:</span>
+                        <span class="detail-value" id="transfer-beneficiario-banesco">OIKOS</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Cédula/RIF:</span>
+                        <span class="detail-value" id="transfer-cedula-banesco">J-12345678-9</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value" id="transfer-email-banesco">cuentas@oikos.com</span>
+                    </div>
+                    <div class="copy-buttons">
+                        <button class="copy-btn" data-copy="0134-1234-56-1234567890">
+                            <i class="copy icon"></i> Copiar Cuenta
+                        </button>
+                        <button class="copy-btn secondary" data-copy="J-12345678-9">
+                            <i class="id card icon"></i> Copiar RIF
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Transferencia Banco de Venezuela -->
+            <div class="bank-info-card">
+                <div class="bank-info-header">
+                    <div class="bank-logo" style="background: linear-gradient(135deg, #f2f2f2 0%, #ffffff 100%); color: #ff0000;">
+                        <i class="building icon"></i>
+                    </div>
+                    <h4 class="bank-name">Banco de Venezuela</h4>
+                    <span class="payment-badge transfer">Transferencia</span>
+                </div>
+                
+                <div class="bank-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Número de Cuenta:</span>
+                        <span class="detail-value" id="transfer-cuenta-bdv">0102-9876-54-3210987654</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Tipo de Cuenta:</span>
+                        <span class="detail-value" id="transfer-tipo-bdv">Ahorro</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Beneficiario:</span>
+                        <span class="detail-value" id="transfer-beneficiario-bdv">OIKOS</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Cédula/RIF:</span>
+                        <span class="detail-value" id="transfer-cedula-bdv">J-12345678-9</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value" id="transfer-email-bdv">cuentas@oikos.com</span>
+                    </div>
+                    <div class="copy-buttons">
+                        <button class="copy-btn" data-copy="0102-9876-54-3210987654">
+                            <i class="copy icon"></i> Copiar Cuenta
+                        </button>
+                        <button class="copy-btn secondary" data-copy="J-12345678-9">
+                            <i class="id card icon"></i> Copiar RIF
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Transferencia Banco Provincial -->
+            <div class="bank-info-card">
+                <div class="bank-info-header">
+                    <div class="bank-logo" style="background: linear-gradient(135deg, #f2f2f2 0%, #ffffff 100%); color: #0033a0;">
+                        <i class="landmark icon"></i>
+                    </div>
+                    <h4 class="bank-name">Banco Provincial</h4>
+                    <span class="payment-badge transfer">Transferencia</span>
+                </div>
+                
+                <div class="bank-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Número de Cuenta:</span>
+                        <span class="detail-value" id="transfer-cuenta-provincial">0108-5678-12-3456789012</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Tipo de Cuenta:</span>
+                        <span class="detail-value" id="transfer-tipo-provincial">Corriente</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Beneficiario:</span>
+                        <span class="detail-value" id="transfer-beneficiario-provincial">OIKOS</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Cédula/RIF:</span>
+                        <span class="detail-value" id="transfer-cedula-provincial">J-12345678-9</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value" id="transfer-email-provincial">cuentas@oikos.com</span>
+                    </div>
+                    <div class="copy-buttons">
+                        <button class="copy-btn" data-copy="0108-5678-12-3456789012">
+                            <i class="copy icon"></i> Copiar Cuenta
+                        </button>
+                        <button class="copy-btn secondary" data-copy="J-12345678-9">
+                            <i class="id card icon"></i> Copiar RIF
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Instrucciones Transferencias -->
+            <div class="pm-instructions">
+                <h4>
+                    <i class="info circle icon"></i>
+                    Instrucciones para Transferencias
+                </h4>
+                <ul class="instructions-list" id="instrucciones-transferencias">
+                    <li>Ingresa a tu banca en línea o aplicación móvil</li>
+                    <li>Selecciona la opción "Transferencia entre cuentas" o "Transferencia a terceros"</li>
+                    <li>Ingresa el número de cuenta del banco correspondiente</li>
+                    <li>Verifica el tipo de cuenta (Corriente/Ahorro)</li>
+                    <li>Confirma el nombre del beneficiario</li>
+                    <li>Ingresa el monto a transferir</li>
+                    <li>Guarda el comprobante de la transacción</li>
+                    <li>Regresa a esta página para reportar tu pago</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notificación de copiado -->
+<div class="copy-notification" id="copyNotification">
+    <i class="check icon"></i>
+    <span id="copyMessage">Texto copiado al portapapeles</span>
+</div>
 
 </body>
 </html>
