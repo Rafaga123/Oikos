@@ -7,6 +7,10 @@ body {
     min-height: 100vh;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
     }
+
+.ui.primary.button {
+    background-color: #9A9CEA !important;
+}
         
         .pusher {
             margin-left: 0px;

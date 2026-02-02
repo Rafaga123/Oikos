@@ -1,6 +1,10 @@
- body {
-            background-image: url(../Images/Fondopagina.png);
-        }
+body {
+    background-image: url(../Images/Fondopagina.png);
+}
+
+.ui.primary.button {
+    background-color: #9A9CEA !important;
+}
         
         .pusher {
             margin-left: 0px;

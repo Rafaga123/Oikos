@@ -7,6 +7,10 @@ body{
     background-color: #f0f0f0; /* color de respaldo por si la imagen no carga */
 }
 
+.ui.primary.button {
+    background-color: #9A9CEA !important;
+}
+
 /*Estilos para el footer*/
 .ui.vertical.footer {
     background-color: #A2B9EE;

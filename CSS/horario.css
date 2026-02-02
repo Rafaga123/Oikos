@@ -174,10 +174,48 @@ body {
     line-height: 1.4;
 }
 
-/* --- SIDEBAR STYLES (Manteniendo consistencia) --- */
-.sidebar-menu {
-    width: 260px;
-    /* ... resto de estilos del sidebar que ya tenías ... */
+/*Habilita Flexbox en el Sidebar Contenedor */
+.ui.left.vertical.sidebar {
+    display: flex !important; 
+    flex-direction: column;
+}
+
+/*Aumentar el tamaño de la letra de todos los elementos del menú */
+.sidebar-menu .item {
+    /*Aumenta la fuente de todo el texto del item*/
+    font-size: 1.15em; 
+    /*Añade más espacio vertical entre los items para que se vean mejor*/
+    padding-top: 18px !important;
+    padding-bottom: 18px !important;
+}
+
+/*Aumentar el tamaño de los iconos dentro de los elementos del menú*/
+.sidebar-menu .item i.icon {
+    /*Aumenta el tamaño de la fuente del icono*/
+    font-size: 1.5em !important;
+    
+    /*Asegura que haya más espacio entre el icono y el texto */
+    margin-right: 15px !important; 
+}
+
+/* Hace que el contenedor de la imagen crezca */
+.sidebar-footer-image {
+    flex-grow: 1; /*Ocupa el espacio restante del sidebar */
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Alinea la imagen a la parte inferior del espacio */
+    padding: 20px; /* Espacio de relleno para que no se pegue al borde */
+}
+
+/*Estilos de la Imagen*/
+.sidebar-footer-image img {
+    /* Asegura que la imagen no exceda el ancho del sidebar */
+    max-width: 100%; 
+    /* Define una altura máxima para que no empuje el menú */
+    max-height: 150px; 
+    /* Mantiene la proporción de la imagen */
+    height: auto; 
+
 }
 
 /* Footer */

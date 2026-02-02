@@ -1,22 +1,60 @@
 /* CSS/pagar.css */
-
-body {
-    /* FONDO RESTAURADO */
+body{
     background-image: url('../Images/Fondopagina.png');
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-color: #f0f0f0;
-    overflow-x: hidden; 
+    background-size: cover; /* cubre toda la pantalla */
+    background-position: center center; /* centra la imagen */
+    background-repeat: no-repeat; /* no se repite */
+    background-attachment: fixed; /* queda fija al hacer scroll */
 }
 
 /* Ajuste para el Sidebar y el Header fijo */
 .pusher {
     min-height: 100vh;
-    /* Fondo ligeramente transparente para ver la imagen de fondo */
-    background-color: rgba(247, 247, 247, 0.85); 
     transform: none !important; 
+}
+
+/*Habilita Flexbox en el Sidebar Contenedor */
+.ui.left.vertical.sidebar {
+    display: flex !important; 
+    flex-direction: column;
+}
+
+/*Aumentar el tamaño de la letra de todos los elementos del menú */
+.sidebar-menu .item {
+    /*Aumenta la fuente de todo el texto del item*/
+    font-size: 1.15em; 
+    /*Añade más espacio vertical entre los items para que se vean mejor*/
+    padding-top: 18px !important;
+    padding-bottom: 18px !important;
+}
+
+/*Aumentar el tamaño de los iconos dentro de los elementos del menú*/
+.sidebar-menu .item i.icon {
+    /*Aumenta el tamaño de la fuente del icono*/
+    font-size: 1.5em !important;
+    
+    /*Asegura que haya más espacio entre el icono y el texto */
+    margin-right: 15px !important; 
+}
+
+/* Hace que el contenedor de la imagen crezca */
+.sidebar-footer-image {
+    flex-grow: 1; /*Ocupa el espacio restante del sidebar */
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Alinea la imagen a la parte inferior del espacio */
+    padding: 20px; /* Espacio de relleno para que no se pegue al borde */
+}
+
+/*Estilos de la Imagen*/
+.sidebar-footer-image img {
+    /* Asegura que la imagen no exceda el ancho del sidebar */
+    max-width: 100%; 
+    /* Define una altura máxima para que no empuje el menú */
+    max-height: 150px; 
+    /* Mantiene la proporción de la imagen */
+    height: auto; 
+
 }
 
 /* Header Fijo */
@@ -51,7 +89,6 @@ body {
     display: flex;
     gap: 15px;
     margin-bottom: 30px;
-    background: #fff;
     padding: 5px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);

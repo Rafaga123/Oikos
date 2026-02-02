@@ -48,8 +48,12 @@
     transform: translateX(0);
 }
 
+.btn.btn-info {
+    background-color: #9A9CEA !important;
+}
+
         body {
-             background-image: url(/Images/Fondopagina.png);
+            background-image: url(../Images/Fondopagina.png);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
