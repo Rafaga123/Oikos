@@ -98,7 +98,7 @@ async function cargarPerfil() {
                             <tr class="${claseColor}">
                                 <td>${fecha}</td>
                                 <td>${pago.concepto}</td>
-                                <td>$${pago.monto}</td>
+                                <td>Bs.${pago.monto}</td>
                                 <td><i class="icon ${getIconoEstado(pago.estado)}"></i> ${pago.estado}</td>
                             </tr>
                         `;
