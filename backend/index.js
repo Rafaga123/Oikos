@@ -1656,7 +1656,7 @@ app.get('/api/gestor/dashboard-stats', verificarToken, async (req, res) => {
             where: { id_comunidad: idComunidad, id_rol: 3, estado_solicitud: { not: 'PENDIENTE' } }
         });
         const habitantesActivos = await prisma.usuario.count({
-            where: { id_comunidad: idComunidad, id_rol: 3, estado_solicitud: 'ACEPTADO' } // O activos según tu lógica
+            where: { id_comunidad: idComunidad, id_rol: 3, estado_solicitud: 'ACEPTADO' } 
         });
 
         // 2. Pagos (Historial últimos 6 meses para la gráfica)
