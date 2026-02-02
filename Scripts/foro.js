@@ -1,8 +1,15 @@
 // --- ESTRUCTURA DE DATOS: PILA (STACK) ---
 class PilaPosts {
+    //Se ejecuta al crear la pila. Inicializa un arreglo vacío para guardar los datos
     constructor() { this.items = []; }
+
+    //Agrega un elemento a la parte superior
     push(element) { this.items.push(element); }
+    
+    //Saca y devuelve el último elemento 
+    //Si está vacía, devuelve null para evitar errores
     pop() { return this.isEmpty() ? null : this.items.pop(); }
+    //devuelve true si la pila está vacía
     isEmpty() { return this.items.length === 0; }
     limpiar() { this.items = []; }
 }
@@ -118,7 +125,7 @@ async function toggleLike(idPost, elementoHtml) {
         if(res.ok) {
             const data = await res.json();
             
-            // 2. CORRECCIÓN CRÍTICA: Usar siempre el valor del servidor
+            // 2. Usar siempre el valor del servidor
             // Esto evita números negativos o desincronizados
             contador.innerText = data.totalLikes;
             

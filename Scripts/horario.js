@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function cargarDashboardHorarios() {
     const token = localStorage.getItem('token');
-    const container = document.querySelector('.horarios-dashboard'); // Asegúrate que este div exista en horario.html
+    const container = document.querySelector('.horarios-dashboard');
     
     try {
         const res = await fetch('http://localhost:3000/api/horarios', {
@@ -22,7 +22,7 @@ async function cargarDashboardHorarios() {
             return;
         }
 
-        // Mapeo de iconos y colores según el área (clave: valor del select del gestor)
+        // Mapeo de iconos y colores según el área (valor del select del gestor)
         const areaConfig = {
             'piscina': { icon: 'swimming pool', color: 'blue' },
             'gimnasio': { icon: 'dumbbell', color: 'orange' },

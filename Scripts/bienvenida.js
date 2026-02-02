@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     //Fondo dinamico
-    
-
     const token = localStorage.getItem('token');
 
     // Protección: Si no hay token, volver al login

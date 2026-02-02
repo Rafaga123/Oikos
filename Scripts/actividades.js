@@ -27,9 +27,9 @@ async function loadResidentActivities() {
         // O mostramos todas. Aquí muestro todas ordenadas.
         const activities = data.filter(a => a.estado !== 'cancelled');
 
-        // Renderizado usando el diseño de Tarjetas Semantic UI
+        // Renderizado usando el diseño de Tarjetas
         activities.forEach(a => {
-            const fecha = new Date(a.fecha).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'numeric', year: 'numeric' });
+        const fecha = new Date(a.fecha).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'numeric', year: 'numeric' });
             
             // Icono según tipo
             let icon = 'calendar icon';

@@ -62,7 +62,7 @@ $(document).ready(function() {
                     }
                 } catch (e) { console.error(e); }
             } 
-            // SI ESTAMOS CREANDO (POST) - Lógica existente...
+            // SI ESTAMOS CREANDO (POST) 
             else {
                 guardarHabitante();
             }

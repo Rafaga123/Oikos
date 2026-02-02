@@ -39,9 +39,7 @@ function renderSurvey(data) {
     const $container = $('#contenedor-preguntas');
     $container.empty();
 
-    // Generar opciones (Asumiendo encuesta simple de 1 pregunta principal por ahora o estructura flexible)
-    // En tu modelo actual, Encuesta tiene Titulo/Desc y una lista de Opciones. 
-    // Es como una "Pregunta única con varias opciones".
+    // Generar opciones
     
     let optionsHTML = '';
     data.opciones.forEach(opcion => {

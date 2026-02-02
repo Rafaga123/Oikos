@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function cargarCuentasUsuario() {
     const token = localStorage.getItem('token');
-    // Buscamos el contenedor de la tabla en el HTML (asegúrate de que el tbody tenga este ID)
+    // Buscamos el contenedor de la tabla en el HTML
     // <tbody id="cuentas-body"> ... </tbody>
     // Si no lo tiene, reemplazamos el contenido de .description
     const container = document.querySelector('.ui.fluid.raised.card .description');
@@ -83,7 +83,7 @@ async function cargarCuentasUsuario() {
         }
         htmlMovil += '</div>';
 
-        // --- 3. SECCIÓN EFECTIVO (Estática o configurable si quisieras) ---
+        // --- 3. SECCIÓN EFECTIVO ---
         const htmlEfectivo = `
             <h3 class="ui dividing header" style="margin-top: 30px;"><i class="money bill alternate icon"></i> Pagos en Efectivo</h3>
             <div class="ui icon message">

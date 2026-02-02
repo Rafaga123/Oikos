@@ -14,10 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
             $('#modalModificar').modal('show');
         });
 
-        // Configurar botón "Guardar" del Modal (Por ahora solo visual)
+        // Configurar botón "Guardar" del Modal 
         $('#guardarCambios').on('click', function() {
-            // Aquí iría la lógica para enviar los nuevos datos al backend
-            // Por ahora, solo cerramos y mostramos alerta de éxito
+            
             $('#modalModificar').modal('hide');
             
             setTimeout(() => {
@@ -28,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------
-    // 2. LOGICA DE DATOS (Backend)
+    // 2. LOGICA DE DATOS 
     // ---------------------------------------------------------
     
     // Cargar datos al entrar
