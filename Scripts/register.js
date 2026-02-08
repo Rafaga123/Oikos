@@ -233,16 +233,50 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      const autoLogin = async () => {
+        const usuarioLogin = payload.email || payload.cedula;
+        const loginResp = await fetch("http://localhost:3000/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ usuario: usuarioLogin, password: payload.password }),
+        });
+        const loginData = await loginResp.json();
+
+        if (!loginResp.ok) {
+          throw new Error(loginData?.error || "No se pudo iniciar sesión");
+        }
+
+        localStorage.setItem("token", loginData.token);
+        localStorage.setItem("usuario", JSON.stringify(loginData.usuario));
+        window.location.href = "bienvenida.html";
+      };
+
       if (window.Swal) {
         Swal.fire({
           icon: "success",
           title: "¡Registro exitoso!",
-          text: "Inicia sesión para continuar.",
-        }).then(() => {
-          window.location.href = "bienvenida.html";
+          text: "Te estamos iniciando sesión...",
+        }).then(async () => {
+          try {
+            await autoLogin();
+          } catch (e) {
+            console.error(e);
+            Swal.fire({
+              icon: "warning",
+              title: "Registro completo",
+              text: "No se pudo iniciar sesión automáticamente. Inicia sesión manualmente.",
+            }).then(() => {
+              window.location.href = "login.html";
+            });
+          }
         });
       } else {
-        window.location.href = "login.html";
+        try {
+          await autoLogin();
+        } catch (e) {
+          console.error(e);
+          window.location.href = "login.html";
+        }
       }
     } catch (error) {
       console.error(error);

@@ -1,390 +1,392 @@
-$(document).ready(function() {
-    // 1. Inicializar UI
-    $('.ui.dropdown').dropdown();
-    const usuario = JSON.parse(localStorage.getItem('usuario'));
-    
-    if(!usuario) {
-        window.location.href = 'login.html';
-        return;
-    }
+let incidencias = [];
+let incidenciaSeleccionada = null;
 
-    // 2. Renderizar Sidebar según ROL
-    renderizarSidebar(usuario.rol);
-    $('#user-role-label').text(usuario.rol === 'ENCARGADO_COMUNIDAD' ? 'Gestor' : 'Habitante');
-
-    // 3. Configurar Permisos de Edición
-    configurarPermisos(usuario.rol);
-
-    // 4. Cargar Datos
-    cargarInfoComunidad();
-
-    // 5. Eventos de Formularios
-    $('#form-comunidad').submit(actualizarComunidad);
-    $('#form-password').submit(cambiarPassword);
+document.addEventListener("DOMContentLoaded", () => {
+  inicializarUI();
+  cargarIncidencias();
 });
 
-// --- LÓGICA DE INTERFAZ ---
+function inicializarUI() {
+  if (window.jQuery) {
+    $(".ui.dropdown").dropdown({ placeholder: "auto" });
+  }
 
-function renderizarSidebar(rol) {
-    const contenedor = $('#sidebar-container');
-    let htmlSidebar = '';
+  $(".ui.sidebar").sidebar({ context: $(".pusher"), transition: "overlay" });
+  $("#sidebar-toggle").on("click", () => $(".ui.sidebar").sidebar("toggle"));
 
-    if (rol === 'ENCARGADO_COMUNIDAD' || rol === 'ADMINISTRADOR') {
-        // Sidebar GESTOR
-        htmlSidebar = `
-        <div class="ui vertical inverted sidebar menu sidebar-menu" style="background-color: #9A9CEA;">
-            <div class="item">
-                <div class="header">
-                    <h2 class="ui inverted header"><i class="cog icon"></i><div class="content">Panel Gestor</div></h2>
-                </div>
-            </div>
-            <div class="item">
-                <div class="menu">
-                    <a class="item" href="./gestor.html"><i class="home icon"></i> Panel de Control</a>
-                    <a class="item" href="./gestion_habitantes.html"><i class="users icon"></i> Habitantes</a>
-                    <a class="item" href="./solicitudes.html"><i class="chart bar icon"></i> Incidencias</a>
-                    <a class="item" href="./solicitudes_nuevas.html"><i class="user icon"></i> Solicitudes</a>
-                    <a class="item" href="./pagos_gestor.html"><i class="money bill alternate icon"></i> Pagos</a>
-                    <a class="item" href="./crear_horario.html"><i class="clock icon"></i> Horarios</a>
-                    <a class="item" href="./modificar_metodo_pago.html"><i class="credit card icon"></i> Cuentas Bancarias</a>
-                    <a class="item" href="./actividades_gestor.html"><i class="calendar icon"></i> Actividades</a>
-                    <a class="item" href="./foro_gestor.html"><i class="comments icon"></i> Foro comunitario</a>
-                    <a class="active item" href="./configuracion.html"><i class="cogs icon"></i> Configuración</a>
-                </div>
-            </div>
-            <div class="item">
-                <div class="ui divider"></div>
-                <a class="item" onclick="cerrarSesion()"><i class="sign out icon"></i> Cerrar Sesión</a>
-            </div>
-            <div class="sidebar-footer-image">
-                <img src="../Images/logopng.png" alt="Logo">
-            </div>
-        </div>`;
-    } else {
-        // Sidebar HABITANTE
-        htmlSidebar = `
-        <div class="ui vertical inverted sidebar menu sidebar-menu" style="background-color: #9A9CEA;">
-            <div class="item">
-                <div class="header">
-                    <h2 class="ui inverted header"><i class="home icon"></i><div class="content">Habitante</div></h2>
-                </div>
-            </div>
-            <div class="item">
-                <div class="menu">
-                    <a class="item" href="./home_page.html"><i class="home icon"></i> Inicio</a>
-                    <a class="item" href="./reglamento.html"><i class="book icon"></i> Reglamento</a>
-                    <a class="item" href="./horario.html"><i class="clock icon"></i> Horarios</a>
-                    <a class="item" href="./cuentasparapagos.html"><i class="credit card icon"></i> Pagos</a>
-                    <a class="item" href="./actividades.html"><i class="calendar alternate icon"></i> Actividades</a>
-                    <a class="item" href="./foro.html"><i class="comments icon"></i> Foro</a>
-                    <a class="active item" href="./configuracion.html"><i class="cogs icon"></i> Configuración</a>
-                </div>
-            </div>
-            <div class="item">
-                <div class="ui divider"></div>
-                <a class="item" onclick="cerrarSesion()"><i class="sign out icon"></i> Cerrar Sesión</a>
-            </div>
-            <div class="sidebar-footer-image">
-                <img src="../Images/logo_neg.png" alt="Logo">
-            </div>
-        </div>`;
-    }
-
-    contenedor.html(htmlSidebar);
-    
-    // Inicializar lógica de sidebar
-    $('.ui.sidebar').sidebar({ context: $('.pusher'), transition: 'overlay' });
-    $('#sidebar-toggle').click(() => $('.ui.sidebar').sidebar('toggle'));
-}
-
-function configurarPermisos(rol) {
-    if (rol === 'ENCARGADO_COMUNIDAD' || rol === 'ADMINISTRADOR') {
-        // Habilitar edición para Gestor
-        $('#comunidad-nombre').prop('disabled', false);
-        $('#comunidad-direccion').prop('disabled', false);
-        $('#btn-guardar-comunidad').show();
-        $('#zona-transferir').show();
-        $('#divider-transferir').show();
-    } else {
-        // Modo solo lectura para Habitante
-        $('#btn-guardar-comunidad').hide();
-        $('#zona-transferir').hide();
-        $('#divider-transferir').hide();
-    }
-}
-
-// --- LÓGICA DE DATOS ---
-
-async function cargarInfoComunidad() {
-    const token = localStorage.getItem('token');
-    try {
-        const res = await fetch('http://localhost:3000/api/comunidad/info', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await res.json();
-        
-        if(res.ok) {
-            $('#comunidad-nombre').val(data.nombre);
-            $('#comunidad-direccion').val(data.direccion);
-            $('#comunidad-codigo').val(data.codigo_unico);
-        }
-    } catch (error) { console.error(error); }
-}
-
-// 1. ACTUALIZAR COMUNIDAD
-async function actualizarComunidad(e) {
+  $("#status-filter, #category-filter, #date-filter").on(
+    "change",
+    aplicarFiltros,
+  );
+  $("#reset-filters").on("click", (e) => {
     e.preventDefault();
-    
-    const result = await Swal.fire({
-        title: '¿Guardar cambios?',
-        text: "Se actualizará la información para todos los habitantes.",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        confirmButtonText: 'Sí, guardar'
-    });
+    $("#status-filter").dropdown("set selected", "all");
+    $("#category-filter").dropdown("set selected", "all");
+    $("#date-filter").dropdown("set selected", "all");
+    aplicarFiltros();
+  });
 
-    if (!result.isConfirmed) return;
+  $("#mark-all-reviewed").on("click", marcarTodasRevisadas);
 
-    const token = localStorage.getItem('token');
-    const nombre = $('#comunidad-nombre').val();
-    const direccion = $('#comunidad-direccion').val();
+  $(document).on("click", ".btn-detalles", (e) => {
+    const id = parseInt($(e.currentTarget).data("id"));
+    abrirModalDetalles(id);
+  });
 
-    try {
-        const res = await fetch('http://localhost:3000/api/comunidad', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({ nombre, direccion })
-        });
+  $(document).on("click", ".btn-resolver", async (e) => {
+    const id = parseInt($(e.currentTarget).data("id"));
+    await actualizarEstado(id, "RESUELTO");
+  });
 
-        if(res.ok) {
-            Swal.fire('Actualizado', 'La información ha sido guardada.', 'success');
-        } else {
-            Swal.fire('Error', 'No tienes permisos o hubo un error.', 'error');
-        }
-    } catch(err) { console.error(err); }
+  $(document).on("click", ".btn-revision", async (e) => {
+    const id = parseInt($(e.currentTarget).data("id"));
+    await actualizarEstado(id, "EN_PROGRESO");
+  });
+
+  $(document).on("click", ".btn-rechazar", async (e) => {
+    const id = parseInt($(e.currentTarget).data("id"));
+    await actualizarEstado(id, "CERRADO");
+  });
+
+  $("#resolve-request-btn").on("click", async () => {
+    if (!incidenciaSeleccionada) return;
+    await actualizarEstado(incidenciaSeleccionada.id, "RESUELTO");
+    $("#request-details-modal").modal("hide");
+  });
 }
 
-// 2. CAMBIAR PASSWORD (Con Validaciones Fuertes)
-async function cambiarPassword(e) {
-    e.preventDefault();
-    const passActual = $('#pass-actual').val();
-    const passNueva = $('#pass-nueva').val();
-    const passConfirm = $('#pass-confirm').val();
+async function cargarIncidencias() {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    window.location.href = "login.html";
+    return;
+  }
 
-    // --- VALIDACIONES DE SEGURIDAD ---
-    
-    // A. Longitud mínima
-    if (passNueva.length < 8) {
-        return Swal.fire('Contraseña Insegura', 'La nueva contraseña debe tener al menos 8 caracteres.', 'warning');
-    }
-
-    // B. Complejidad (Letras y Números)
-    if (!/[A-Za-z]/.test(passNueva) || !/\d/.test(passNueva)) {
-        return Swal.fire('Contraseña Insegura', 'La nueva contraseña debe incluir al menos una letra y un número.', 'warning');
-    }
-
-    // C. Coincidencia
-    if (passNueva !== passConfirm) {
-        return Swal.fire('Error', 'Las contraseñas nuevas no coinciden.', 'warning');
-    }
-
-    const result = await Swal.fire({
-        title: '¿Cambiar contraseña?',
-        text: "Tendrás que usar la nueva contraseña la próxima vez.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, cambiar'
+  try {
+    const res = await fetch("http://localhost:3000/api/gestor/incidencias", {
+      headers: { Authorization: `Bearer ${token}` },
     });
 
-    if (!result.isConfirmed) return;
+    if (!res.ok) throw new Error("Error al cargar incidencias");
 
-    const token = localStorage.getItem('token');
-    try {
-        const res = await fetch('http://localhost:3000/api/auth/cambiar-password', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({ passwordActual: passActual, passwordNuevo: passNueva })
-        });
-
-        const data = await res.json();
-        if (res.ok) {
-            Swal.fire('Éxito', 'Contraseña actualizada.', 'success');
-            $('#form-password')[0].reset();
-        } else {
-            Swal.fire('Error', data.error, 'error');
-        }
-    } catch(err) { console.error(err); }
+    incidencias = await res.json();
+    aplicarFiltros();
+  } catch (error) {
+    console.error(error);
+    $("#requests-list").html(
+      '<div class="ui negative message">No se pudieron cargar las incidencias.</div>',
+    );
+  }
 }
 
-function copiarCodigo() {
-    const codigo = document.getElementById("comunidad-codigo");
-    codigo.select();
-    codigo.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(codigo.value);
-    
-    const btn = event.currentTarget;
-    const originalHtml = btn.innerHTML;
-    btn.innerHTML = '<i class="check icon"></i> Copiado';
-    setTimeout(() => { btn.innerHTML = originalHtml; }, 2000);
+function aplicarFiltros() {
+  const statusFilter = $("#status-filter").val();
+  const categoryFilter = $("#category-filter").val();
+  const dateFilter = $("#date-filter").val();
+
+  let filtradas = [...incidencias];
+
+  if (statusFilter !== "all") {
+    filtradas = filtradas.filter(
+      (i) => mapEstado(i.estado).key === statusFilter,
+    );
+  }
+
+  if (categoryFilter !== "all") {
+    filtradas = filtradas.filter(
+      (i) => normalizarCategoria(i.categoria) === categoryFilter,
+    );
+  }
+
+  if (dateFilter !== "all") {
+    filtradas = filtradas.filter((i) =>
+      filtrarPorFecha(i.fecha_reporte, dateFilter),
+    );
+  }
+
+  actualizarEstadisticas();
+  renderizarLista(filtradas);
 }
 
-// --- ZONA DE PELIGRO (ACCIONES PROTEGIDAS) ---
+function renderizarLista(lista) {
+  const contenedor = $("#requests-list");
+  contenedor.empty();
 
-async function eliminarCuenta() {
-    // 1. Confirmación inicial
-    const result = await Swal.fire({
-        title: '¿Estás completamente seguro?',
-        text: "Esta acción eliminará tu cuenta permanentemente. No se puede deshacer.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        confirmButtonText: 'Continuar'
-    });
+  if (!lista.length) {
+    contenedor.html(`
+            <div class="empty-state">
+                <i class="inbox icon"></i>
+                <h3>No hay solicitudes pendientes</h3>
+                <p>No se encontraron incidencias con los filtros actuales.</p>
+            </div>
+        `);
+    $("#requests-count").text("0 solicitudes encontradas");
+    return;
+  }
 
-    if (!result.isConfirmed) return;
+  $("#requests-count").text(`${lista.length} solicitudes encontradas`);
 
-    // 2. Pedir contraseña
-    const { value: password } = await Swal.fire({
-        title: 'Verificación de Seguridad',
-        text: 'Ingresa tu contraseña para confirmar la eliminación:',
-        input: 'password',
-        inputPlaceholder: 'Tu contraseña actual',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        confirmButtonText: 'Eliminar mi cuenta',
-        inputValidator: (value) => {
-            if (!value) return 'Debes ingresar tu contraseña';
+  lista.forEach((incidencia) => {
+    const estado = mapEstado(incidencia.estado);
+    const categoria = normalizarCategoria(incidencia.categoria);
+    const categoriaClase = `category-${categoria}`;
+    const fecha = formatearFecha(incidencia.fecha_reporte);
+    const nombre = incidencia.usuario
+      ? `${incidencia.usuario.primer_nombre} ${incidencia.usuario.primer_apellido}`
+      : "Habitante";
+    const casa =
+      incidencia.usuario && incidencia.usuario.numero_casa
+        ? `Casa ${incidencia.usuario.numero_casa}`
+        : "Sin casa";
+
+    const acciones = `
+            <button class="ui tiny button btn-detalles" data-id="${incidencia.id}">
+                <i class="eye icon"></i> Ver detalles
+            </button>
+            ${
+              incidencia.estado !== "RESUELTO"
+                ? `
+        ${
+          incidencia.estado === "ABIERTO"
+            ? `
+        <button class="ui tiny blue button btn-revision" data-id="${incidencia.id}">
+          <i class="sync alternate icon"></i> En revisión
+        </button>`
+            : ""
         }
-    });
-
-    if (password) {
-        const token = localStorage.getItem('token');
-        try {
-            const res = await fetch('http://localhost:3000/api/auth/eliminar-cuenta', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ password: password }) 
-            });
-
-            if (res.ok) {
-                await Swal.fire('Eliminado', 'Tu cuenta ha sido eliminada.', 'success');
-                window.location.href = 'login.html';
-            } else {
-                const data = await res.json();
-                Swal.fire('Error', data.error || 'Contraseña incorrecta', 'error');
+            <button class="ui tiny green button btn-resolver" data-id="${incidencia.id}">
+                <i class="check icon"></i> Marcar Resuelta
+            </button>`
+                : ""
             }
-        } catch (err) { console.error(err); }
-    }
+        ${
+          incidencia.estado !== "CERRADO"
+            ? `
+        <button class="ui tiny red button btn-rechazar" data-id="${incidencia.id}">
+          <i class="times icon"></i> Rechazar
+        </button>`
+            : ""
+        }
+        `;
+
+    const html = `
+            <div class="request-item ${estado.key === "resuelta" ? "resuelta" : ""}">
+                <div class="request-header">
+                    <div class="request-title">${incidencia.titulo || "Incidencia"}</div>
+                    <div>
+                        <span class="request-category ${categoriaClase}">${incidencia.categoria || "Otros"}</span>
+                        <span class="status-badge ${estado.badge}">${estado.label}</span>
+                    </div>
+                </div>
+
+                <div class="request-content">${incidencia.descripcion || "Sin descripción"}</div>
+
+                <div class="request-meta">
+                    <div class="request-info">
+                        <span><i class="user icon"></i> ${nombre}</span>
+                        <span><i class="home icon"></i> ${casa}</span>
+                        <span><i class="calendar icon"></i> ${fecha}</span>
+                    </div>
+                    <div class="request-actions">
+                        ${acciones}
+                    </div>
+                </div>
+            </div>
+        `;
+
+    contenedor.append(html);
+  });
 }
 
-async function transferirGestoria() {
-    // 1. Pedir Cédula
-    const { value: cedula } = await Swal.fire({
-        title: 'Transferir Gestoría',
-        text: 'Ingresa la Cédula del habitante al que cederás tu puesto.',
-        input: 'text',
-        inputPlaceholder: 'Ej: V-12345678',
-        showCancelButton: true,
-        confirmButtonText: 'Siguiente',
-        inputValidator: (value) => {
-            if (!value) return 'Debes escribir una cédula';
-        }
-    });
+function actualizarEstadisticas() {
+  const pendientes = incidencias.filter((i) => i.estado === "ABIERTO").length;
+  const revision = incidencias.filter((i) => i.estado === "EN_PROGRESO").length;
+  const resueltas = incidencias.filter((i) => i.estado === "RESUELTO").length;
+  const rechazadas = incidencias.filter((i) => i.estado === "CERRADO").length;
 
-    if (!cedula) return;
-
-    // 2. Pedir Contraseña
-    const { value: password } = await Swal.fire({
-        title: 'Confirmar Transferencia',
-        text: `Vas a ceder tus permisos a la cédula: ${cedula}. Ingresa tu contraseña para confirmar:`,
-        input: 'password',
-        inputPlaceholder: 'Tu contraseña actual',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        confirmButtonText: 'Transferir Cargo',
-        inputValidator: (value) => {
-            if (!value) return 'Debes ingresar tu contraseña';
-        }
-    });
-
-    if (password) {
-        const token = localStorage.getItem('token');
-        try {
-            const res = await fetch('http://localhost:3000/api/comunidad/transferir', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ cedulaNuevoGestor: cedula, password: password })
-            });
-
-            if (res.ok) {
-                await Swal.fire('Transferencia Exitosa', 'Has cedido tu cargo. Serás redirigido al inicio de sesión.', 'success');
-                cerrarSesion();
-            } else {
-                const data = await res.json();
-                Swal.fire('Error', data.error || 'Contraseña incorrecta', 'error');
-            }
-        } catch (err) { console.error(err); }
-    }
+  $("#pending-count").text(pendientes);
+  $("#review-count").text(revision);
+  $("#resolved-count").text(resueltas);
+  $("#rejected-count").text(rechazadas);
 }
 
-async function salirDeComunidad() {
-    const usuario = JSON.parse(localStorage.getItem('usuario'));
+function abrirModalDetalles(id) {
+  const incidencia = incidencias.find((i) => i.id === id);
+  if (!incidencia) return;
 
-    // VERIFICACIÓN DE GESTOR: Bloquear salida si es administrador
-    if (usuario.rol === 'ENCARGADO_COMUNIDAD' || usuario.rol === 'ADMINISTRADOR') {
-        return Swal.fire({
-            icon: 'error',
-            title: 'Acción no permitida',
-            text: 'Como Gestor, no puedes abandonar la comunidad directamente. Debes transferir tu cargo a otro habitante o eliminar tu cuenta.'
-        });
-    }
+  incidenciaSeleccionada = incidencia;
+  const estado = mapEstado(incidencia.estado);
+  const fecha = formatearFecha(incidencia.fecha_reporte, true);
+  const nombre = incidencia.usuario
+    ? `${incidencia.usuario.primer_nombre} ${incidencia.usuario.primer_apellido}`
+    : "Habitante";
+  const casa =
+    incidencia.usuario && incidencia.usuario.numero_casa
+      ? `Casa ${incidencia.usuario.numero_casa}`
+      : "Sin casa";
 
-    // 1. Confirmación inicial
-    const result = await Swal.fire({
-        title: '¿Salir de la comunidad?',
-        text: "Dejarás de tener acceso a los datos de este condominio, pero tu cuenta de usuario seguirá existiendo.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        confirmButtonText: 'Sí, quiero salir'
-    });
+  $("#modal-title").text(incidencia.titulo || "Detalles de la Solicitud");
+  $("#request-details-content").html(`
+        <div class="details-section">
+            <span class="details-label">Estado</span>
+            <div class="details-value">${estado.label}</div>
+        </div>
+        <div class="details-section">
+            <span class="details-label">Categoría</span>
+            <div class="details-value">${incidencia.categoria || "Otros"}</div>
+        </div>
+        <div class="details-section">
+            <span class="details-label">Importancia</span>
+            <div class="details-value">${incidencia.importancia || "Sin prioridad"}</div>
+        </div>
+        <div class="details-section">
+            <span class="details-label">Descripción</span>
+            <div class="details-value">${incidencia.descripcion || "Sin descripción"}</div>
+        </div>
+        <div class="details-section">
+            <span class="details-label">Reportado por</span>
+            <div class="details-value">${nombre} · ${casa}</div>
+        </div>
+        <div class="details-section">
+            <span class="details-label">Fecha</span>
+            <div class="details-value">${fecha}</div>
+        </div>
+    `);
+  $("#request-details-content").show();
+  $("#resolve-request-btn").toggle(
+    incidencia.estado !== "RESUELTO" && incidencia.estado !== "CERRADO",
+  );
+  $("#request-details-modal").modal("show");
+}
 
-    if (!result.isConfirmed) return;
+async function marcarTodasRevisadas() {
+  const token = localStorage.getItem("token");
+  if (!token) return;
 
-    // 2. Pedir contraseña
-    const { value: password } = await Swal.fire({
-        title: 'Confirmar Salida',
-        text: 'Por seguridad, ingresa tu contraseña para confirmar:',
-        input: 'password',
-        inputPlaceholder: 'Tu contraseña actual',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        confirmButtonText: 'Confirmar Salida',
-        inputValidator: (value) => {
-            if (!value) return 'Debes ingresar tu contraseña';
-        }
-    });
+  try {
+    const res = await fetch(
+      "http://localhost:3000/api/gestor/incidencias/revisar-todo",
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
 
-    if (password) {
-        const token = localStorage.getItem('token');
-        try {
-            const res = await fetch('http://localhost:3000/api/comunidad/salir', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ password: password })
-            });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "No se pudo actualizar");
 
-            if (res.ok) {
-                await Swal.fire('Listo', 'Has salido de la comunidad. Serás redirigido.', 'success');
-                // Cerrar sesión y redirigir
-                localStorage.removeItem('token');
-                localStorage.removeItem('usuario');
-                window.location.href = 'login.html';
-            } else {
-                const data = await res.json();
-                Swal.fire('Error', data.error || 'Contraseña incorrecta', 'error');
-            }
-        } catch (err) { console.error(err); }
-    }
+    await Swal.fire(
+      "Listo",
+      data.mensaje || "Incidencias actualizadas.",
+      "success",
+    );
+    cargarIncidencias();
+  } catch (error) {
+    console.error(error);
+    Swal.fire("Error", "No se pudo marcar como revisadas.", "error");
+  }
+}
+
+async function actualizarEstado(id, estado) {
+  const token = localStorage.getItem("token");
+  if (!token) return;
+
+  try {
+    const res = await fetch(
+      `http://localhost:3000/api/gestor/incidencias/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ estado }),
+      },
+    );
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "No se pudo actualizar");
+
+    await Swal.fire(
+      "Actualizado",
+      "Estado actualizado correctamente.",
+      "success",
+    );
+    cargarIncidencias();
+  } catch (error) {
+    console.error(error);
+    Swal.fire("Error", "No se pudo actualizar el estado.", "error");
+  }
+}
+
+function mapEstado(estado) {
+  switch (estado) {
+    case "ABIERTO":
+      return {
+        key: "pendiente",
+        label: "Pendiente",
+        badge: "status-pendiente",
+      };
+    case "EN_PROGRESO":
+      return {
+        key: "revision",
+        label: "En Revisión",
+        badge: "status-revision",
+      };
+    case "RESUELTO":
+      return { key: "resuelta", label: "Resuelta", badge: "status-resuelta" };
+    case "CERRADO":
+      return {
+        key: "rechazada",
+        label: "Rechazada",
+        badge: "status-rechazada",
+      };
+    default:
+      return {
+        key: "pendiente",
+        label: "Pendiente",
+        badge: "status-pendiente",
+      };
+  }
+}
+
+function normalizarCategoria(categoria) {
+  const texto = (categoria || "otros").toString().trim().toLowerCase();
+  if (texto.includes("manten")) return "mantenimiento";
+  if (texto.includes("ruido")) return "ruido";
+  if (texto.includes("limpieza")) return "limpieza";
+  if (texto.includes("seguridad")) return "seguridad";
+  return "otros";
+}
+
+function filtrarPorFecha(fecha, tipo) {
+  const fechaReporte = new Date(fecha);
+  const ahora = new Date();
+  const diferencia = ahora - fechaReporte;
+  const unDia = 1000 * 60 * 60 * 24;
+
+  if (tipo === "today") {
+    return fechaReporte.toDateString() === ahora.toDateString();
+  }
+  if (tipo === "week") {
+    return diferencia <= unDia * 7;
+  }
+  if (tipo === "month") {
+    return diferencia <= unDia * 30;
+  }
+  if (tipo === "older") {
+    return diferencia > unDia * 30;
+  }
+  return true;
+}
+
+function formatearFecha(fecha, conHora = false) {
+  const opciones = conHora
+    ? { dateStyle: "medium", timeStyle: "short" }
+    : { dateStyle: "medium" };
+  try {
+    return new Date(fecha).toLocaleString("es-VE", opciones);
+  } catch (error) {
+    return fecha;
+  }
 }

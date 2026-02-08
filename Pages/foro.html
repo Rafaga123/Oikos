@@ -103,7 +103,24 @@
         <div class="ui container">
             <h1>Foro del Condominio</h1>
             <h2>Bienvenido al foro del condominio. Aquí puede compartir sus inquietudes, sugerencias y problemas relacionados con la comunidad.</h2>
-            <button class="ui large primary button" id="agregarBtn">Aportar Información al Foro <i class="plus icon"></i></button>
+            <div class="ui stackable grid" style="margin-top: 10px; margin-bottom: 10px;">
+                <div class="ten wide column">
+                    <button class="ui large primary button" id="agregarBtn">Aportar Información al Foro <i class="plus icon"></i></button>
+                </div>
+                <div class="six wide column right aligned">
+                    <div class="ui selection dropdown" id="orden-posts">
+                        <input type="hidden" name="orden">
+                        <i class="dropdown icon"></i>
+                        <div class="default text">Ordenar por</div>
+                        <div class="menu">
+                            <div class="item" data-value="pila">Más recientes</div>
+                            <div class="item" data-value="mas_likes">Más likeadas</div>
+                            <div class="item" data-value="menos_likes">Menos likes</div>
+                            <div class="item" data-value="mas_viejas">Más viejas</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="ui small modal" id="modalAgregar">
                 <div class="header">Información a Publicar</div>
