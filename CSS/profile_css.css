@@ -1,5 +1,5 @@
- 
-body { /*Atributos del Fondo de la pagina*/
+body {
+  /*Atributos del Fondo de la pagina*/
   background-image: url(../Images/Fondopagina.png);
 }
 /*Atributos CSS de la alerta exitosa*/
@@ -8,10 +8,10 @@ body { /*Atributos del Fondo de la pagina*/
   margin: 20px auto;
   width: 80%;
   border-radius: 5px;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: "Segoe UI", sans-serif;
   font-size: 16px;
   color: white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   opacity: 1;
   transition: opacity 0.6s ease;
   position: relative;
@@ -19,7 +19,7 @@ body { /*Atributos del Fondo de la pagina*/
 }
 
 .alert.success {
-  background-color: #4CAF50;
+  background-color: #4caf50;
 }
 
 .closebtn {
@@ -29,4 +29,37 @@ body { /*Atributos del Fondo de la pagina*/
   font-size: 20px;
   cursor: pointer;
   color: white;
+}
+
+.password-metrics {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.4rem 0 1rem;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.password-metrics li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0;
+}
+
+.password-metrics li::before {
+  content: "•";
+  color: #c0c4d6;
+}
+
+.password-metrics li.met-ok {
+  color: #21ba45;
+}
+
+.password-metrics li.met-ok::before {
+  content: "✔";
+  color: #21ba45;
+}
+
+.password-metrics li.met-bad {
+  color: #db2828;
 }

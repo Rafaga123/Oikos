@@ -1,68 +1,100 @@
 // Scripts/reset_password.js
 
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('resetForm');
-  const errorBox = document.getElementById('reset-error-message');
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("resetForm");
+  const errorBox = document.getElementById("reset-error-message");
+  const resetMetrics = document.getElementById("reset-password-metrics");
 
   if (!form) return;
 
   const showError = (msg) => {
     if (!errorBox) {
       Swal.fire({
-        icon: 'error',
-        title: 'No se pudo actualizar',
-        text: msg
+        icon: "error",
+        title: "No se pudo actualizar",
+        text: msg,
       });
       return;
     }
     errorBox.textContent = msg;
-    errorBox.style.display = 'block';
+    errorBox.style.display = "block";
   };
 
   const clearError = () => {
     if (errorBox) {
-      errorBox.style.display = 'none';
-      errorBox.textContent = '';
+      errorBox.style.display = "none";
+      errorBox.textContent = "";
     }
+  };
+
+  const refreshMetrics = () => {
+    const pass = document.getElementById("newPassword")?.value || "";
+    const conf = document.getElementById("confirmPassword")?.value || "";
+    updatePasswordMetrics(pass, conf, resetMetrics);
+  };
+
+  const updatePasswordMetrics = (passValue, confirmValue, container) => {
+    if (!container) return;
+    const rules = {
+      length: passValue.length >= 8,
+      lettersNumbers: /[A-Za-z]/.test(passValue) && /\d/.test(passValue),
+      match: passValue.length > 0 && passValue === confirmValue,
+    };
+
+    container.querySelectorAll("li").forEach((item) => {
+      const rule = item.getAttribute("data-rule");
+      const ok = rules[rule];
+      item.classList.toggle("met-ok", Boolean(ok));
+      item.classList.toggle("met-bad", !ok);
+    });
   };
 
   function getTokenFromQuery() {
     const params = new URLSearchParams(window.location.search);
-    return params.get('token');
+    return params.get("token");
   }
 
-  form.addEventListener('submit', async (e) => {
+  ["newPassword", "confirmPassword"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", refreshMetrics);
+  });
+
+  refreshMetrics();
+
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     clearError();
 
     const token = getTokenFromQuery();
-    const pass = document.getElementById('newPassword').value;
-    const conf = document.getElementById('confirmPassword').value;
+    const pass = document.getElementById("newPassword").value;
+    const conf = document.getElementById("confirmPassword").value;
 
-    if (!token) return showError('Token faltante en la URL');
-    if (pass.length < 8) return showError('La contraseña debe tener al menos 8 caracteres');
-    if (!/[A-Za-z]/.test(pass) || !/\d/.test(pass)) return showError('Incluye letras y números');
-    if (pass !== conf) return showError('Las contraseñas no coinciden');
+    if (!token) return showError("Token faltante en la URL");
+    if (pass.length < 8)
+      return showError("La contraseña debe tener al menos 8 caracteres");
+    if (!/[A-Za-z]/.test(pass) || !/\d/.test(pass))
+      return showError("Incluye letras y números");
+    if (pass !== conf) return showError("Las contraseñas no coinciden");
 
     try {
-      const res = await fetch('http://localhost:3000/api/password/reset', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, password: pass })
+      const res = await fetch("http://localhost:3000/api/password/reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, password: pass }),
       });
       const data = await res.json();
-      if (!res.ok) return showError(data?.error || 'No se pudo actualizar');
+      if (!res.ok) return showError(data?.error || "No se pudo actualizar");
 
       Swal.fire({
-        icon: 'success',
-        title: 'Contraseña actualizada',
-        text: 'Ahora puedes iniciar sesión.'
+        icon: "success",
+        title: "Contraseña actualizada",
+        text: "Ahora puedes iniciar sesión.",
       }).then(() => {
-        window.location.href = 'login.html';
+        window.location.href = "login.html";
       });
     } catch (err) {
       console.error(err);
-      showError('Error de conexión con el servidor');
+      showError("Error de conexión con el servidor");
     }
   });
 });

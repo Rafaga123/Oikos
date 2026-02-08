@@ -1,37 +1,68 @@
-$(document).ready(function() {
-    // 1. Inicializar UI
-    $('.ui.dropdown').dropdown();
-    const usuario = JSON.parse(localStorage.getItem('usuario'));
-    
-    if(!usuario) {
-        window.location.href = 'login.html';
-        return;
-    }
+$(document).ready(function () {
+  // 1. Inicializar UI
+  $(".ui.dropdown").dropdown();
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  const configMetrics = document.getElementById("config-password-metrics");
+  const passNuevaEl = document.getElementById("pass-nueva");
+  const passConfirmEl = document.getElementById("pass-confirm");
 
-    // 2. Renderizar Sidebar según ROL
-    renderizarSidebar(usuario.rol);
-    $('#user-role-label').text(usuario.rol === 'ENCARGADO_COMUNIDAD' ? 'Gestor' : 'Habitante');
+  if (!usuario) {
+    window.location.href = "login.html";
+    return;
+  }
 
-    // 3. Configurar Permisos de Edición
-    configurarPermisos(usuario.rol);
+  // 2. Renderizar Sidebar según ROL
+  renderizarSidebar(usuario.rol);
+  $("#user-role-label").text(
+    usuario.rol === "ENCARGADO_COMUNIDAD" ? "Gestor" : "Habitante",
+  );
 
-    // 4. Cargar Datos
-    cargarInfoComunidad();
+  // 3. Configurar Permisos de Edición
+  configurarPermisos(usuario.rol);
 
-    // 5. Eventos de Formularios
-    $('#form-comunidad').submit(actualizarComunidad);
-    $('#form-password').submit(cambiarPassword);
+  // 4. Cargar Datos
+  cargarInfoComunidad();
+
+  // 5. Eventos de Formularios
+  $("#form-comunidad").submit(actualizarComunidad);
+  $("#form-password").submit(cambiarPassword);
+
+  if (passNuevaEl) passNuevaEl.addEventListener("input", refreshMetrics);
+  if (passConfirmEl) passConfirmEl.addEventListener("input", refreshMetrics);
+  refreshMetrics();
+
+  function refreshMetrics() {
+    const pass = passNuevaEl?.value || "";
+    const conf = passConfirmEl?.value || "";
+    updatePasswordMetrics(pass, conf, configMetrics);
+  }
 });
+
+function updatePasswordMetrics(passValue, confirmValue, container) {
+  if (!container) return;
+  const rules = {
+    length: passValue.length >= 8,
+    lettersNumbers: /[A-Za-z]/.test(passValue) && /\d/.test(passValue),
+    match: passValue.length > 0 && passValue === confirmValue,
+  };
+
+  container.querySelectorAll("li").forEach((item) => {
+    const rule = item.getAttribute("data-rule");
+    const ok = rules[rule];
+    item.classList.toggle("met-ok", Boolean(ok));
+    item.classList.toggle("met-bad", !ok);
+  });
+}
 
 // --- LÓGICA DE INTERFAZ ---
 
 function renderizarSidebar(rol) {
-    const contenedor = $('#sidebar-container');
-    let htmlSidebar = '';
+  const contenedor = $("#sidebar-container");
+  let htmlSidebar = "";
 
-    if (rol === 'ENCARGADO_COMUNIDAD' || rol === 'ADMINISTRADOR') {
-        // Sidebar GESTOR
-        htmlSidebar = `
+  if (rol === "ENCARGADO_COMUNIDAD" || rol === "ADMINISTRADOR") {
+    // Sidebar GESTOR
+    htmlSidebar = `
         <div class="ui vertical inverted sidebar menu sidebar-menu" style="background-color: #9A9CEA;">
             <div class="item">
                 <div class="header">
@@ -60,9 +91,9 @@ function renderizarSidebar(rol) {
                 <img src="../Images/logopng.png" alt="Logo">
             </div>
         </div>`;
-    } else {
-        // Sidebar HABITANTE
-        htmlSidebar = `
+  } else {
+    // Sidebar HABITANTE
+    htmlSidebar = `
         <div class="ui vertical inverted sidebar menu sidebar-menu" style="background-color: #9A9CEA;">
             <div class="item">
                 <div class="header">
@@ -88,303 +119,367 @@ function renderizarSidebar(rol) {
                 <img src="../Images/logo_neg.png" alt="Logo">
             </div>
         </div>`;
-    }
+  }
 
-    contenedor.html(htmlSidebar);
-    
-    // Inicializar lógica de sidebar
-    $('.ui.sidebar').sidebar({ context: $('.pusher'), transition: 'overlay' });
-    $('#sidebar-toggle').click(() => $('.ui.sidebar').sidebar('toggle'));
+  contenedor.html(htmlSidebar);
+
+  // Inicializar lógica de sidebar
+  $(".ui.sidebar").sidebar({ context: $(".pusher"), transition: "overlay" });
+  $("#sidebar-toggle").click(() => $(".ui.sidebar").sidebar("toggle"));
 }
 
 function configurarPermisos(rol) {
-    if (rol === 'ENCARGADO_COMUNIDAD' || rol === 'ADMINISTRADOR') {
-        // Habilitar edición para Gestor
-        $('#comunidad-nombre').prop('disabled', false);
-        $('#comunidad-direccion').prop('disabled', false);
-        $('#btn-guardar-comunidad').show();
-        $('#zona-transferir').show();
-        $('#divider-transferir').show();
-    } else {
-        // Modo solo lectura para Habitante
-        $('#btn-guardar-comunidad').hide();
-        $('#zona-transferir').hide();
-        $('#divider-transferir').hide();
-    }
+  if (rol === "ENCARGADO_COMUNIDAD" || rol === "ADMINISTRADOR") {
+    // Habilitar edición para Gestor
+    $("#comunidad-nombre").prop("disabled", false);
+    $("#comunidad-direccion").prop("disabled", false);
+    $("#btn-guardar-comunidad").show();
+    $("#zona-transferir").show();
+    $("#divider-transferir").show();
+  } else {
+    // Modo solo lectura para Habitante
+    $("#btn-guardar-comunidad").hide();
+    $("#zona-transferir").hide();
+    $("#divider-transferir").hide();
+  }
 }
 
 // --- LÓGICA DE DATOS ---
 
 async function cargarInfoComunidad() {
-    const token = localStorage.getItem('token');
-    try {
-        const res = await fetch('http://localhost:3000/api/comunidad/info', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await res.json();
-        
-        if(res.ok) {
-            $('#comunidad-nombre').val(data.nombre);
-            $('#comunidad-direccion').val(data.direccion);
-            $('#comunidad-codigo').val(data.codigo_unico);
-        }
-    } catch (error) { console.error(error); }
+  const token = localStorage.getItem("token");
+  try {
+    const res = await fetch("http://localhost:3000/api/comunidad/info", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      $("#comunidad-nombre").val(data.nombre);
+      $("#comunidad-direccion").val(data.direccion);
+      $("#comunidad-codigo").val(data.codigo_unico);
+    }
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 // 1. ACTUALIZAR COMUNIDAD
 async function actualizarComunidad(e) {
-    e.preventDefault();
-    
-    const result = await Swal.fire({
-        title: '¿Guardar cambios?',
-        text: "Se actualizará la información para todos los habitantes.",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        confirmButtonText: 'Sí, guardar'
+  e.preventDefault();
+
+  const result = await Swal.fire({
+    title: "¿Guardar cambios?",
+    text: "Se actualizará la información para todos los habitantes.",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    confirmButtonText: "Sí, guardar",
+  });
+
+  if (!result.isConfirmed) return;
+
+  const token = localStorage.getItem("token");
+  const nombre = $("#comunidad-nombre").val();
+  const direccion = $("#comunidad-direccion").val();
+
+  try {
+    const res = await fetch("http://localhost:3000/api/comunidad", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ nombre, direccion }),
     });
 
-    if (!result.isConfirmed) return;
-
-    const token = localStorage.getItem('token');
-    const nombre = $('#comunidad-nombre').val();
-    const direccion = $('#comunidad-direccion').val();
-
-    try {
-        const res = await fetch('http://localhost:3000/api/comunidad', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({ nombre, direccion })
-        });
-
-        if(res.ok) {
-            Swal.fire('Actualizado', 'La información ha sido guardada.', 'success');
-        } else {
-            Swal.fire('Error', 'No tienes permisos o hubo un error.', 'error');
-        }
-    } catch(err) { console.error(err); }
+    if (res.ok) {
+      Swal.fire("Actualizado", "La información ha sido guardada.", "success");
+    } else {
+      Swal.fire("Error", "No tienes permisos o hubo un error.", "error");
+    }
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 // 2. CAMBIAR PASSWORD (Con Validaciones Fuertes)
 async function cambiarPassword(e) {
-    e.preventDefault();
-    const passActual = $('#pass-actual').val();
-    const passNueva = $('#pass-nueva').val();
-    const passConfirm = $('#pass-confirm').val();
+  e.preventDefault();
+  const passActual = $("#pass-actual").val();
+  const passNueva = $("#pass-nueva").val();
+  const passConfirm = $("#pass-confirm").val();
 
-    // --- VALIDACIONES DE SEGURIDAD ---
-    
-    // A. Longitud mínima
-    if (passNueva.length < 8) {
-        return Swal.fire('Contraseña Insegura', 'La nueva contraseña debe tener al menos 8 caracteres.', 'warning');
-    }
+  // --- VALIDACIONES DE SEGURIDAD ---
 
-    // B. Complejidad (Letras y Números)
-    if (!/[A-Za-z]/.test(passNueva) || !/\d/.test(passNueva)) {
-        return Swal.fire('Contraseña Insegura', 'La nueva contraseña debe incluir al menos una letra y un número.', 'warning');
-    }
+  // A. Longitud mínima
+  if (passNueva.length < 8) {
+    return Swal.fire(
+      "Contraseña Insegura",
+      "La nueva contraseña debe tener al menos 8 caracteres.",
+      "warning",
+    );
+  }
 
-    // C. Coincidencia
-    if (passNueva !== passConfirm) {
-        return Swal.fire('Error', 'Las contraseñas nuevas no coinciden.', 'warning');
-    }
+  // B. Complejidad (Letras y Números)
+  if (!/[A-Za-z]/.test(passNueva) || !/\d/.test(passNueva)) {
+    return Swal.fire(
+      "Contraseña Insegura",
+      "La nueva contraseña debe incluir al menos una letra y un número.",
+      "warning",
+    );
+  }
 
-    const result = await Swal.fire({
-        title: '¿Cambiar contraseña?',
-        text: "Tendrás que usar la nueva contraseña la próxima vez.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, cambiar'
+  // C. Coincidencia
+  if (passNueva !== passConfirm) {
+    return Swal.fire(
+      "Error",
+      "Las contraseñas nuevas no coinciden.",
+      "warning",
+    );
+  }
+
+  const result = await Swal.fire({
+    title: "¿Cambiar contraseña?",
+    text: "Tendrás que usar la nueva contraseña la próxima vez.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Sí, cambiar",
+  });
+
+  if (!result.isConfirmed) return;
+
+  const token = localStorage.getItem("token");
+  try {
+    const res = await fetch("http://localhost:3000/api/auth/cambiar-password", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        passwordActual: passActual,
+        passwordNuevo: passNueva,
+      }),
     });
 
-    if (!result.isConfirmed) return;
-
-    const token = localStorage.getItem('token');
-    try {
-        const res = await fetch('http://localhost:3000/api/auth/cambiar-password', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({ passwordActual: passActual, passwordNuevo: passNueva })
-        });
-
-        const data = await res.json();
-        if (res.ok) {
-            Swal.fire('Éxito', 'Contraseña actualizada.', 'success');
-            $('#form-password')[0].reset();
-        } else {
-            Swal.fire('Error', data.error, 'error');
-        }
-    } catch(err) { console.error(err); }
+    const data = await res.json();
+    if (res.ok) {
+      Swal.fire("Éxito", "Contraseña actualizada.", "success");
+      $("#form-password")[0].reset();
+    } else {
+      Swal.fire("Error", data.error, "error");
+    }
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 function copiarCodigo() {
-    const codigo = document.getElementById("comunidad-codigo");
-    codigo.select();
-    codigo.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(codigo.value);
-    
-    const btn = event.currentTarget;
-    const originalHtml = btn.innerHTML;
-    btn.innerHTML = '<i class="check icon"></i> Copiado';
-    setTimeout(() => { btn.innerHTML = originalHtml; }, 2000);
+  const codigo = document.getElementById("comunidad-codigo");
+  codigo.select();
+  codigo.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(codigo.value);
+
+  const btn = event.currentTarget;
+  const originalHtml = btn.innerHTML;
+  btn.innerHTML = '<i class="check icon"></i> Copiado';
+  setTimeout(() => {
+    btn.innerHTML = originalHtml;
+  }, 2000);
 }
 
 // --- ZONA DE PELIGRO (ACCIONES PROTEGIDAS) ---
 
 async function eliminarCuenta() {
-    // 1. Confirmación inicial
-    const result = await Swal.fire({
-        title: '¿Estás completamente seguro?',
-        text: "Esta acción eliminará tu cuenta permanentemente. No se puede deshacer.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        confirmButtonText: 'Continuar'
-    });
+  // 1. Confirmación inicial
+  const result = await Swal.fire({
+    title: "¿Estás completamente seguro?",
+    text: "Esta acción eliminará tu cuenta permanentemente. No se puede deshacer.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    confirmButtonText: "Continuar",
+  });
 
-    if (!result.isConfirmed) return;
+  if (!result.isConfirmed) return;
 
-    // 2. Pedir contraseña
-    const { value: password } = await Swal.fire({
-        title: 'Verificación de Seguridad',
-        text: 'Ingresa tu contraseña para confirmar la eliminación:',
-        input: 'password',
-        inputPlaceholder: 'Tu contraseña actual',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        confirmButtonText: 'Eliminar mi cuenta',
-        inputValidator: (value) => {
-            if (!value) return 'Debes ingresar tu contraseña';
-        }
-    });
+  // 2. Pedir contraseña
+  const { value: password } = await Swal.fire({
+    title: "Verificación de Seguridad",
+    text: "Ingresa tu contraseña para confirmar la eliminación:",
+    input: "password",
+    inputPlaceholder: "Tu contraseña actual",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    confirmButtonText: "Eliminar mi cuenta",
+    inputValidator: (value) => {
+      if (!value) return "Debes ingresar tu contraseña";
+    },
+  });
 
-    if (password) {
-        const token = localStorage.getItem('token');
-        try {
-            const res = await fetch('http://localhost:3000/api/auth/eliminar-cuenta', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ password: password }) 
-            });
+  if (password) {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(
+        "http://localhost:3000/api/auth/eliminar-cuenta",
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ password: password }),
+        },
+      );
 
-            if (res.ok) {
-                await Swal.fire('Eliminado', 'Tu cuenta ha sido eliminada.', 'success');
-                window.location.href = 'login.html';
-            } else {
-                const data = await res.json();
-                Swal.fire('Error', data.error || 'Contraseña incorrecta', 'error');
-            }
-        } catch (err) { console.error(err); }
+      if (res.ok) {
+        await Swal.fire("Eliminado", "Tu cuenta ha sido eliminada.", "success");
+        window.location.href = "login.html";
+      } else {
+        const data = await res.json();
+        Swal.fire("Error", data.error || "Contraseña incorrecta", "error");
+      }
+    } catch (err) {
+      console.error(err);
     }
+  }
 }
 
 async function transferirGestoria() {
-    // 1. Pedir Cédula
-    const { value: cedula } = await Swal.fire({
-        title: 'Transferir Gestoría',
-        text: 'Ingresa la Cédula del habitante al que cederás tu puesto.',
-        input: 'text',
-        inputPlaceholder: 'Ej: V-12345678',
-        showCancelButton: true,
-        confirmButtonText: 'Siguiente',
-        inputValidator: (value) => {
-            if (!value) return 'Debes escribir una cédula';
-        }
-    });
+  // 1. Pedir Cédula
+  const { value: cedula } = await Swal.fire({
+    title: "Transferir Gestoría",
+    text: "Ingresa la Cédula del habitante al que cederás tu puesto.",
+    input: "text",
+    inputPlaceholder: "Ej: V-12345678",
+    showCancelButton: true,
+    confirmButtonText: "Siguiente",
+    inputValidator: (value) => {
+      if (!value) return "Debes escribir una cédula";
+    },
+  });
 
-    if (!cedula) return;
+  if (!cedula) return;
 
-    // 2. Pedir Contraseña
-    const { value: password } = await Swal.fire({
-        title: 'Confirmar Transferencia',
-        text: `Vas a ceder tus permisos a la cédula: ${cedula}. Ingresa tu contraseña para confirmar:`,
-        input: 'password',
-        inputPlaceholder: 'Tu contraseña actual',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        confirmButtonText: 'Transferir Cargo',
-        inputValidator: (value) => {
-            if (!value) return 'Debes ingresar tu contraseña';
-        }
-    });
+  // 2. Pedir Contraseña
+  const { value: password } = await Swal.fire({
+    title: "Confirmar Transferencia",
+    text: `Vas a ceder tus permisos a la cédula: ${cedula}. Ingresa tu contraseña para confirmar:`,
+    input: "password",
+    inputPlaceholder: "Tu contraseña actual",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    confirmButtonText: "Transferir Cargo",
+    inputValidator: (value) => {
+      if (!value) return "Debes ingresar tu contraseña";
+    },
+  });
 
-    if (password) {
-        const token = localStorage.getItem('token');
-        try {
-            const res = await fetch('http://localhost:3000/api/comunidad/transferir', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ cedulaNuevoGestor: cedula, password: password })
-            });
+  if (password) {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(
+        "http://localhost:3000/api/comunidad/transferir",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            cedulaNuevoGestor: cedula,
+            password: password,
+          }),
+        },
+      );
 
-            if (res.ok) {
-                await Swal.fire('Transferencia Exitosa', 'Has cedido tu cargo. Serás redirigido al inicio de sesión.', 'success');
-                cerrarSesion();
-            } else {
-                const data = await res.json();
-                Swal.fire('Error', data.error || 'Contraseña incorrecta', 'error');
-            }
-        } catch (err) { console.error(err); }
+      if (res.ok) {
+        await Swal.fire(
+          "Transferencia Exitosa",
+          "Has cedido tu cargo. Serás redirigido al inicio de sesión.",
+          "success",
+        );
+        cerrarSesion();
+      } else {
+        const data = await res.json();
+        Swal.fire("Error", data.error || "Contraseña incorrecta", "error");
+      }
+    } catch (err) {
+      console.error(err);
     }
+  }
 }
 
 async function salirDeComunidad() {
-    const usuario = JSON.parse(localStorage.getItem('usuario'));
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-    // VERIFICACIÓN DE GESTOR: Bloquear salida si es administrador
-    if (usuario.rol === 'ENCARGADO_COMUNIDAD' || usuario.rol === 'ADMINISTRADOR') {
-        return Swal.fire({
-            icon: 'error',
-            title: 'Acción no permitida',
-            text: 'Como Gestor, no puedes abandonar la comunidad directamente. Debes transferir tu cargo a otro habitante o eliminar tu cuenta.'
-        });
-    }
-
-    // 1. Confirmación inicial
-    const result = await Swal.fire({
-        title: '¿Salir de la comunidad?',
-        text: "Dejarás de tener acceso a los datos de este condominio, pero tu cuenta de usuario seguirá existiendo.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        confirmButtonText: 'Sí, quiero salir'
+  // VERIFICACIÓN DE GESTOR: Bloquear salida si es administrador
+  if (
+    usuario.rol === "ENCARGADO_COMUNIDAD" ||
+    usuario.rol === "ADMINISTRADOR"
+  ) {
+    return Swal.fire({
+      icon: "error",
+      title: "Acción no permitida",
+      text: "Como Gestor, no puedes abandonar la comunidad directamente. Debes transferir tu cargo a otro habitante o eliminar tu cuenta.",
     });
+  }
 
-    if (!result.isConfirmed) return;
+  // 1. Confirmación inicial
+  const result = await Swal.fire({
+    title: "¿Salir de la comunidad?",
+    text: "Dejarás de tener acceso a los datos de este condominio, pero tu cuenta de usuario seguirá existiendo.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    confirmButtonText: "Sí, quiero salir",
+  });
 
-    // 2. Pedir contraseña
-    const { value: password } = await Swal.fire({
-        title: 'Confirmar Salida',
-        text: 'Por seguridad, ingresa tu contraseña para confirmar:',
-        input: 'password',
-        inputPlaceholder: 'Tu contraseña actual',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        confirmButtonText: 'Confirmar Salida',
-        inputValidator: (value) => {
-            if (!value) return 'Debes ingresar tu contraseña';
-        }
-    });
+  if (!result.isConfirmed) return;
 
-    if (password) {
-        const token = localStorage.getItem('token');
-        try {
-            const res = await fetch('http://localhost:3000/api/comunidad/salir', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ password: password })
-            });
+  // 2. Pedir contraseña
+  const { value: password } = await Swal.fire({
+    title: "Confirmar Salida",
+    text: "Por seguridad, ingresa tu contraseña para confirmar:",
+    input: "password",
+    inputPlaceholder: "Tu contraseña actual",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    confirmButtonText: "Confirmar Salida",
+    inputValidator: (value) => {
+      if (!value) return "Debes ingresar tu contraseña";
+    },
+  });
 
-            if (res.ok) {
-                await Swal.fire('Listo', 'Has salido de la comunidad. Serás redirigido.', 'success');
-                // Cerrar sesión y redirigir
-                localStorage.removeItem('token');
-                localStorage.removeItem('usuario');
-                window.location.href = 'login.html';
-            } else {
-                const data = await res.json();
-                Swal.fire('Error', data.error || 'Contraseña incorrecta', 'error');
-            }
-        } catch (err) { console.error(err); }
+  if (password) {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch("http://localhost:3000/api/comunidad/salir", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ password: password }),
+      });
+
+      if (res.ok) {
+        await Swal.fire(
+          "Listo",
+          "Has salido de la comunidad. Serás redirigido.",
+          "success",
+        );
+        // Cerrar sesión y redirigir
+        localStorage.removeItem("token");
+        localStorage.removeItem("usuario");
+        window.location.href = "login.html";
+      } else {
+        const data = await res.json();
+        Swal.fire("Error", data.error || "Contraseña incorrecta", "error");
+      }
+    } catch (err) {
+      console.error(err);
     }
+  }
 }
